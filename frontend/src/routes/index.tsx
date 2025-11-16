@@ -2,11 +2,14 @@ import { lazy, Suspense, type ReactNode } from "react"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import { useAuth } from "../context/authContext"
 import Layout from "../components/Layout"
+import { WorkspaceProvider } from "../context/workspaceContext"
 
 const Index = lazy(() => import("../pages"))
 const Login = lazy(() => import("../pages/Login"))
 const Register = lazy(() => import("../pages/Register"))
 const Home = lazy(() => import("../pages/Home"))
+const Workspaces = lazy(() => import("../pages/Workspaces"))
+
 
 
 type RequireAuthTypes = { children: ReactNode; roles?: string[] }
@@ -60,7 +63,16 @@ export default function Router() {
             }
           >
             <Route path="/home" element={<Home />} />
-            
+            <Route path="/home" element={<Home />} />
+            <Route
+              path="/workspaces"
+              element={
+                <WorkspaceProvider>
+                  <Workspaces />
+                </WorkspaceProvider>
+              }
+            />
+
           </Route>
         </Routes>
       </Suspense>

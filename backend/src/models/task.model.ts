@@ -16,23 +16,29 @@ export enum TaskStatus {
 export interface ITask extends Document {
   title: string;
   description?: string;
-  workspaceId: mongoose.Types.ObjectId;
+  workspaceId?: mongoose.Types.ObjectId | null;
   createdBy: mongoose.Types.ObjectId;
-  assignedTo?: mongoose.Types.ObjectId;
+  assignedTo?: mongoose.Types.ObjectId | null;
   priority: TaskPriority;
   tags?: string[];
   dueDate?: Date;
   status: TaskStatus;
+
   subtasks?: {
     title: string;
     completed: boolean;
   }[];
-  attachments?: string[];
+
+  attachments?: {
+    resourceId: mongoose.Types.ObjectId; // linking to Resource model
+  }[];
+
   comments?: {
     userId: mongoose.Types.ObjectId;
     message: string;
     createdAt?: Date;
   }[];
+
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -40,21 +46,40 @@ export interface ITask extends Document {
 const taskSchema = new Schema<ITask>(
   {
     title: { type: String, required: true },
-    description: { type: String },
-    workspaceId: { type: Schema.Types.ObjectId, ref: "Workspace", required: true },
+    description: String,
+
+    workspaceId: { type: Schema.Types.ObjectId, ref: "Workspace", default: null },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    assignedTo: { type: Schema.Types.ObjectId, ref: "User" },
-    priority: { type: String, enum: Object.values(TaskPriority), default: TaskPriority.MEDIUM },
+    assignedTo: { type: Schema.Types.ObjectId, ref: "User", default: null },
+
+    priority: {
+      type: String,
+      enum: Object.values(TaskPriority),
+      default: TaskPriority.MEDIUM,
+    },
+
     tags: [{ type: String }],
-    dueDate: { type: Date },
-    status: { type: String, enum: Object.values(TaskStatus), default: TaskStatus.TODO },
+    dueDate: Date,
+
+    status: {
+      type: String,
+      enum: Object.values(TaskStatus),
+      default: TaskStatus.TODO,
+    },
+
     subtasks: [
       {
         title: String,
         completed: { type: Boolean, default: false },
       },
     ],
-    attachments: [String],
+
+    attachments: [
+      {
+        resourceId: { type: Schema.Types.ObjectId, ref: "Resource" },
+      },
+    ],
+
     comments: [
       {
         userId: { type: Schema.Types.ObjectId, ref: "User" },
@@ -65,5 +90,8 @@ const taskSchema = new Schema<ITask>(
   },
   { timestamps: true }
 );
+
+taskSchema.index({ workspaceId: 1 });
+taskSchema.index({ assignedTo: 1 });
 
 export const Task = mongoose.model<ITask>("Task", taskSchema);

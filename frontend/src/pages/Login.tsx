@@ -45,7 +45,7 @@ export default function Login() {
 
         Toast.fire({
             icon: "success",
-            title: `Welcome back, ${resData.data.firstname}!`
+            title: `Welcome back, ${resData.data.name}!`
         });
 
         navigate("/home")

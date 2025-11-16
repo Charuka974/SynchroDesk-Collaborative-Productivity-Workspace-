@@ -9,6 +9,7 @@ export enum NotificationType {
 
 export interface INotification extends Document {
   userId: mongoose.Types.ObjectId;
+  workspaceId?: mongoose.Types.ObjectId;
   type: NotificationType;
   message: string;
   link?: string;
@@ -20,6 +21,7 @@ export interface INotification extends Document {
 const notificationSchema = new Schema<INotification>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    workspaceId: { type: Schema.Types.ObjectId, ref: "Workspace" },
     type: { type: String, enum: Object.values(NotificationType), required: true },
     message: { type: String, required: true },
     link: { type: String },
@@ -28,4 +30,9 @@ const notificationSchema = new Schema<INotification>(
   { timestamps: true }
 );
 
-export const Notification = mongoose.model<INotification>("Notification", notificationSchema);
+notificationSchema.index({ userId: 1, read: 1 });
+
+export const Notification = mongoose.model<INotification>(
+  "Notification",
+  notificationSchema
+);

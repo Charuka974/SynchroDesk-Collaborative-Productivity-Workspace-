@@ -114,31 +114,39 @@ Additional: Socket.io (real-time), Stripe (payments), Cloudinary (files), JWT (a
 
 ---
 
+Ah! I see what happened — the folder tree lost its formatting because Markdown requires **triple backticks and proper indentation** for code blocks. Here's a clean, readable version for your README:
+
+```markdown
 ## 🗂️ Folder Structure
+
+```
 
 synchro-desk-cpw/
 ├── client/
-│ ├── public/
-│ └── src/
-│ ├── components/
-│ ├── pages/
-│ ├── redux/
-│ ├── hooks/
-│ ├── utils/
-│ └── styles/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── redux/
+│       ├── hooks/
+│       ├── utils/
+│       └── styles/
 ├── server/
-│ └── src/
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ ├── middleware/
-│ ├── utils/
-│ ├── config/
-│ └── sockets/
+│   └── src/
+│       ├── controllers/
+│       ├── models/
+│       ├── routes/
+│       ├── middleware/
+│       ├── utils/
+│       ├── config/
+│       └── sockets/
 ├── node_modules/
 ├── .env
 ├── package.json
 └── README.md
+
+```
+```
 
 
 ---

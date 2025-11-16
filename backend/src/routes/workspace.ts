@@ -1,17 +1,27 @@
-// import { Router } from "express"
-// import { authenticate } from "../middleware/auth"
-// import {
-//   createWorkspace,
-//   inviteMember,
-//   removeMember,
-//   getMyWorkspaces
-// } from "../controllers/workspace.controller"
+import { Router } from "express";
+import { authenticate } from "../middleware/auth";
+import {
+  createWorkspace,
+  inviteMember,
+  removeMember,
+  getMyWorkspaces,
+  getWorkspace,
+  updateWorkspace,
+  deleteWorkspace
+} from "../controllers/workspace.controller";
 
-// const router = Router()
+const router = Router();
 
-// router.post("/", authenticate, createWorkspace)
-// router.post("/:id/invite", authenticate, inviteMember)
-// router.delete("/:id/remove/:userId", authenticate, removeMember)
-// router.get("/mine", authenticate, getMyWorkspaces)
+// Workspace CRUD
+router.post("/", authenticate, createWorkspace);
+router.get("/mine", authenticate, getMyWorkspaces);
+router.get("/:id", authenticate, getWorkspace);
+router.put("/:id", authenticate, updateWorkspace);
+router.delete("/:id", authenticate, deleteWorkspace);
 
-// export default router
+// Members
+router.post("/:id/members", authenticate, inviteMember);
+router.delete("/:id/members/:userId", authenticate, removeMember);
+
+export default router;
+ 
