@@ -1,0 +1,3 @@
+// ✔ sendMessage()
+// ✔ getMessagesByChannel()
+// ✔ getDirectMessages()

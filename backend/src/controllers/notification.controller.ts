@@ -1,0 +1,4 @@
+// ✔ getMyNotifications()
+// ✔ markAsRead()
+// ✔ markAllAsRead()
+// ✔ deleteNotification()

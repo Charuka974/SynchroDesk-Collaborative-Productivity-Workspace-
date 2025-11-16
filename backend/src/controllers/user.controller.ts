@@ -1,0 +1,7 @@
+// ✔ getMyDetails()
+// ✔ updateProfile()
+// ✔ updatePassword()
+// ✔ uploadAvatar()
+// ✔ deleteUser()
+// ✔ adminGetAllUsers() (admin)
+// ✔ adminUpdateUserRole() (admin)
