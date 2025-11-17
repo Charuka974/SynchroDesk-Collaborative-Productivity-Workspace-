@@ -12,7 +12,7 @@ type WorkspaceContextType = {
   setWorkspaces: (ws: Workspace[]) => void;
   activeWorkspace: Workspace | null;
   setActiveWorkspace: (ws: Workspace) => void;
-};
+}; 
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
 

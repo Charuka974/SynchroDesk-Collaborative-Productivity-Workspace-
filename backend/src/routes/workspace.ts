@@ -12,16 +12,19 @@ import {
 
 const router = Router();
 
-// Workspace CRUD
+// ─────────────────────────────
+// WORKSPACE CRUD ROUTES
+// ─────────────────────────────
 router.post("/", authenticate, createWorkspace);
 router.get("/mine", authenticate, getMyWorkspaces);
 router.get("/:id", authenticate, getWorkspace);
 router.put("/:id", authenticate, updateWorkspace);
 router.delete("/:id", authenticate, deleteWorkspace);
 
-// Members
-router.post("/:id/members", authenticate, inviteMember);
-router.delete("/:id/members/:userId", authenticate, removeMember);
+// ─────────────────────────────
+// MEMBER MANAGEMENT ROUTES
+// ─────────────────────────────
+router.post("/:id/invite", authenticate, inviteMember);
+router.delete("/:id/remove/:userId", authenticate, removeMember);
 
 export default router;
- 

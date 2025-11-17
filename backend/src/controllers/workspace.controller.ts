@@ -5,6 +5,8 @@
 // ✔ getWorkspaceById()
 // ✔ changeWorkspaceRole()
 // ✔ leaveWorkspace()
+// ✔ inviteMember()
+// ✔ removeMember()
 
 import { Request, Response } from "express";
 import mongoose from "mongoose";
@@ -18,18 +20,24 @@ import { AUthRequest } from "../middleware/auth";
 export const createWorkspace = async (req: AUthRequest, res: Response) => {
   try {
     const { name, description } = req.body;
-    const ownerId = req.user?._id; // set by authenticate middleware
+    const ownerId = req.user?.sub; // set by authenticate middleware
 
     if (!name) return res.status(400).json({ message: "Workspace name is required" });
 
     const workspace = new Workspace({
-      name,
+      name, 
       description,
       owner: ownerId,
       members: [{ userId: ownerId, role: WorkspaceRole.OWNER }],
     });
 
     await workspace.save();
+
+    // Add workspace ID to user
+    await User.findByIdAndUpdate(ownerId, {
+      $push: { workspaceIds: workspace._id },
+    });
+
     return res.status(201).json(workspace);
   } catch (error) {
     console.error(error);
@@ -42,13 +50,42 @@ export const createWorkspace = async (req: AUthRequest, res: Response) => {
 // -------------------------
 export const getMyWorkspaces = async (req: AUthRequest, res: Response) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.sub;
 
-    const workspaces = await Workspace.find({
+    const workspaces = await Workspace.find({ 
       "members.userId": userId,
-    });
+    }); // lean() makes them plain objects
 
-    res.status(200).json(workspaces);
+    const populatedWorkspaces = await Promise.all(
+      workspaces.map(async (ws) => {
+        const members = await Promise.all(
+          ws.members.map(async (m) => {
+            const user = await User.findById(m.userId).lean();
+            return {
+              id: m.userId.toString(),
+              name: user?.name ?? "Unknown",
+              email: user?.email ?? "",
+              role: m.role,
+            };
+          })
+        );
+
+        return {
+          id: ws._id?.toString()??"Invalid Workspace",
+          name: ws.name,
+          description: ws.description,
+          color: ws.settings?.color??"indigo",
+          role: ws.members.find(m => m.userId.toString() === userId)?.role ?? "MEMBER",
+          taskCount: ws.taskCount ?? 0,
+          createdAt: ws.createdAt,
+          members,
+        };
+      })
+    );
+
+    res.status(200).json(populatedWorkspaces);
+
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error fetching workspaces" });
@@ -71,7 +108,7 @@ export const getWorkspace = async (req: AUthRequest, res: Response) => {
 
     // Check membership
     const isMember = workspace.members.some(
-      (m) => m.userId.toString() === req.user?._id.toString()
+      (m) => m.userId.toString() === req.user?.sub.toString()
     );
     if (!isMember) return res.status(403).json({ message: "Access denied" });
 
@@ -95,7 +132,7 @@ export const updateWorkspace = async (req: AUthRequest, res: Response) => {
 
     // Only owner or admin can update
     const member = workspace.members.find(
-      (m) => m.userId.toString() === req.user?._id.toString()
+      (m) => m.userId.toString() === req.user?.sub.toString()
     );
     if (!member || (member.role !== WorkspaceRole.OWNER && member.role !== WorkspaceRole.ADMIN))
       return res.status(403).json({ message: "Permission denied" });
@@ -123,7 +160,7 @@ export const deleteWorkspace = async (req: AUthRequest, res: Response) => {
     if (!workspace) return res.status(404).json({ message: "Workspace not found" });
 
     // Only owner can delete
-    if (workspace.owner.toString() !== req.user?._id.toString())
+    if (workspace.owner.toString() !== req.user?.sub.toString())
       return res.status(403).json({ message: "Only owner can delete workspace" });
 
     await workspace.deleteOne();
@@ -147,9 +184,8 @@ export const inviteMember = async (req: AUthRequest, res: Response) => {
     const workspace = await Workspace.findById(id);
     if (!workspace) return res.status(404).json({ message: "Workspace not found" });
 
-    // Only owner/admin
     const member = workspace.members.find(
-      (m) => m.userId.toString() === req.user?._id.toString()
+      (m) => m.userId.toString() === req.user?.sub.toString()
     );
     if (!member || (member.role !== WorkspaceRole.OWNER && member.role !== WorkspaceRole.ADMIN))
       return res.status(403).json({ message: "Permission denied" });
@@ -157,24 +193,35 @@ export const inviteMember = async (req: AUthRequest, res: Response) => {
     const userToInvite = await User.findOne({ email });
     if (!userToInvite) return res.status(404).json({ message: "User not found" });
 
-    // Check if already member
     const alreadyMember = workspace.members.some(
       (m) => m.userId.toString() === userToInvite._id.toString()
     );
     if (alreadyMember) return res.status(400).json({ message: "User already in workspace" });
 
+    // Add to members
     workspace.members.push({
       userId: userToInvite._id,
       role: role || WorkspaceRole.MEMBER,
     });
 
+    // Track invited users
+    workspace.invitedUsers = workspace.invitedUsers || [];
+    workspace.invitedUsers.push(userToInvite._id);
+
     await workspace.save();
+
+    // Add workspace to user's workspaceIds
+    await User.findByIdAndUpdate(userToInvite._id, {
+      $addToSet: { workspaceIds: workspace._id },
+    });
+
     res.status(200).json({ message: "Member invited successfully", workspace });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error inviting member" });
   }
 };
+
 
 // -------------------------
 // REMOVE MEMBER
@@ -188,7 +235,7 @@ export const removeMember = async (req: AUthRequest, res: Response) => {
 
     // Only owner/admin
     const member = workspace.members.find(
-      (m) => m.userId.toString() === req.user?._id.toString()
+      (m) => m.userId.toString() === req.user?.sub.toString()
     );
     if (!member || (member.role !== WorkspaceRole.OWNER && member.role !== WorkspaceRole.ADMIN))
       return res.status(403).json({ message: "Permission denied" });

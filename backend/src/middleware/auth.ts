@@ -19,7 +19,7 @@ export const authenticate = (
     return res.status(401).json({ message: "No token provided" })
   }
   // Bearer dgcfhvgjygukhiluytkuy
-  const token = authHeader.split(" ")[1] // ["Bearer", "dgcfhvgjygukhiluytkuy"]
+  const token = authHeader.split(" ")[1]
 
   try {
     const payload = jwt.verify(token, JWT_SECRET)
@@ -28,6 +28,7 @@ export const authenticate = (
     //   roles: user.roles
     // }
     req.user = payload
+
     next()
   } catch (err) {
     console.error(err)

@@ -2,7 +2,10 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
+
 import authRouter from "./routes/auth"
+import workspaceRouter from "./routes/workspace"
+
 import { authenticate } from "./middleware/auth"
 import { requireRole } from "./middleware/role"
 import { Role } from "./models/user.model"
@@ -23,11 +26,11 @@ app.use(
 
 app.use("/api/v1/auth", authRouter)
 
+// protected workspace routes
+app.use("/api/v1/workspaces", authenticate, workspaceRouter)
+
 // public
 app.get("/test-1", (req, res) => {})
-
-// protected
-app.get("/test-2", authenticate, (req, res) => {})
 
 // admin only
 app.get("/test-3", authenticate, requireRole([Role.ADMIN]), (req, res) => {})

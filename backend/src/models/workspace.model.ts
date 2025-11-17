@@ -20,10 +20,13 @@ export interface IWorkspace extends Document {
   isArchived?: boolean;
 
   settings?: {
-    theme: "light" | "dark";
+    theme: "light" | "dark"; 
+    color?: string;
     allowUploads: boolean;
     notifications: boolean;
   };
+
+  taskCount?: number;  
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -51,9 +54,12 @@ const workspaceSchema = new Schema<IWorkspace>(
 
     settings: {
       theme: { type: String, default: "light" },
+      color: { type: String, default: "indigo" },
       allowUploads: { type: Boolean, default: true },
       notifications: { type: Boolean, default: true },
     },
+    
+    taskCount: { type: Number, default: 0 },
 
     isArchived: { type: Boolean, default: false },
   },

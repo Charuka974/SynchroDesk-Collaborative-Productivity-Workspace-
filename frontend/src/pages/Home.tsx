@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import Sidebar from "../components/Sidebar"
+import { useAuth } from "../context/authContext"
 
 export default function SynchroDeskDashboard() {
 
@@ -30,11 +30,7 @@ export default function SynchroDeskDashboard() {
   const [activeFilter, setActiveFilter] = useState("all")
 
   // Mock user data
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar: "JD"
-  }
+  const { user, setUser } = useAuth()
 
   const handleSaveNote = () => {
     if (notes.trim()) {
@@ -65,7 +61,7 @@ export default function SynchroDeskDashboard() {
   }
 
   const handleLogout = () => {
-    // setUser(null)
+    setUser(null)
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     navigate("/login")
@@ -97,8 +93,8 @@ export default function SynchroDeskDashboard() {
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}! 👋</h1>
-            <p className="text-gray-600 mt-1">Here's what's happening with your projects today</p>
+            <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}</h1>
+            <p className="text-gray-600 mt-1">Here's what's happening today</p>
           </div>
           <div className="flex items-center gap-3">
             <button className="p-2 hover:bg-gray-100 rounded-lg transition relative">
@@ -118,7 +114,7 @@ export default function SynchroDeskDashboard() {
             </div>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+              className="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-700 transition font-medium"
             >
               Logout
             </button>
