@@ -7,6 +7,7 @@ export enum WorkspaceRole {
 }
 
 export interface IWorkspace extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   description?: string;
   owner: mongoose.Types.ObjectId;

@@ -1,27 +1,73 @@
-// workspaceContext.tsx
-import { createContext, useContext, useState, type ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { getMyWorkspacesAPI, createWorkspaceAPI } from "../services/workspace";
 
-export type Workspace = {
-  id: string;
+interface Member {
+  userId: string;
+  role: string;
+}
+
+export interface Workspace {
+  _id: string;
   name: string;
   description?: string;
-};
+  owner: string;
+  members: Member[];
+  invitedUsers?: string[];
+  isArchived?: boolean;
+  settings?: { theme: string; allowUploads: boolean; notifications: boolean };
+}
 
-type WorkspaceContextType = {
+interface WorkspaceContextType {
   workspaces: Workspace[];
-  setWorkspaces: (ws: Workspace[]) => void;
-  activeWorkspace: Workspace | null;
-  setActiveWorkspace: (ws: Workspace) => void;
-}; 
+  currentWorkspace?: Workspace;
+  loading: boolean;
+  error?: string;
+  fetchWorkspaces: () => void;
+  selectWorkspace: (workspace: Workspace) => void;
+  createWorkspace: (name: string, description?: string) => void;
+}
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
 
 export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | undefined>();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>();
+
+  const fetchWorkspaces = async () => {
+    setLoading(true);
+    try {
+      const data = await getMyWorkspacesAPI();
+      setWorkspaces(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch workspaces");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectWorkspace = (workspace: Workspace) => {
+    setCurrentWorkspace(workspace);
+  };
+
+  const createWorkspace = async (name: string, description?: string) => {
+    try {
+      const newWorkspace = await createWorkspaceAPI({ name, description });
+      setWorkspaces((prev) => [...prev, newWorkspace]);
+    } catch (err: any) {
+      setError(err.message || "Failed to create workspace");
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkspaces();
+  }, []);
 
   return (
-    <WorkspaceContext.Provider value={{ workspaces, setWorkspaces, activeWorkspace, setActiveWorkspace }}>
+    <WorkspaceContext.Provider
+      value={{ workspaces, currentWorkspace, loading, error, fetchWorkspaces, selectWorkspace, createWorkspace }}
+    >
       {children}
     </WorkspaceContext.Provider>
   );

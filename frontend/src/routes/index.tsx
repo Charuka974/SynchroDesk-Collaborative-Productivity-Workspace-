@@ -9,6 +9,8 @@ const Login = lazy(() => import("../pages/Login"))
 const Register = lazy(() => import("../pages/Register"))
 const Home = lazy(() => import("../pages/Home"))
 const Workspaces = lazy(() => import("../pages/Workspaces"))
+const SelectedWorkspace = lazy(() => import("../pages/SelectedWorkspace"))
+const Tasks = lazy(() => import("../pages/Tasks"))
 
 
 
@@ -63,7 +65,7 @@ export default function Router() {
             }
           >
             <Route path="/home" element={<Home />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/tasks" element={<Tasks />} />
             <Route
               path="/workspaces"
               element={
@@ -72,8 +74,16 @@ export default function Router() {
                 </WorkspaceProvider>
               }
             />
+            <Route
+              path="/selected-workspace"
+              element={
+                <WorkspaceProvider>
+                  <SelectedWorkspace />
+                </WorkspaceProvider>
+              }
+            />
+            </Route>
 
-          </Route>
         </Routes>
       </Suspense>
     </BrowserRouter>

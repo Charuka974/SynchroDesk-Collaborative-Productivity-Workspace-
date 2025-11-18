@@ -1,8 +1,24 @@
-import { useState, useEffect, type SetStateAction } from "react"
-import { changeRoleAPI, createWorkspaceAPI, deleteWorkspaceAPI, getMyWorkspacesAPI, inviteMemberAPI, leaveWorkspaceAPI, removeMemberAPI, updateWorkspaceAPI } from "../services/workspace";
-import Swal from "sweetalert2"
+import { useState, useEffect } from "react";
+import {
+  changeRoleAPI,
+  createWorkspaceAPI,
+  deleteWorkspaceAPI,
+  getMyWorkspacesAPI,
+  inviteMemberAPI,
+  leaveWorkspaceAPI,
+  removeMemberAPI,
+  updateWorkspaceAPI,
+} from "../services/workspace";
+import Swal from "sweetalert2";
+import { useAuth } from "../context/authContext";
+
+import { useNavigate } from "react-router-dom"
+
+
 
 export default function WorkspacesPage() {
+  const navigate = useNavigate()
+  
   type Member = {
     id: string;
     name: string;
@@ -22,25 +38,29 @@ export default function WorkspacesPage() {
   };
 
   // Toast notification
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end", // top-right
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-    });
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end", // top-right
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+  });
 
   // ----------------------
   // State
   // ----------------------
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
+    null
+  );
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
 
-  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
+    null
+  );
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -54,54 +74,8 @@ export default function WorkspacesPage() {
   const [editDescription, setEditDescription] = useState("");
 
   // Current user
-  const currentUser = { id: "user1", name: "John Doe", email: "john@example.com" };
+  const currentUser = useAuth();
 
-
-  // useEffect(() => {
-  //   const mockWorkspaces = [
-  //     {
-  //       id: "1",
-  //       name: "Marketing Team",
-  //       description: "All marketing campaigns and content",
-  //       role: "admin",
-  //       members: [
-  //         { id: "1", name: "John Doe", email: "john@example.com", role: "admin" },
-  //         { id: "2", name: "Jane Smith", email: "jane@example.com", role: "member" },
-  //         { id: "3", name: "Bob Wilson", email: "bob@example.com", role: "member" },
-  //       ],
-  //       createdAt: "2024-10-15",
-  //       taskCount: 24,
-  //       color: "indigo"
-  //     },
-  //     {
-  //       id: "2",
-  //       name: "Product Development",
-  //       description: "Product roadmap and development tasks",
-  //       role: "admin",
-  //       members: [
-  //         { id: "1", name: "John Doe", email: "john@example.com", role: "admin" },
-  //         { id: "4", name: "Alice Brown", email: "alice@example.com", role: "member" },
-  //       ],
-  //       createdAt: "2024-09-20",
-  //       taskCount: 45,
-  //       color: "purple"
-  //     },
-  //     {
-  //       id: "3",
-  //       name: "Design Team",
-  //       description: "UI/UX design and brand assets",
-  //       role: "member",
-  //       members: [
-  //         { id: "5", name: "Charlie Green", email: "charlie@example.com", role: "admin" },
-  //         { id: "1", name: "John Doe", email: "john@example.com", role: "member" },
-  //       ],
-  //       createdAt: "2024-11-01",
-  //       taskCount: 12,
-  //       color: "pink"
-  //     },
-  //   ]
-  //   setWorkspaces(mockWorkspaces)
-  // }, [])
   useEffect(() => {
     const fetchWorkspaces = async () => {
       try {
@@ -111,7 +85,7 @@ export default function WorkspacesPage() {
         console.error(error);
         Toast.fire({
           icon: "error",
-          title: "Error fetching workspaces"
+          title: "Error fetching workspaces",
         });
       }
     };
@@ -119,35 +93,11 @@ export default function WorkspacesPage() {
     fetchWorkspaces();
   }, []);
 
-
-  // const handleCreateWorkspace = () => {
-  //   if (!newWorkspaceName.trim()) {
-  //     alert("Please enter a workspace name");
-  //     return;
-  //   }
-
-  //   const newWS: Workspace = {
-  //     id: Date.now().toString(),
-  //     name: newWorkspaceName,
-  //     description: newWorkspaceDescription,
-  //     role: "admin",
-  //     members: [{ ...currentUser, role: "admin" }],
-  //     createdAt: new Date().toISOString().split("T")[0],
-  //     taskCount: 0,
-  //     color: ["indigo", "purple", "pink", "blue", "green"][Math.floor(Math.random() * 5)]
-  //   };
-
-  //   setWorkspaces(prev => [...prev, newWS]);
-  //   setNewWorkspaceName("");
-  //   setNewWorkspaceDescription("");
-  //   setShowCreateModal(false);
-  //   alert("Workspace created successfully!");
-  // };
   const handleCreateWorkspace = async () => {
     if (!newWorkspaceName.trim()) {
       Toast.fire({
         icon: "warning",
-        title: "Please enter a workspace name"
+        title: "Please enter a workspace name",
       });
       return;
     }
@@ -158,50 +108,30 @@ export default function WorkspacesPage() {
         description: newWorkspaceDescription,
       });
 
-      setWorkspaces(prev => [...prev, newWS]);
+      setWorkspaces((prev) => [...prev, newWS]);
       setShowCreateModal(false);
       setNewWorkspaceName("");
       setNewWorkspaceDescription("");
 
       Toast.fire({
         icon: "success",
-        title: "Workspace created successfully!"
+        title: "Workspace created successfully!",
       });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error creating workspace"
+        title: "Error creating workspace",
       });
     }
   };
 
-
-  // const handleUpdateWorkspace = () => {
-  //   if (!selectedWorkspace) return;
-
-  //   if (!editName.trim()) {
-  //     alert("Please enter a workspace name");
-  //     return;
-  //   }
-
-  //   setWorkspaces(ws =>
-  //     ws.map(w =>
-  //       w.id === selectedWorkspace.id
-  //         ? { ...w, name: editName, description: editDescription }
-  //         : w
-  //     )
-  //   );
-
-  //   setShowSettingsModal(false);
-  //   alert("Workspace updated successfully!");
-  // };
   const handleUpdateWorkspace = async () => {
     if (!selectedWorkspace) return;
     if (!editName.trim()) {
       Toast.fire({
         icon: "warning",
-        title: "Please enter a workspace name"
+        title: "Please enter a workspace name",
       });
       return;
     }
@@ -212,46 +142,34 @@ export default function WorkspacesPage() {
         description: editDescription,
       });
 
-      setWorkspaces(ws =>
-        ws.map(w => (w.id === updatedWS.id ? updatedWS : w))
+      setWorkspaces((ws) =>
+        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
       );
 
       setShowSettingsModal(false);
       Toast.fire({
         icon: "success",
-        title: "Workspace updated successfully!"
+        title: "Workspace updated successfully!",
       });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error updating workspace"
+        title: "Error updating workspace",
       });
     }
   };
 
-
-  // const handleDeleteWorkspace = () => {
-  //   if (!selectedWorkspace) return;
-
-  //   if (selectedWorkspace.role !== "admin") {
-  //     alert("Only admins can delete workspaces");
-  //     return;
-  //   }
-
-  //   if (window.confirm(`Are you sure you want to delete "${selectedWorkspace.name}"?`)) {
-  //     setWorkspaces(ws => ws.filter(w => w.id !== selectedWorkspace.id));
-  //     setShowSettingsModal(false);
-  //     alert("Workspace deleted successfully!");
-  //   }
-  // };
   const handleDeleteWorkspace = async () => {
     if (!selectedWorkspace) return;
 
-    if (selectedWorkspace.role !== "ADMIN" && selectedWorkspace.role !== "OWNER") {
+    if (
+      selectedWorkspace.role !== "ADMIN" &&
+      selectedWorkspace.role !== "OWNER"
+    ) {
       Toast.fire({
         icon: "warning",
-        title: "Only admins can delete workspaces"
+        title: "Only admins can delete workspaces",
       });
       return;
     }
@@ -260,109 +178,72 @@ export default function WorkspacesPage() {
 
     try {
       await deleteWorkspaceAPI(selectedWorkspace.id);
-      setWorkspaces(ws => ws.filter(w => w.id !== selectedWorkspace.id));
+      setWorkspaces((ws) => ws.filter((w) => w.id !== selectedWorkspace.id));
       setShowSettingsModal(false);
 
       Toast.fire({
         icon: "success",
-        title: "Workspace deleted successfully!"
+        title: "Workspace deleted successfully!",
       });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error deleting workspace"
+        title: "Error deleting workspace",
       });
     }
   };
 
-
-  // const handleLeaveWorkspace = () => {
-  //   if (!selectedWorkspace) return;
-
-  //   if (selectedWorkspace.role === "admin") {
-  //     alert("Admins cannot leave the workspace.");
-  //     return;
-  //   }
-
-  //   if (window.confirm(`Are you sure you want to leave "${selectedWorkspace.name}"?`)) {
-  //     setWorkspaces(ws => ws.filter(w => w.id !== selectedWorkspace.id));
-  //     setShowSettingsModal(false);
-  //     alert("You left the workspace");
-  //   }
-  // };
   const handleLeaveWorkspace = async () => {
     if (!selectedWorkspace) return;
 
     if (selectedWorkspace.role === "ADMIN") {
       Toast.fire({
         icon: "warning",
-        title: "Admins cannot leave the workspace."
+        title: "Admins cannot leave the workspace.",
       });
       return;
     }
 
-    if (!confirm(`Leave "${selectedWorkspace.name}"?`)) return;
+    // Use Swal instead of native confirm
+    const result = await Swal.fire({
+      title: `Leave "${selectedWorkspace.name}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, leave",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return; // User canceled
 
     try {
-      await leaveWorkspaceAPI(selectedWorkspace.id);
+      await leaveWorkspaceAPI( selectedWorkspace.id, currentUser.id);
 
-      setWorkspaces(ws => ws.filter(w => w.id !== selectedWorkspace.id));
+      setWorkspaces((ws) => ws.filter((w) => w.id !== selectedWorkspace.id));
       setShowSettingsModal(false);
 
       Toast.fire({
         icon: "success",
-        title: "You left the workspace"
-      })
+        title: "You left the workspace",
+      });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error leaving workspace"
-      })
+        title: "Error leaving workspace",
+      });
     }
   };
 
 
-  // const handleInviteMember = () => {
-  //   if (!selectedWorkspace) return;
-
-  //   if (!inviteEmail.trim()) {
-  //     alert("Please enter an email");
-  //     return;
-  //   }
-
-  //   setWorkspaces(ws =>
-  //     ws.map(w =>
-  //       w.id === selectedWorkspace.id
-  //         ? {
-  //             ...w,
-  //             members: [
-  //               ...w.members,
-  //               {
-  //                 id: Date.now().toString(),
-  //                 name: inviteEmail.split("@")[0],
-  //                 email: inviteEmail,
-  //                 role: inviteRole
-  //               }
-  //             ]
-  //           }
-  //         : w
-  //     )
-  //   );
-
-  //   setInviteEmail("");
-  //   setInviteRole("member");
-  //   setShowInviteModal(false);
-  //   alert(`Invitation sent to ${inviteEmail}`);
-  // };
   const handleInviteMember = async () => {
     if (!selectedWorkspace) return;
     if (!inviteEmail.trim()) {
       Toast.fire({
         icon: "warning",
-        title: "Please enter an email"
-      })
+        title: "Please enter an email",
+      });
       return;
     }
 
@@ -372,8 +253,8 @@ export default function WorkspacesPage() {
         role: inviteRole,
       });
 
-      setWorkspaces(ws =>
-        ws.map(w => (w.id === updatedWS.id ? updatedWS : w))
+      setWorkspaces((ws) =>
+        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
       );
 
       setInviteEmail("");
@@ -382,111 +263,62 @@ export default function WorkspacesPage() {
 
       Toast.fire({
         icon: "success",
-        title: `Invitation sent to ${inviteEmail}`
-      })
+        title: `Invitation sent to ${inviteEmail}`,
+      });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error inviting member"
-      })
+        title: "Error inviting member",
+      });
     }
   };
 
-
-  // const handleRemoveMember = (memberId: string) => {
-  //   if (!selectedWorkspace) return;
-
-  //   if (selectedWorkspace.role !== "admin") {
-  //     alert("Only admins can remove members");
-  //     return;
-  //   }
-
-  //   setWorkspaces(ws =>
-  //     ws.map(w =>
-  //       w.id === selectedWorkspace.id
-  //         ? { ...w, members: w.members.filter(m => m.id !== memberId) }
-  //         : w
-  //     )
-  //   );
-
-  //   setSelectedWorkspace({
-  //     ...selectedWorkspace,
-  //     members: selectedWorkspace.members.filter(m => m.id !== memberId)
-  //   });
-
-  //   alert("Member removed successfully");
-  // };
   const handleRemoveMember = async (memberId: string) => {
     if (!selectedWorkspace) return;
-    if (selectedWorkspace.role !== "ADMIN" && selectedWorkspace.role !== "OWNER") {
+    if (
+      selectedWorkspace.role !== "ADMIN" &&
+      selectedWorkspace.role !== "OWNER"
+    ) {
       Toast.fire({
         icon: "warning",
-        title: "Only admins can remove members"
-      })
+        title: "Only admins can remove members",
+      });
       return;
     }
 
     try {
       const updatedWS = await removeMemberAPI(selectedWorkspace.id, memberId);
 
-      setWorkspaces(ws =>
-        ws.map(w => (w.id === updatedWS.id ? updatedWS : w))
+      setWorkspaces((ws) =>
+        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
       );
 
       setSelectedWorkspace(updatedWS);
 
       Toast.fire({
         icon: "success",
-        title: "Member removed successfully"
-      })
+        title: "Member removed successfully",
+      });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error removing member"
-      })
+        title: "Error removing member",
+      });
     }
   };
 
-
-  // const handleChangeRole = (memberId: string, newRole: string) => {
-  //   if (!selectedWorkspace) return;
-
-  //   if (selectedWorkspace.role !== "admin") {
-  //     alert("Only admins can change roles");
-  //     return;
-  //   }
-
-  //   setWorkspaces(ws =>
-  //     ws.map(w =>
-  //       w.id === selectedWorkspace.id
-  //         ? {
-  //             ...w,
-  //             members: w.members.map(m =>
-  //               m.id === memberId ? { ...m, role: newRole } : m
-  //             )
-  //           }
-  //         : w
-  //     )
-  //   );
-
-  //   setSelectedWorkspace({
-  //     ...selectedWorkspace,
-  //     members: selectedWorkspace.members.map(m =>
-  //       m.id === memberId ? { ...m, role: newRole } : m
-  //     )
-  //   });
-
-  //   alert("Member role updated");
-  // };
   const handleChangeRole = async (memberId: string, newRole: string) => {
     if (!selectedWorkspace) return;
-    if (selectedWorkspace.role !== "ADMIN" && selectedWorkspace.role !== "OWNER") {
+    if (
+      selectedWorkspace.role !== "ADMIN" &&
+      selectedWorkspace.role !== "OWNER"
+    ) {
       Toast.fire({
         icon: "warning",
-        title: "Only admins can change roles"
-      })
+        title: "Only admins can change roles",
+      });
       return;
     }
 
@@ -496,25 +328,24 @@ export default function WorkspacesPage() {
         role: newRole,
       });
 
-      setWorkspaces(ws =>
-        ws.map(w => (w.id === updatedWS.id ? updatedWS : w))
+      setWorkspaces((ws) =>
+        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
       );
 
       setSelectedWorkspace(updatedWS);
 
       Toast.fire({
         icon: "success",
-        title: "Member role updated"
-      })
+        title: "Member role updated",
+      });
     } catch (error) {
       console.error(error);
       Toast.fire({
         icon: "error",
-        title: "Error changing role"
-      })
+        title: "Error changing role",
+      });
     }
   };
-
 
   const openSettings = (workspace: Workspace) => {
     setSelectedWorkspace(workspace);
@@ -528,7 +359,6 @@ export default function WorkspacesPage() {
     setShowInviteModal(true);
   };
 
-
   const getColorClass = (color: string) => {
     const colors: Record<string, string> = {
       indigo: "from-indigo-500 to-indigo-600",
@@ -540,7 +370,6 @@ export default function WorkspacesPage() {
     return colors[color] || colors.indigo;
   };
 
-
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
       <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -548,14 +377,26 @@ export default function WorkspacesPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Workspaces</h1>
-              <p className="text-gray-600 mt-1">Manage and collaborate across multiple workspaces</p>
+              <p className="text-gray-600 mt-1">
+                Manage and collaborate across multiple workspaces
+              </p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
               className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               New Workspace
             </button>
@@ -565,18 +406,46 @@ export default function WorkspacesPage() {
             <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`px-4 py-2 rounded-md transition ${viewMode === "grid" ? "bg-white shadow-sm text-indigo-600" : "text-gray-600"}`}
+                className={`px-4 py-2 rounded-md transition ${
+                  viewMode === "grid"
+                    ? "bg-white shadow-sm text-indigo-600"
+                    : "text-gray-600"
+                }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
                 </svg>
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`px-4 py-2 rounded-md transition ${viewMode === "list" ? "bg-white shadow-sm text-indigo-600" : "text-gray-600"}`}
+                className={`px-4 py-2 rounded-md transition ${
+                  viewMode === "list"
+                    ? "bg-white shadow-sm text-indigo-600"
+                    : "text-gray-600"
+                }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </button>
             </div>
@@ -591,12 +460,26 @@ export default function WorkspacesPage() {
         {workspaces.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              <svg
+                className="w-12 h-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No workspaces yet</h3>
-            <p className="text-gray-600 mb-6">Create your first workspace to start collaborating with your team</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No workspaces yet
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Create your first workspace to start collaborating with your team
+            </p>
             <button
               onClick={() => setShowCreateModal(true)}
               className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
@@ -605,17 +488,29 @@ export default function WorkspacesPage() {
             </button>
           </div>
         ) : (
-          <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "space-y-4"
+            }
+          >
             {workspaces.map((workspace) => (
               <div
                 key={workspace.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group"
               >
-                <div className={`h-24 bg-linear-to-r ${getColorClass(workspace.color)} p-6 relative`}>
+                <div
+                  className={`h-24 bg-linear-to-r ${getColorClass(
+                    workspace.color
+                  )} p-6 relative`}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-1">{workspace.name}</h3>
-                      <span className="inline-flex items-center px-2 py-1 bg-white bg-opacity-20 backdrop-blur-sm rounded text-xs font-medium text-white">
+                      <h3 className="text-xl font-bold text-white mb-1">
+                        {workspace.name}
+                      </h3>
+                      <span className="inline-flex items-center px-2 py-1 bg-white bg-opacity-20 backdrop-blur-sm rounded text-xs text-gray-500 font-bold">
                         {workspace.role}
                       </span>
                     </div>
@@ -623,8 +518,18 @@ export default function WorkspacesPage() {
                       onClick={() => openSettings(workspace)}
                       className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition opacity-0 group-hover:opacity-100"
                     >
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -637,14 +542,34 @@ export default function WorkspacesPage() {
 
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="flex items-center gap-2 text-gray-600">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        />
                       </svg>
                       <span>{workspace.taskCount} tasks</span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
                       </svg>
                       <span>{workspace.members.length} members</span>
                     </div>
@@ -667,24 +592,31 @@ export default function WorkspacesPage() {
                         </div>
                       )}
                     </div>
-                    {workspace.role === "ADMIN" || workspace.role === "OWNER" && (
-                      <button
-                        onClick={() => openInvite(workspace)}
-                        className="ml-3 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-                      >
-                        + Invite
-                      </button>
-                    )}
+                    {workspace.role === "ADMIN" ||
+                      (workspace.role === "OWNER" && (
+                        <button
+                          onClick={() => openInvite(workspace)}
+                          className="ml-3 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                        >
+                          + Invite
+                        </button>
+                      ))}
                   </div>
 
                   <button
-                    onClick={() => 
-                      // alert(`Open workspace: ${workspace.name}`)
-                      Toast.fire({
-                        icon: "info",
-                        title: `Open workspace: ${workspace.name}`
-                      })
-                    }
+                    onClick={() => {
+                      if (
+                        workspace.role === "ADMIN" ||
+                        workspace.role === "OWNER" ||
+                        workspace.role === "MEMBER"
+                      ) {
+                        navigate(`/selected-workspace?id=${workspace.id}`)
+                        Toast.fire({
+                          icon: "info",
+                          title: `Open workspace: ${workspace.name}`,
+                        });
+                      }
+                    }}
                     className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
                   >
                     Open Workspace
@@ -697,9 +629,17 @@ export default function WorkspacesPage() {
       </div>
 
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Create New Workspace</h2>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto"
+          onClick={() => setShowSettingsModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 mt-8 mb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Create New Workspace
+            </h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -745,20 +685,39 @@ export default function WorkspacesPage() {
       )}
 
       {showSettingsModal && selectedWorkspace && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 my-8">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto"
+          onClick={() => setShowSettingsModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 mt-8 mb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Workspace Settings</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Workspace Settings
+              </h2>
               <button
                 onClick={() => setShowSettingsModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
+            {/* Name & Description */}
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -768,7 +727,12 @@ export default function WorkspacesPage() {
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  disabled={selectedWorkspace.role !== "ADMIN" && selectedWorkspace.role !== "OWNER"}
+                  disabled={
+                    !(
+                      selectedWorkspace.role === "ADMIN" ||
+                      selectedWorkspace.role === "OWNER"
+                    )
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
                 />
               </div>
@@ -779,12 +743,18 @@ export default function WorkspacesPage() {
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  disabled={selectedWorkspace.role !== "ADMIN" && selectedWorkspace.role !== "OWNER"}
+                  disabled={
+                    !(
+                      selectedWorkspace.role === "ADMIN" ||
+                      selectedWorkspace.role === "OWNER"
+                    )
+                  }
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none disabled:bg-gray-100"
                 />
               </div>
-              {selectedWorkspace.role === "ADMIN" && (
+              {(selectedWorkspace.role === "ADMIN" ||
+                selectedWorkspace.role === "OWNER") && (
                 <button
                   onClick={handleUpdateWorkspace}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
@@ -795,39 +765,66 @@ export default function WorkspacesPage() {
             </div>
 
             <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Members ({selectedWorkspace.members.length})</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Members ({selectedWorkspace.members.length})
+              </h3>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {selectedWorkspace.members.map((member) => (
-                  <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-linear-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold">
                         {(member.name?.charAt(0) ?? "?").toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{member.name}</p>
+                        <p className="font-medium text-gray-900">
+                          {member.name}
+                        </p>
                         <p className="text-sm text-gray-600">{member.email}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {selectedWorkspace.role === "ADMIN" && member.id !== currentUser.id ? (
+                      {/* Only Admins/Owner can change roles or remove members */}
+                      {(selectedWorkspace.role === "ADMIN" ||
+                        selectedWorkspace.role === "OWNER") &&
+                      member.id !== currentUser.id ? (
                         <>
-                          <select
-                            value={member.role}
-                            onChange={(e) => handleChangeRole(member.id, e.target.value)}
-                            className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          >
-                            <option value="ADMIN">Admin</option>
-                            <option value="member">Member</option>
-                          </select>
-                          <button
-                            onClick={() => handleRemoveMember(member.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                            title="Remove member"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
+                          {member.role !== "OWNER" && (
+                            <>
+                              <select
+                                value={member.role}
+                                onChange={(e) =>
+                                  handleChangeRole(member.id, e.target.value)
+                                }
+                                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              >
+                                <option value="ADMIN">Admin</option>
+                                <option value="MEMBER">Member</option>
+                              </select>
+
+                              <button
+                                onClick={() => handleRemoveMember(member.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                title="Remove member"
+                              >
+                                <svg
+                                  className="w-5 h-5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                              </button>
+                            </>
+                          )}
                         </>
                       ) : (
                         <span className="px-3 py-1 bg-white border border-gray-300 rounded-lg text-sm text-gray-700">
@@ -841,9 +838,11 @@ export default function WorkspacesPage() {
             </div>
 
             <div className="border-t border-red-200 pt-6 mt-6">
-              <h3 className="text-lg font-semibold text-red-600 mb-4">Danger Zone</h3>
+              <h3 className="text-lg font-semibold text-red-600 mb-4">
+                Danger Zone
+              </h3>
               <div className="space-y-3">
-                {selectedWorkspace.role === "ADMIN" ? (
+                {selectedWorkspace.role === "OWNER" ? (
                   <button
                     onClick={handleDeleteWorkspace}
                     className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
@@ -865,10 +864,20 @@ export default function WorkspacesPage() {
       )}
 
       {showInviteModal && selectedWorkspace && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Invite Member</h2>
-            <p className="text-gray-600 mb-4">Invite someone to join {selectedWorkspace.name}</p>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto"
+          onClick={() => setShowSettingsModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 mt-8 mb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Invite Member
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Invite someone to join {selectedWorkspace.name}
+            </p>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -888,7 +897,9 @@ export default function WorkspacesPage() {
                 </label>
                 <select
                   value={inviteRole}
-                  onChange={(e) => setInviteRole(e.target.value as "MEMBER" | "ADMIN")}
+                  onChange={(e) =>
+                    setInviteRole(e.target.value as "MEMBER" | "ADMIN")
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="member">Member</option>
@@ -914,5 +925,5 @@ export default function WorkspacesPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

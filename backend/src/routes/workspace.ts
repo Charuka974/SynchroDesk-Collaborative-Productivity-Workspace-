@@ -7,7 +7,8 @@ import {
   getMyWorkspaces,
   getWorkspace,
   updateWorkspace,
-  deleteWorkspace
+  deleteWorkspace,
+  changeWorkspaceRole
 } from "../controllers/workspace.controller";
 
 const router = Router();
@@ -26,5 +27,7 @@ router.delete("/:id", authenticate, deleteWorkspace);
 // ─────────────────────────────
 router.post("/:id/invite", authenticate, inviteMember);
 router.delete("/:id/remove/:userId", authenticate, removeMember);
+router.patch("/:id/role", authenticate, changeWorkspaceRole);
+
 
 export default router;

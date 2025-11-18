@@ -102,17 +102,40 @@ export const getWorkspace = async (req: AUthRequest, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(400).json({ message: "Invalid workspace ID" });
 
-    const workspace = await Workspace.findById(id);
-
-    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+    const ws = await Workspace.findById(id);
+    if (!ws) return res.status(404).json({ message: "Workspace not found" });
 
     // Check membership
-    const isMember = workspace.members.some(
+    const isMember = ws.members.some(
       (m) => m.userId.toString() === req.user?.sub.toString()
     );
     if (!isMember) return res.status(403).json({ message: "Access denied" });
 
-    res.status(200).json(workspace);
+    // ----- populate members exactly like getMyWorkspaces() -----
+    const members = await Promise.all(
+      ws.members.map(async (m) => {
+        const user = await User.findById(m.userId).lean();
+        return {
+          id: m.userId.toString(),
+          name: user?.name ?? "Unknown",
+          email: user?.email ?? "",
+          avatar: user?.avatar ?? null,
+          role: m.role,
+        };
+      })
+    );
+
+    return res.status(200).json({
+      id: ws._id.toString(),
+      name: ws.name,
+      description: ws.description,
+      members,
+      color: ws.settings?.color ?? "indigo",
+      role: ws.members.find(m => m.userId.toString() === req.user?.sub)?.role ?? "MEMBER",
+      taskCount: ws.taskCount ?? 0,
+      createdAt: ws.createdAt,
+    });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error fetching workspace" });
@@ -253,5 +276,38 @@ export const removeMember = async (req: AUthRequest, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error removing member" });
+  }
+};
+
+// -------------------------
+// CHANGE MEMBER ROLE
+// -------------------------
+export const changeWorkspaceRole = async (req: AUthRequest, res: Response) => {
+  try {
+    const { id } = req.params; // workspace ID
+    const { userId, role } = req.body;
+
+    const workspace = await Workspace.findById(id);
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+
+    // Only owner/admin can change roles
+    const member = workspace.members.find(m => m.userId.toString() === req.user?.sub.toString());
+    if (!member || (member.role !== WorkspaceRole.OWNER && member.role !== WorkspaceRole.ADMIN))
+      return res.status(403).json({ message: "Permission denied" });
+
+    // Cannot change owner's role
+    if (workspace.owner.toString() === userId)
+      return res.status(400).json({ message: "Cannot change owner's role" });
+
+    const targetMember = workspace.members.find(m => m.userId.toString() === userId);
+    if (!targetMember) return res.status(404).json({ message: "Member not found" });
+
+    targetMember.role = role;
+    await workspace.save();
+
+    res.status(200).json(workspace);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error changing role" });
   }
 };

@@ -13,37 +13,12 @@ export default function SynchroDeskDashboard() {
     { id: 4, title: "Update documentation", status: "Pending", priority: "medium", assignedTo: "Team" },
   ])
 
-  const [events, setEvents] = useState([
-    { id: 1, title: "Sprint Planning", date: "2025-11-18", time: "10:00 AM", type: "meeting" },
-    { id: 2, title: "Client Call", date: "2025-11-19", time: "2:00 PM", type: "call" },
-    { id: 3, title: "Project Deadline", date: "2025-11-22", time: "EOD", type: "deadline" },
-  ])
-
-  const [notes, setNotes] = useState("")
-  const [savedNotes, setSavedNotes] = useState([
-    { id: 1, content: "Remember to follow up with design team", timestamp: "2025-11-15 09:30" },
-    { id: 2, content: "API integration needs testing", timestamp: "2025-11-14 14:20" },
-  ])
-
   const [newTask, setNewTask] = useState("")
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [activeFilter, setActiveFilter] = useState("all")
 
   // Mock user data
   const { user, setUser } = useAuth()
-
-  const handleSaveNote = () => {
-    if (notes.trim()) {
-      const newNote = {
-        id: Date.now(),
-        content: notes,
-        timestamp: new Date().toISOString().slice(0, 16).replace('T', ' ')
-      }
-      setSavedNotes([newNote, ...savedNotes])
-      setNotes("")
-      alert("Note saved!")
-    }
-  }
 
   const handleAddTask = () => {
     if (newTask.trim()) {
@@ -58,13 +33,6 @@ export default function SynchroDeskDashboard() {
       setNewTask("")
       setShowTaskModal(false)
     }
-  }
-
-  const handleLogout = () => {
-    setUser(null)
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    navigate("/login")
   }
 
   const getTaskStats = () => {
@@ -93,30 +61,7 @@ export default function SynchroDeskDashboard() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}</h1>
-            <p className="text-gray-600 mt-1">Here's what's happening today</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition relative">
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <div className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 border border-gray-200">
-              <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                {user.avatar ?? user.name?.charAt(0)?.toUpperCase() ?? "?"}
-              </div>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                <p className="text-xs text-gray-500">{user.email}</p>
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              Logout
-            </button>
+            <p className="text-gray-600 mt-1">Here's your targets for today</p>
           </div>
         </header>
 
@@ -176,7 +121,7 @@ export default function SynchroDeskDashboard() {
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* Tasks Panel */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -256,66 +201,6 @@ export default function SynchroDeskDashboard() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Upcoming Events</h2>
-              <div className="space-y-3">
-                {events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="p-4 bg-linear-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{event.date} at {event.time}</p>
-                        <span className="inline-block mt-2 px-2 py-1 bg-white rounded text-xs font-medium text-indigo-600">
-                          {event.type}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Notes */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Notes</h2>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                placeholder="Write a quick note..."
-              />
-              <button
-                onClick={handleSaveNote}
-                className="mt-3 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
-              >
-                Save Note
-              </button>
-
-              {savedNotes.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <h3 className="text-sm font-semibold text-gray-700">Recent Notes</h3>
-                  {savedNotes.slice(0, 2).map((note) => (
-                    <div key={note.id} className="p-3 bg-gray-50 rounded-lg text-sm">
-                      <p className="text-gray-700">{note.content}</p>
-                      <p className="text-xs text-gray-500 mt-1">{note.timestamp}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>

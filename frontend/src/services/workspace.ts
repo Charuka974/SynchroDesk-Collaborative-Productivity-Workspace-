@@ -49,7 +49,7 @@ export const changeRoleAPI = async (
   return res.data;
 };
 
-export const leaveWorkspaceAPI = async (workspaceId: string) => {
-  const res = await api.post(`/workspaces/${workspaceId}/leave`);
+export const leaveWorkspaceAPI = async (workspaceId: string, userId: string) => {
+  const res = await api.delete(`/workspaces/${workspaceId}/remove/${userId}`);
   return res.data;
 };

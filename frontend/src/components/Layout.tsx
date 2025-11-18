@@ -35,7 +35,7 @@ function Layout() {
 
       {/* Main content area */}
       <main
-        className={`flex-1 transition-all duration-300 p-4 ${
+        className={`flex-1 transition-all duration-300 ${
           isSidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
         }`}
       >
