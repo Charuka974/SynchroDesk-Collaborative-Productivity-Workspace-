@@ -20,6 +20,8 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import Header from "./Header"
+import Footer from "./Footer"
 
 function Layout() {
   // Lift the sidebar collapsed state to layout to adjust main content
@@ -32,6 +34,7 @@ function Layout() {
         isCollapsed={isSidebarCollapsed}
         onCollapseToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
+      
 
       {/* Main content area */}
       <main
@@ -39,7 +42,16 @@ function Layout() {
           isSidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
         }`}
       >
-        <Outlet />
+        {/* Header */}
+        <Header />
+        
+        {/* Page content */}
+        <div className="flex-1">
+          <Outlet />
+        </div>
+
+        {/* Page Footer */}
+        <Footer />
       </main>
     </div>
   );

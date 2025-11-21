@@ -11,6 +11,7 @@ const Home = lazy(() => import("../pages/Home"))
 const Workspaces = lazy(() => import("../pages/Workspaces"))
 const SelectedWorkspace = lazy(() => import("../pages/SelectedWorkspace"))
 const Tasks = lazy(() => import("../pages/Tasks"))
+const Landing = lazy(() => import("../pages/Landing"))
 
 
 
@@ -29,6 +30,10 @@ const RequireAuth = ({ children, roles }: RequireAuthTypes) => {
 
   if (!user) {
     return <Navigate to="/login" replace />
+  }
+
+  if (!user) {
+    return <Navigate to="/register" replace />
   }
 
   if (roles && !roles.some((role) => user.roles?.includes(role))) {
@@ -54,7 +59,9 @@ export default function Router() {
         }
       >
         <Routes>
-          <Route path="/" element={<Index />} />
+          
+          <Route path="/" element={<Landing />} />
+          {/* <Route path="/" element={<Index />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route

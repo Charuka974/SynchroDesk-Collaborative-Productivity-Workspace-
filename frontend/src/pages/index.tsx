@@ -9,7 +9,7 @@ export default function Index() {
       <p className="text-lg mb-8 text-gray-700 text-center max-w-md">
         This is your Rapid Application Development (RAD) demo. Navigate to login
         or register to continue.
-      </p>
+      </p> 
 
       <div className="flex gap-6">
         <Link
