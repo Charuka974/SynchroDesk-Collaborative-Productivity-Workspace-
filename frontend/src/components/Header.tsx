@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/authContext"
 import { useState } from "react"
-import { useTheme } from "../hooks/useTheme";
+
 
 
 export default function Header() {
@@ -9,7 +9,7 @@ export default function Header() {
   const navigate = useNavigate()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const { theme, toggleTheme } = useTheme();
+
 
 
   const handleLogout = () => {
@@ -19,6 +19,18 @@ export default function Header() {
     navigate("/login")
   }
 
+  // Notifications
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const notifications = [
+    { id: 1, text: "New task assigned to you", time: "2 mins ago" },
+    { id: 2, text: "Meeting starts in 1 hour", time: "1 hour ago" },
+    { id: 3, text: "Project deadline updated", time: "Yesterday" },
+  ];
+  
+  // const notifications: any[] = [];
+
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -26,7 +38,7 @@ export default function Header() {
           {/* Logo and Brand */}
           <div className="flex items-center gap-8">
             <Link to="/home" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
+              <div className="w-10 h-10 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -66,37 +78,68 @@ export default function Header() {
           {/* Right Side - User Menu */}
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-            >
-              {theme === "light" ? (
-                // Moon icon (switch to dark)
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" viewBox="0 0 24 24" 
-                    strokeWidth="2" stroke="currentColor"
-                    className="w-6 h-6 text-gray-700 dark:text-gray-300">
-                  <path strokeLinecap="round" strokeLinejoin="round"
-                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+            
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition relative hidden sm:block"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
                 </svg>
-              ) : (
-                // Sun icon (switch to light)
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" viewBox="0 0 24 24" 
-                    strokeWidth="2" stroke="currentColor"
-                    className="w-6 h-6 text-gray-200 dark:text-yellow-300">
-                  <path strokeLinecap="round" strokeLinejoin="round"
-                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
-                </svg>
+
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center">
+                    {/* Ping Animation */}
+                    <span className="absolute inline-flex h-5 w-5 rounded-full bg-red-400 opacity-75 animate-ping"></span>
+
+                    {/* Pill Count Badge */}
+                    <span className="relative inline-flex h-5 min-w-5 px-1.5 bg-red-500 text-white text-[10px] font-semibold rounded-full items-center justify-center">
+                      {notifications.length > 99 ? "99+" : notifications.length}
+                    </span>
+                  </span>
+                )}
+
+              </button>
+
+              {/* Dropdown */}
+              {showNotifications && (
+                <>
+                  {/* Overlay */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowNotifications(false)}
+                  />
+
+                  <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-sm font-semibold text-gray-900">Notifications</p>
+                    </div>
+
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifications.length > 0 ? (
+                        notifications.map((noti) => (
+                          <div
+                            key={noti.id}
+                            className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition flex flex-col gap-1"
+                          >
+                            <p className="text-sm text-gray-800">{noti.text}</p>
+                            <span className="text-xs text-gray-500">{noti.time}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                          No notifications
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
-            </button>
-            {/* Notifications */}
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition relative hidden sm:block">
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
+            </div>
+
 
             {/* User Profile Dropdown */}
             <div className="relative">
@@ -104,7 +147,7 @@ export default function Header() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-3 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 transition border border-gray-200"
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                <div className="w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                   {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
                 </div>
                 <div className="hidden lg:block text-left">

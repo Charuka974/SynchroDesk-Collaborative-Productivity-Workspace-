@@ -9,7 +9,7 @@ export default function SynchroDeskLanding() {
     navigate(navipath);
   };
 
-  const [email, setEmail] = useState("")
+  // const [email, setEmail] = useState("")
   const [showDemo, setShowDemo] = useState(false)
 
   const features = [
@@ -97,13 +97,13 @@ export default function SynchroDeskLanding() {
   // }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -136,7 +136,7 @@ export default function SynchroDeskLanding() {
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Work Smarter, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Together</span>
+            Work Smarter, <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600">Together</span>
           </h2>
           <p className="text-xl text-gray-600 mb-10 leading-relaxed">
             SynchroDesk brings your team's tasks, communication, and knowledge into one powerful workspace. Collaborate seamlessly, stay organized, and achieve more.
@@ -185,14 +185,14 @@ export default function SynchroDeskLanding() {
 
         {/* Hero Image / Demo Preview */}
         <div className="mt-16 relative">
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-gray-50 via-transparent to-transparent z-10"></div>
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
             <div className="bg-gray-100 px-6 py-3 flex items-center gap-2 border-b border-gray-200">
               <div className="w-3 h-3 rounded-full bg-red-400"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
               <div className="w-3 h-3 rounded-full bg-green-400"></div>
             </div>
-            <div className="p-8 bg-gradient-to-br from-indigo-50 to-purple-50">
+            <div className="p-8 bg-linear-to-br from-indigo-50 to-purple-50">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-2">
@@ -267,7 +267,7 @@ export default function SynchroDeskLanding() {
               key={index}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-white mb-4">
+              <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-white mb-4">
                 {feature.icon}
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
@@ -278,7 +278,7 @@ export default function SynchroDeskLanding() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16">
+      <section className="bg-linear-to-r from-indigo-600 to-purple-600 py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center text-white">
             <div>
@@ -303,7 +303,7 @@ export default function SynchroDeskLanding() {
 
       {/* CTA Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-12 text-center">
+        <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-12 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Ready to Transform Your Workflow?</h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Join thousands of teams already using SynchroDesk to boost productivity and collaboration
@@ -324,7 +324,7 @@ export default function SynchroDeskLanding() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>

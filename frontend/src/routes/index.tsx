@@ -32,10 +32,6 @@ const RequireAuth = ({ children, roles }: RequireAuthTypes) => {
     return <Navigate to="/login" replace />
   }
 
-  if (!user) {
-    return <Navigate to="/register" replace />
-  }
-
   if (roles && !roles.some((role) => user.roles?.includes(role))) {
     return (
       <div className="text-center py-20">
