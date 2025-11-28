@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/authContext";
 
 type SidebarProps = {
   isCollapsed: boolean;
@@ -9,15 +10,19 @@ type SidebarProps = {
 export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps) {
 
 //   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const { user, setUser } = useAuth()
   const navigate = useNavigate();
 
   const handleNavigation = (navipath: string) => {
     navigate(navipath);
   };
 
+  const handleUserIdNavigation = (userId: string) => {
+    navigate("/messages", { state: { userId } });
+  };
+
   const handleLogout = () => {
-    // setUser(null)
+    setUser(null)
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     navigate("/login")
@@ -30,7 +35,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {/* Header with Logo and Toggle */}
         <div className="flex items-center justify-between mb-8">
           <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 bg-linear-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
@@ -98,7 +103,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
           </button>
           
           <button 
-            onClick={() => handleNavigation("/messages")}
+            onClick={() => handleUserIdNavigation(user.id)}
             className={`w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition ${isCollapsed ? 'justify-center' : ''}`}
             title={isCollapsed ? "Messages" : ""}
           >
@@ -146,10 +151,10 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {/* Upgrade Card - Expanded */}
         {!isCollapsed && (
           <div className="absolute bottom-1 left-6 right-6">
-            <div className="bg-linear-to-r from-indigo-500 to-purple-600 rounded-lg p-2 text-white shadow-lg">
+            <div className="bg-linear-to-r from-gray-500 to-gray-600 rounded-lg p-2 text-white shadow-lg">
               <h3 className="font-semibold mb-1">Upgrade to Pro</h3>
-              <p className="text-xs text-indigo-100 mb-3">Unlock unlimited tasks and more features</p>
-              <button className="w-full bg-white text-indigo-600 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+              <p className="text-xs text-gray-100 mb-3">Unlock unlimited tasks and more features</p>
+              <button className="w-full bg-white text-gray-900 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
                 Upgrade Now
               </button>
             </div>
@@ -160,7 +165,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {isCollapsed && (
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
             <button 
-              className="w-10 h-10 bg-linear-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center hover:from-indigo-600 hover:to-purple-700 transition shadow-lg"
+              className="w-10 h-10 bg-linear-to-r from-gray-800 to-gray-600 rounded-lg flex items-center justify-center hover:from-gray-900 hover:to-gray-700 transition shadow-lg"
               title="Upgrade to Pro"
             >
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

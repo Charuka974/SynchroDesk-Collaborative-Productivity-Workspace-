@@ -38,7 +38,7 @@ export default function Header() {
           {/* Logo and Brand */}
           <div className="flex items-center gap-8">
             <Link to="/home" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
+              <div className="w-10 h-10 bg-linear-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -147,7 +147,7 @@ export default function Header() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-3 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 transition border border-gray-200"
               >
-                <div className="w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                <div className="w-8 h-8 bg-linear-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                   {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
                 </div>
                 <div className="hidden lg:block text-left">
@@ -180,7 +180,7 @@ export default function Header() {
                           {user.roles.map((role: string) => (
                             <span
                               key={role}
-                              className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded font-medium"
+                              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded font-medium"
                             >
                               {role}
                             </span>

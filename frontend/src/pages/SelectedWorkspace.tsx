@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getMyWorkspacesAPI, getWorkspaceByIdAPI } from "../services/workspace";
 import Swal from "sweetalert2";
+import ChatWindow from "../components/Chat";
+import { motion } from "framer-motion";
+
 
 export default function WorkspacesPage() {
   const [params] = useSearchParams();
   const id = params.get("id");
+  const [currentTab, setCurrentTab] = useState("Woerkspace");
 
   const Toast = Swal.mixin({
     toast: true,
@@ -72,7 +76,7 @@ export default function WorkspacesPage() {
   const WorkspaceLayout = ({ workspace }: { workspace: Workspace }) => (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-80 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="w-60 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 bg-linear-to-r from-indigo-500 to-purple-600 text-white">
           <h1 className="text-2xl font-bold">{workspace.name}</h1>
           <p className="text-white text-opacity-90">{workspace.description}</p>
@@ -108,45 +112,97 @@ export default function WorkspacesPage() {
           <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
             Quick Actions
           </h3>
-          <button className="w-full mb-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg">
-            New Task
+          <button className="w-full mb-2 px-4 py-2 bg-indigo-50 text-red-600 rounded-lg"
+            onClick={() => setCurrentTab("Chat")}
+            >
+            Chat
           </button>
-          <button className="w-full mb-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg">
-            New Note
+          <button className="w-full mb-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg"
+            onClick={() => setCurrentTab("Tasks")}
+            >
+            Tasks
           </button>
-          <button className="w-full mb-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg">
-            New Event
+          <button className="w-full mb-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg"
+            onClick={() => setCurrentTab("Notes")}
+            >
+            Notes
           </button>
-          <button className="w-full px-4 py-2 bg-orange-50 text-orange-600 rounded-lg">
-            Upload File
+          <button className="w-full mb-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg"
+            onClick={() => setCurrentTab("Events")}
+            >
+            Events
+          </button>
+          <button className="w-full px-4 py-2 bg-orange-50 text-orange-600 rounded-lg"
+            onClick={() => setCurrentTab("Files")}
+            >
+            Files
           </button>
         </div>
       </aside>
 
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
+
         {/* Tabs */}
         <div className="bg-white border-b border-gray-200 px-6">
-          <div className="flex gap-4 justify-between w-full">
-            {["Home", "Tasks", "Notes", "Files", "Calendar"].map((tab) => (
+          <div className="flex gap-1">
+            {["Home", "Chat", "Tasks", "Notes", "Files", "Calendar"].map((tab) => (
               <button
                 key={tab}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+                className={`px-4 py-3 text-sm font-medium transition-all duration-200 relative ${
+                  currentTab === tab 
+                    ? "text-indigo-600" 
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+                onClick={() => setCurrentTab(tab)}
               >
                 {tab}
+                {currentTab === tab && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          <h2 className="text-xl font-bold mb-4">
-            Welcome to {workspace.name}
-          </h2>
-          <p>Workspace details and tasks will appear here.</p>
+        {/* CONTENT AREA */}
+        <div className="flex-1 flex bg-gray-300 h-100">
+          {currentTab === "Chat" && (
+            <div className="w-full h-full">
+              <ChatWindow
+                userId="me"
+                workspaceId={workspace.id}
+              />
+            </div>
+          )}
+
+          {currentTab !== "Chat" && (
+            <div className="flex-1 overflow-y-auto p-6">
+              {currentTab === "Home" && (
+                <>
+                  <h2 className="text-xl font-bold mb-4">
+                    Welcome to {workspace.name}
+                  </h2>
+                  <p>Workspace details and tasks will appear here.</p>
+                </>
+              )}
+
+              {currentTab === "Tasks" && <p>Tasks will show here later.</p>}
+              {currentTab === "Notes" && <p>Notes panel</p>}
+              {currentTab === "Files" && <p>Files list</p>}
+              {currentTab === "Events" && <p>Calendar UI</p>}
+            </div>
+          )}
         </div>
+
       </div>
+
     </div>
+
   );
 
   return (

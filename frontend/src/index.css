@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+
+:root {
+  --dark-bg: #0D0F12;
+  --dark-surface: #16191F;
+  --dark-surface-2: #1F232A;
+  --dark-surface-highlight: #272C35;
+
+  --dark-text-primary: #E6EAF0;
+  --dark-text-secondary: #A7B0BC;
+  --dark-text-disabled: #5E6672;
+
+  --dark-accent-blue: #3A82F7;
+  --dark-accent-blue-hover: #5A98FF;
+  --dark-accent-purple: #9A6CFF;
+
+  --dark-success: #3CCB7F;
+  --dark-warning: #F4C76C;
+  --dark-error: #F16963;
+  --dark-info: #56C2E8;
+
+  --dark-border: #2D323C;
+  --dark-divider: #3A404A;
+
+  --dark-premium: #CBA86B;
+}

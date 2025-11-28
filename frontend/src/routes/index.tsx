@@ -12,6 +12,7 @@ const Workspaces = lazy(() => import("../pages/Workspaces"))
 const SelectedWorkspace = lazy(() => import("../pages/SelectedWorkspace"))
 const Tasks = lazy(() => import("../pages/Tasks"))
 const Landing = lazy(() => import("../pages/Landing"))
+const ChatMessages = lazy(() => import("../pages/Chat"))
 
 
 
@@ -69,6 +70,7 @@ export default function Router() {
           >
             <Route path="/home" element={<Home />} />
             <Route path="/tasks" element={<Tasks />} />
+            <Route path="/messages" element={<ChatMessages />} />
             <Route
               path="/workspaces"
               element={

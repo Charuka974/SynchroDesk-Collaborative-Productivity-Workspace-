@@ -66,9 +66,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50 flex">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-50 flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-indigo-600 to-purple-600 p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-gray-900 to-gray-600 p-12 flex-col justify-between relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full -ml-48 -mb-48"></div>
@@ -76,7 +76,7 @@ export default function Login() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-              <svg className="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-7 h-7 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
@@ -89,7 +89,7 @@ export default function Login() {
             Achieve Together.
           </h2>
           
-          <p className="text-indigo-100 text-lg">
+          <p className="text-gray-100 text-lg">
             Your team's productivity workspace where tasks sync seamlessly and collaboration flows naturally.
           </p>
         </div>
@@ -103,7 +103,7 @@ export default function Login() {
             </div>
             <div>
               <h3 className="text-white font-semibold mb-1">Real-time Collaboration</h3>
-              <p className="text-indigo-100 text-sm">Work together with your team in real-time, no matter where you are.</p>
+              <p className="text-gray-100 text-sm">Work together with your team in real-time, no matter where you are.</p>
             </div>
           </div>
 
@@ -115,7 +115,7 @@ export default function Login() {
             </div>
             <div>
               <h3 className="text-white font-semibold mb-1">Smart Task Management</h3>
-              <p className="text-indigo-100 text-sm">Organize tasks with intelligent prioritization and tracking.</p>
+              <p className="text-gray-100 text-sm">Organize tasks with intelligent prioritization and tracking.</p>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ export default function Login() {
             </div>
             <div>
               <h3 className="text-white font-semibold mb-1">Lightning Fast</h3>
-              <p className="text-indigo-100 text-sm">Instant sync across all devices keeps your team moving forward.</p>
+              <p className="text-gray-100 text-sm">Instant sync across all devices keeps your team moving forward.</p>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gray-600 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
@@ -163,7 +163,7 @@ export default function Login() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition"
                   disabled={isLoading}
                 />
               </div>
@@ -175,7 +175,7 @@ export default function Login() {
                   </label>
                   <button
                     type="button"
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-sm text-gray-600 hover:text-gray-700 font-medium"
                   >
                     Forgot password?
                   </button>
@@ -186,7 +186,7 @@ export default function Login() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition"
                   disabled={isLoading}
                 />
               </div>
@@ -195,7 +195,7 @@ export default function Login() {
                 <input
                   id="remember"
                   type="checkbox"
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
                   Remember me for 30 days
@@ -205,7 +205,7 @@ export default function Login() {
               <button
                 onClick={handleLogin}
                 disabled={isLoading}
-                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   "Signing in..."
@@ -225,7 +225,7 @@ export default function Login() {
                 Don't have an account?{" "}
                 <button 
                   onClick={() => navigate("/register")} 
-                  className="text-indigo-600 font-semibold hover:text-indigo-700 transition">
+                  className="text-gray-900 font-semibold hover:text-gray-700 transition">
                   Create one free
                 </button>
               </p>
@@ -234,15 +234,15 @@ export default function Login() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-xs text-gray-500 text-center">
                 By signing in, you agree to our{" "}
-                <button className="text-indigo-600 hover:underline">Terms of Service</button>
+                <button className="text-gray-600 hover:underline">Terms of Service</button>
                 {" "}and{" "}
-                <button className="text-indigo-600 hover:underline">Privacy Policy</button>
+                <button className="text-gray-600 hover:underline">Privacy Policy</button>
               </p>
             </div>
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Need help? <button className="text-indigo-600 hover:underline">Contact support</button>
+            Need help? <button className="text-gray-600 hover:underline">Contact support</button>
           </p>
         </div>
       </div>

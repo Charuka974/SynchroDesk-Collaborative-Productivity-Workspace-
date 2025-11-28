@@ -67,9 +67,9 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50 flex">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-50 flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-purple-600 to-indigo-600 p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-gray-900 to-gray-600 p-12 flex-col justify-between relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full -ml-48 -mb-48"></div>
@@ -77,7 +77,7 @@ export default function Register() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-              <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-7 h-7 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
@@ -90,7 +90,7 @@ export default function Register() {
             worldwide.
           </h2>
           
-          <p className="text-purple-100 text-lg">
+          <p className="text-gray-100 text-lg">
             Create your free account and start collaborating with your team in minutes.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function Register() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
-            <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
@@ -141,7 +141,7 @@ export default function Register() {
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition"
                   disabled={isLoading}
                 />
               </div>
@@ -156,7 +156,7 @@ export default function Register() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition"
                   disabled={isLoading}
                 />
               </div>
@@ -171,7 +171,7 @@ export default function Register() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition"
                   disabled={isLoading}
                 />
                 <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
@@ -187,7 +187,7 @@ export default function Register() {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition"
                   disabled={isLoading}
                 />
               </div>
@@ -196,20 +196,20 @@ export default function Register() {
                 <input
                   id="terms"
                   type="checkbox"
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-1"
+                  className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-500 mt-1"
                 />
                 <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
                   I agree to the{" "}
-                  <button className="text-purple-600 hover:underline">Terms of Service</button>
+                  <button className="text-gray-900 hover:underline">Terms of Service</button>
                   {" "}and{" "}
-                  <button className="text-purple-600 hover:underline">Privacy Policy</button>
+                  <button className="text-gray-900 hover:underline">Privacy Policy</button>
                 </label>
               </div>
 
               <button
                 onClick={handleRegister}
                 disabled={isLoading}
-                className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   "Creating account..."
@@ -229,7 +229,7 @@ export default function Register() {
                 Already have an account?{" "}
                 <button 
                   onClick={() => navigate("/login")} 
-                  className="text-purple-600 font-semibold hover:text-purple-700 transition">
+                  className="text-gray-900 font-semibold hover:text-gray-700 transition">
                   Sign in
                 </button>
               </p>
@@ -237,7 +237,7 @@ export default function Register() {
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Need help? <button className="text-purple-600 hover:underline">Contact support</button>
+            Need help? <button className="text-gray-900 hover:underline">Contact support</button>
           </p>
         </div>
       </div>

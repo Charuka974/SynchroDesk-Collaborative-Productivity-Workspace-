@@ -371,7 +371,7 @@ export default function WorkspacesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen flex flex-col bg-linear-to-br from-gray-50 to-gray-100">
       <div className="bg-white border-b border-gray-200 px-8 py-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
@@ -456,7 +456,7 @@ export default function WorkspacesPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="flex-1 overflow-auto px-8 py-8 max-w-7xl mx-auto">
         {workspaces.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -619,7 +619,7 @@ export default function WorkspacesPage() {
                     }}
                     className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
                   >
-                    Open Workspace
+                     Open {workspace.name} {/* Workspace */}
                   </button>
                 </div>
               </div>

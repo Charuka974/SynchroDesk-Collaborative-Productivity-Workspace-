@@ -39,7 +39,7 @@ export default function FloatingActionButtons() {
             {/* AI Assistant Button */}
             <button
               onClick={handleAIAssistant}
-              className="group flex items-center gap-3 px-5 py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95"
+              className="group flex items-center gap-3 px-5 py-3 bg-linear-to-r from-gray-900 to-gray-600 hover:from-gray-700 hover:to-gray-300 text-white rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95"
             >
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@ export default function FloatingActionButtons() {
           className={`w-15 h-15 rounded-full shadow-2xl flex items-center justify-center text-white transition-all transform hover:scale-110 active:scale-95 relative ${
             open 
               ? "bg-gray-600 hover:bg-gray-700 rotate-45" 
-              : "bg-linear-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+              : "bg-linear-to-br from-gray-900 to-gray-600 hover:from-gray-700 hover:to-gray-300"
           }`}
         >
           {open ? (
