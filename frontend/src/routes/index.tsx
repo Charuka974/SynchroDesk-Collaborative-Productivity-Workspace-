@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import { useAuth } from "../context/authContext"
 import Layout from "../components/Layout"
 import { WorkspaceProvider } from "../context/workspaceContext"
+import { TaskProvider } from "../context/taskContext"
 
 const Index = lazy(() => import("../pages"))
 const Login = lazy(() => import("../pages/Login"))
@@ -69,8 +70,17 @@ export default function Router() {
             }
           >
             <Route path="/home" element={<Home />} />
-            <Route path="/tasks" element={<Tasks />} />
+            
             <Route path="/messages" element={<ChatMessages />} />
+
+            <Route 
+              path="/tasks"
+              element={
+              <TaskProvider>
+                <Tasks />
+              </TaskProvider>} 
+            />
+
             <Route
               path="/workspaces"
               element={
@@ -79,6 +89,7 @@ export default function Router() {
                 </WorkspaceProvider>
               }
             />
+
             <Route
               path="/selected-workspace"
               element={
@@ -87,6 +98,7 @@ export default function Router() {
                 </WorkspaceProvider>
               }
             />
+
             </Route>
 
         </Routes>

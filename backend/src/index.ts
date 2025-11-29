@@ -5,6 +5,7 @@ import mongoose from "mongoose"
 
 import authRouter from "./routes/auth"
 import workspaceRouter from "./routes/workspace"
+import tasksRouter from "./routes/tasks"
 
 import { authenticate } from "./middleware/auth"
 import { requireRole } from "./middleware/role"
@@ -26,12 +27,13 @@ app.use(
 
 app.use("/api/v1/auth", authRouter)
 
-// protected workspace routes
+// protected routes
 app.use("/api/v1/workspaces", authenticate, workspaceRouter)
+app.use("/api/v1/tasks", authenticate, tasksRouter)
+
 
 // public
 app.get("/test-1", (req, res) => {})
-
 // admin only
 app.get("/test-3", authenticate, requireRole([Role.ADMIN]), (req, res) => {})
 

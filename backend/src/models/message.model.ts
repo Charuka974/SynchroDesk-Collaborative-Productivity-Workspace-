@@ -6,9 +6,9 @@ export interface IMessage extends Document {
 
   senderId: mongoose.Types.ObjectId;
   receiverId?: mongoose.Types.ObjectId | null;
-
+ 
   content?: string;
-  type: "text" | "image" | "file" | "audio";
+  type: "text" | "image" | "file" | "audio"; 
 
   attachments?: {
     resourceId: mongoose.Types.ObjectId;
