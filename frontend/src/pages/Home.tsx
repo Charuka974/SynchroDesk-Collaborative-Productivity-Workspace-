@@ -2,6 +2,9 @@ import { useState, useEffect } from "react"
 // import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/authContext"
 
+import { AIAssistant } from "../components/AiAssistant";
+import { AIProvider } from "../context/aiContext";
+
 export default function SynchroDeskDashboard() {
 
   // const navigate = useNavigate()
@@ -262,6 +265,13 @@ export default function SynchroDeskDashboard() {
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* AI Assistant Panel */}
+            <AIProvider>
+              <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+                {/* ...all your dashboard content */}
+                <AIAssistant />
+              </div>
+            </AIProvider>
             {/* Upcoming Events */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Upcoming Events</h2>
@@ -318,6 +328,9 @@ export default function SynchroDeskDashboard() {
                 </div>
               )}
             </div>
+
+            
+
           </div>
         </div>
       </main>

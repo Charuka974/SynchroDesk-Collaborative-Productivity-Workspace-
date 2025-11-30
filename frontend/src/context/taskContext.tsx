@@ -31,7 +31,7 @@ export interface ITask {
   status: "TODO" | "IN_PROGRESS" | "DONE";
   subtasks?: { title: string; completed: boolean }[];
   attachments?: { resourceId: string }[];
-  comments?: { userId: string; message: string; createdAt?: string }[];
+  comments?: { userId: string; message: string; createdAt?: Date; }[];
   createdAt?: string;
   updatedAt?: string;
 }
