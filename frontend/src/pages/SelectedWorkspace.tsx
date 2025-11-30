@@ -4,7 +4,7 @@ import { getMyWorkspacesAPI, getWorkspaceByIdAPI } from "../services/workspace";
 import Swal from "sweetalert2";
 import ChatWindow from "../components/Chat";
 import { motion } from "framer-motion";
-import { TaskProvider, useTasks, type ICreateTaskPayload, type ITask } from "../context/taskContext";
+import { TaskProvider, useTasks, type ICreateTaskPayload} from "../context/taskContext";
 import { TaskPanel } from "../components/Tasks";
 
 

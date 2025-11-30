@@ -151,26 +151,26 @@ export default function SynchroDeskDashboard() {
         {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {/* CARD */}
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
             <span className="text-gray-600 text-sm font-medium">
               Total Tasks
             </span>
             <p className="text-3xl font-bold">{stats.total}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
             <span className="text-gray-600 text-sm font-medium">Pending</span>
             <p className="text-3xl font-bold">{stats.pending}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
             <span className="text-gray-600 text-sm font-medium">
               In Progress
             </span>
             <p className="text-3xl font-bold">{stats.inProgress}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
             <span className="text-gray-600 text-sm font-medium">
               Completed
             </span>
@@ -179,7 +179,7 @@ export default function SynchroDeskDashboard() {
         </div>
 
         {/* MAIN TASKS PANEL */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">My Tasks</h2>
 
@@ -192,7 +192,7 @@ export default function SynchroDeskDashboard() {
           </div>
 
           {/* FILTER TABS */}
-          <div className="flex gap-2 mb-4 border-b">
+          <div className="flex gap-2 mb-4 border-b-2 border-gray-400 shadow-sm">
             {["All", "Pending", "In Progress", "Done"].map(f => (
               <button
                 key={f}

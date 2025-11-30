@@ -122,3 +122,51 @@ export const changePassword = async (req: AUthRequest, res: Response) => {
     res.status(500).json({ message: "Server error changing password" });
   }
 };
+
+// ===============================================
+// GET MY WORKSPACES WITH MY ROLE
+// ===============================================
+export const getMyWorkspaceRoles = async (req: AUthRequest, res: Response) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Fetch all workspaces where user is a member or owner
+    const workspaces = await Workspace.find({
+      $or: [
+        { owner: userId },
+        { "members.userId": userId }
+      ]
+    })
+      .select("name description owner members")
+      .lean();
+
+    // Map each workspace to include user's role
+    const workspacesWithRoles = workspaces.map((ws) => {
+      let myRole = "MEMBER";
+
+      if (ws.owner?.toString() === userId.toString()) {
+        myRole = "OWNER";
+      } else {
+        const membership = ws.members.find(
+          (m) => m.userId?.toString() === userId.toString()
+        );
+        if (membership) myRole = membership.role;
+      }
+
+      return {
+        _id: ws._id,
+        name: ws.name,
+        description: ws.description,
+        myRole,
+        memberCount: ws.members?.length || 0,
+        owner: ws.owner,
+      };
+    });
+
+    res.status(200).json(workspacesWithRoles);
+  } catch (error) {
+    console.error("Error fetching workspace roles:", error);
+    res.status(500).json({ message: "Server error fetching workspace roles" });
+  }
+};

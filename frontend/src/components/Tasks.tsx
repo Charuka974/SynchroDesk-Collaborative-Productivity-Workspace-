@@ -287,7 +287,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
   const deleteComment = async (task: ITask, index: number) => {
     const updated = task.comments?.filter((_, i) => i !== index) || [];
     await updateTask(task._id!, { comments: updated });
-    refreshTasks();
+    refreshTasks(); 
   };
 
   return (
@@ -351,10 +351,49 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
                   <h3 className={`font-semibold ${task.status === "DONE" ? "line-through text-gray-500" : "text-gray-900"}`}>
                     {task.title}
                   </h3>
-                  <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-1">
-                    {task.dueDate && <span>📅 {new Date(task.dueDate).toLocaleDateString()}</span>}
-                    <span className={`px-2 py-1 rounded text-white ${task.priority === "URGENT" ? "bg-red-600" : task.priority === "HIGH" ? "bg-orange-500" : task.priority === "MEDIUM" ? "bg-blue-500" : "bg-gray-500"}`}>{task.priority}</span>
-                    <span>💬 {(task.comments || []).length}</span>
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-1 items-center">
+                    {/* Calendar / Due Date */}
+                    {task.dueDate && (
+                        <span className="flex items-center gap-1">
+                        <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                        </svg>
+                        {new Date(task.dueDate).toLocaleDateString()}
+                        </span>
+                    )}
+
+                    {/* Priority */}
+                    <span
+                        className={`px-2 py-1 rounded text-white text-xs font-medium ${
+                        task.priority === "URGENT"
+                            ? "bg-red-600"
+                            : task.priority === "HIGH"
+                            ? "bg-orange-500"
+                            : task.priority === "MEDIUM"
+                            ? "bg-blue-500"
+                            : "bg-gray-500"
+                        }`}
+                    >
+                        {task.priority}
+                    </span>
+
+                    {/* Comments */}
+                    <span className="flex items-center gap-1">
+                        <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4-.84L3 20l.84-4A9.863 9.863 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
+                        </svg>
+                        {(task.comments || []).length}
+                    </span>
                   </div>
                 </div>
 

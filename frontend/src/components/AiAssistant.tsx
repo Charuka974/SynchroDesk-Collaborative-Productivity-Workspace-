@@ -58,8 +58,8 @@ interface AIAssistantProps {
 }
 
 export const AIAssistant = ({ userName = "", onTaskCreate }: AIAssistantProps) => {
-  const { user, setUser } = useAuth()
-  const { ask, response, loading } = useAI();
+  const { user } = useAuth()
+  const { ask, loading } = useAI();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([

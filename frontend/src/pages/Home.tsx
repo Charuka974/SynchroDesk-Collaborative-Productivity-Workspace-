@@ -3,7 +3,6 @@ import { useAuth } from "../context/authContext";
 import { AIAssistant } from "../components/AiAssistant";
 import { AIProvider } from "../context/aiContext";
 import { TaskPanel } from "../components/Tasks";
-import type { ITask } from "../context/taskContext";
 import { useTasks } from "../context/taskContext";
 // import { useNavigate } from "react-router-dom";
 
@@ -28,13 +27,9 @@ export default function SynchroDeskDashboard() {
     { id: 2, content: "API integration needs testing", timestamp: "2025-11-14 14:20" },
   ]);
 
-  const [showTaskModal, setShowTaskModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState("Pending");
-  const [editTaskData, setEditTaskData] = useState<ITask | null>(null);
   const { tasks, loadPersonalTasks, changeStatus, createTask, updateTask } = useTasks();
   const refreshTasks = () => loadPersonalTasks();
-
-
   useEffect(() => {
     loadPersonalTasks();
   }, [loadPersonalTasks]);
@@ -52,19 +47,6 @@ export default function SynchroDeskDashboard() {
     alert("Note saved!");
   };
 
-  // const handleAddTask = async () => {
-  //   if (!newTaskTitle.trim()) return;
-
-  //   await createTask({
-  //     title: newTaskTitle,
-  //     description: "",
-  //     priority: "MEDIUM",
-  //   });
-
-  //   setNewTaskTitle("");
-  //   setShowTaskModal(false);
-  //   refreshTasks();
-  // };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">

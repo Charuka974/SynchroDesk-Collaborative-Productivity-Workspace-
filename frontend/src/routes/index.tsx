@@ -4,6 +4,7 @@ import { useAuth } from "../context/authContext"
 import Layout from "../components/Layout"
 import { WorkspaceProvider } from "../context/workspaceContext"
 import { TaskProvider } from "../context/taskContext"
+import { UserProvider } from "../context/profileContext"
 
 const Index = lazy(() => import("../pages"))
 const Login = lazy(() => import("../pages/Login"))
@@ -14,6 +15,7 @@ const SelectedWorkspace = lazy(() => import("../pages/SelectedWorkspace"))
 const Tasks = lazy(() => import("../pages/Tasks"))
 const Landing = lazy(() => import("../pages/Landing"))
 const ChatMessages = lazy(() => import("../pages/Chat"))
+const ManageProfile = lazy(() => import("../pages/ManageProfile"))
 
 
 
@@ -99,6 +101,17 @@ export default function Router() {
               element={
                 <WorkspaceProvider>
                   <SelectedWorkspace />
+                </WorkspaceProvider>
+              }
+            />
+
+            <Route
+              path="/manage-profile"
+              element={
+                <WorkspaceProvider>
+                  <UserProvider>
+                    <ManageProfile />
+                  </UserProvider>
                 </WorkspaceProvider>
               }
             />

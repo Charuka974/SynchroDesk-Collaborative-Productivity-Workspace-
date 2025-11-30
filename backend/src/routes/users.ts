@@ -6,16 +6,29 @@ import {
   getAllUsers,
   getUsersInMyWorkspaces,
   updateProfile,
-  changePassword
+  changePassword,
+  getMyWorkspaceRoles
 } from "../controllers/user.controller";
 
 const router = Router();
 
+// ─────────────────────────────
+// USER PROFILE ROUTES
+// ─────────────────────────────
 router.get("/me", authenticate, getMyProfile);
-router.get("/", authenticate, getAllUsers);
-router.get("/workspace-users", authenticate, getUsersInMyWorkspaces);
-
 router.put("/me", authenticate, updateProfile);
-router.put("/change-password", authenticate, changePassword);
+router.put("/me/password", authenticate, changePassword);
+
+// ─────────────────────────────
+// USERS LIST ROUTES
+// ─────────────────────────────
+router.get("/", authenticate, getAllUsers);
+
+// ─────────────────────────────
+// WORKSPACE RELATED USERS
+// ─────────────────────────────
+router.get("/workspace-members", authenticate, getUsersInMyWorkspaces);
+
+router.get("/workspace-my-roles", authenticate, getMyWorkspaceRoles);
 
 export default router;
