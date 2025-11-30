@@ -41,7 +41,7 @@ export default function SynchroDeskDashboard() {
   );
   const [editingText, setEditingText] = useState<Record<string, string>>({});
 
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("Pending");
   const TASK_PRIORITIES: TaskPriority[] = ["LOW", "MEDIUM", "HIGH", "URGENT"];
 
   // Load tasks (workspace or personal)
@@ -119,7 +119,7 @@ export default function SynchroDeskDashboard() {
 
   // Filters
   const filteredTasks = tasks.filter(task => {
-    if (activeFilter === "all") return true;
+    if (activeFilter === "All") return true;
 
     const map: Record<string, TaskStatus> = {
       Pending: "TODO",
@@ -193,7 +193,7 @@ export default function SynchroDeskDashboard() {
 
           {/* FILTER TABS */}
           <div className="flex gap-2 mb-4 border-b">
-            {["all", "Pending", "In Progress", "Done"].map(f => (
+            {["All", "Pending", "In Progress", "Done"].map(f => (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}

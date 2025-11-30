@@ -69,7 +69,11 @@ export default function Router() {
               </RequireAuth>
             }
           >
-            <Route path="/home" element={<Home />} />
+            <Route path="/home" element={
+              <TaskProvider>
+                <Home />
+              </TaskProvider>} 
+            />
             
             <Route path="/messages" element={<ChatMessages />} />
 

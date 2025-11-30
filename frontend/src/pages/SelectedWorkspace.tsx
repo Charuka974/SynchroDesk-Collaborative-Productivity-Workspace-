@@ -4,6 +4,8 @@ import { getMyWorkspacesAPI, getWorkspaceByIdAPI } from "../services/workspace";
 import Swal from "sweetalert2";
 import ChatWindow from "../components/Chat";
 import { motion } from "framer-motion";
+import { TaskProvider, useTasks, type ICreateTaskPayload, type ITask } from "../context/taskContext";
+import { TaskPanel } from "../components/Tasks";
 
 
 export default function WorkspacesPage() {
@@ -43,6 +45,44 @@ export default function WorkspacesPage() {
     null
   );
   const [loading, setLoading] = useState(true);
+
+  // const [showTaskModal, setShowTaskModal] = useState(false);
+  // const [activeFilter, setActiveFilter] = useState("Pending");
+  // const [editTaskData, setEditTaskData] = useState<ITask | null>(null);
+  // const { tasks, loadPersonalTasks, changeStatus } = useTasks();
+  // const refreshTasks = () => {
+  //   loadPersonalTasks();
+  // };
+
+  const WorkspaceTasks = ({ workspaceId }: { workspaceId: string }) => {
+    const { tasks,loadWorkspaceTasks, loadPersonalTasks, changeStatus, updateTask, createTask } = useTasks();
+    const [activeFilter, setActiveFilter] = useState("Pending");
+
+    // Load tasks for this workspace
+    useEffect(() => {
+      loadWorkspaceTasks(workspaceId); // You may need to adjust API to accept workspaceId
+    }, [workspaceId]);
+    const refreshTasks = () => loadPersonalTasks();
+    const createTaskWithWorkspace = async (task: Omit<ICreateTaskPayload, "workspaceId">) => {
+      await createTask({ ...task, workspaceId });
+      refreshTasks();
+    };
+
+    return (
+      <TaskPanel
+        tasks={tasks}
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
+        createTask={createTaskWithWorkspace}
+        updateTask={updateTask}
+        changeStatus={changeStatus}
+        refreshTasks={refreshTasks}
+      />
+
+    );
+  };
+
+
 
   // Load workspace list
   useEffect(() => {
@@ -181,7 +221,7 @@ export default function WorkspacesPage() {
           )}
 
           {currentTab !== "Chat" && (
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto">
               {currentTab === "Home" && (
                 <>
                   <h2 className="text-xl font-bold mb-4">
@@ -191,7 +231,13 @@ export default function WorkspacesPage() {
                 </>
               )}
 
-              {currentTab === "Tasks" && <p>Tasks will show here later.</p>}
+              {currentTab === "Tasks" && (
+                <TaskProvider>
+                  <WorkspaceTasks workspaceId={workspace.id} />
+                </TaskProvider>
+              )}
+
+
               {currentTab === "Notes" && <p>Notes panel</p>}
               {currentTab === "Files" && <p>Files list</p>}
               {currentTab === "Events" && <p>Calendar UI</p>}

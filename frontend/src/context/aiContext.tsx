@@ -3,7 +3,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import { askAI, type AIResponse } from "../services/aiassistant";
 
 interface AIContextType {
-  ask: (prompt: string) => Promise<void>;
+  ask: (prompt: string) => Promise<string>; // returns the AI response
   response: string;
   loading: boolean;
 }
@@ -14,14 +14,17 @@ export const AIProvider = ({ children }: { children: ReactNode }) => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const ask = async (prompt: string) => {
+  const ask = async (prompt: string): Promise<string> => {
     setLoading(true);
     try {
-      const res: AIResponse = await askAI(prompt);
+      const res: AIResponse = await askAI(prompt); // call your backend
       setResponse(res.content);
+      return res.content; // return the content so caller can use it
     } catch (err) {
       console.error("AI error:", err);
-      setResponse("Error contacting AI.");
+      const errorMessage = "Error contacting AI.";
+      setResponse(errorMessage);
+      return errorMessage; // return error message as fallback
     } finally {
       setLoading(false);
     }

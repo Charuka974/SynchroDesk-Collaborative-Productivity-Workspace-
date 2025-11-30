@@ -55,7 +55,7 @@ function Layout() {
         <Footer />
 
         {/* Floating Action Buttons */}
-        <FloatButtonContainer />
+        {/* <FloatButtonContainer /> */}
 
       </main>
     </div>

@@ -371,7 +371,7 @@ export default function WorkspacesPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-linear-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen w-full bg-linear-to-br from-gray-50 to-gray-100">
       <div className="bg-white border-b border-gray-200 px-8 py-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
