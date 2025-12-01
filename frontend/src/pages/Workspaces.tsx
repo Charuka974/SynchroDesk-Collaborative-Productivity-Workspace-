@@ -50,9 +50,9 @@ export default function WorkspacesPage() {
   // State
   // ----------------------
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
-    null
-  );
+  // const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
+  //   null
+  // );
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);

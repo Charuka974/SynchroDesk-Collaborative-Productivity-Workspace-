@@ -77,7 +77,12 @@ export default function Router() {
               </TaskProvider>} 
             />
             
-            <Route path="/messages" element={<ChatMessages />} />
+            <Route 
+              path="/messages" 
+              element={
+                  <ChatMessages/>
+              } 
+            />
 
             <Route 
               path="/tasks"

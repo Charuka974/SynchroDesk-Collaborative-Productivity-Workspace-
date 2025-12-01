@@ -32,13 +32,13 @@ export default function Header() {
 
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <header className="bg-white border-b border-gray-200 z-50 shadow-sm"> {/* sticky top-0 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center gap-8">
             <Link to="/home" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-linear-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
+              <div className="invisible w-10 h-10 bg-linear-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>

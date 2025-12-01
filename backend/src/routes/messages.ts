@@ -1,33 +1,12 @@
-import { Router } from "express";
+import express from "express";
 import { authenticate } from "../middleware/auth";
-import {
-  sendMessage,
-  getMessagesByChannel,
-  editMessage,
-  deleteMessage
-} from "../controllers/message.controller";
+import { getMessages, getUsersForSidebar, sendMessage } from "../controllers/message.controller";
 
-const router = Router();
+const router = express.Router();
 
-// -------------------------
-// Send a message (workspace/channel/direct)
-// -------------------------
-router.post("/", authenticate, sendMessage);
+router.get("/users", authenticate, getUsersForSidebar);
+router.get("/:id", authenticate, getMessages);
 
-// -------------------------
-// Get messages by workspace or channel
-// -------------------------
-// expects query params: ?workspaceId=...&channelId=...
-router.get("/", authenticate, getMessagesByChannel);
-
-// -------------------------
-// Edit a message
-// -------------------------
-router.put("/:messageId", authenticate, editMessage);
-
-// -------------------------
-// Delete a message
-// -------------------------
-router.delete("/:messageId", authenticate, deleteMessage);
+router.post("/send/:id", authenticate, sendMessage);
 
 export default router;

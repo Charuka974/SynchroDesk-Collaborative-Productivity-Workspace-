@@ -7,6 +7,7 @@ import {
   useTasks,
   type ITask
 } from "../context/taskContext";
+import { CheckCircle2, Clock, ListTodo, PlayCircle } from "lucide-react";
 
 export default function SynchroDeskDashboard() {
   const { user } = useAuth();
@@ -149,37 +150,109 @@ export default function SynchroDeskDashboard() {
         </header>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          {/* CARD */}
-          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
+        <div className="p-8 bg-linear-to-br from-gray-50 to-gray-100">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {/* Total Tasks */}
+              <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-blue-100 text-sm font-semibold uppercase tracking-wide">
+                      Total Tasks
+                    </span>
+                    <ListTodo className="w-8 h-8 text-blue-200 group-hover:rotate-12 transition-transform duration-300" />
+                  </div>
+                  <p className="text-5xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+                    {stats.total}
+                  </p>
+                  <div className="h-1 w-16 bg-blue-300 rounded-full group-hover:w-24 transition-all duration-300"></div>
+                </div>
+              </div>
+
+              {/* Pending */}
+              <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-orange-100 text-sm font-semibold uppercase tracking-wide">
+                      Pending
+                    </span>
+                    <Clock className="w-8 h-8 text-orange-200 group-hover:animate-pulse" />
+                  </div>
+                  <p className="text-5xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+                    {stats.pending}
+                  </p>
+                  <div className="h-1 w-16 bg-orange-300 rounded-full group-hover:w-24 transition-all duration-300"></div>
+                </div>
+              </div>
+
+              {/* In Progress */}
+              <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-purple-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-purple-100 text-sm font-semibold uppercase tracking-wide">
+                      In Progress
+                    </span>
+                    <PlayCircle className="w-8 h-8 text-purple-200 group-hover:rotate-90 transition-transform duration-500" />
+                  </div>
+                  <p className="text-5xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+                    {stats.inProgress}
+                  </p>
+                  <div className="h-1 w-16 bg-purple-300 rounded-full group-hover:w-24 transition-all duration-300"></div>
+                </div>
+              </div>
+
+              {/* Completed */}
+              <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 to-green-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-green-100 text-sm font-semibold uppercase tracking-wide">
+                      Completed
+                    </span>
+                    <CheckCircle2 className="w-8 h-8 text-green-200 group-hover:scale-125 transition-transform duration-300" />
+                  </div>
+                  <p className="text-5xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+                    {stats.done}
+                  </p>
+                  <div className="h-1 w-16 bg-green-300 rounded-full group-hover:w-24 transition-all duration-300"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-300 p-6 ">
             <span className="text-gray-600 text-sm font-medium">
               Total Tasks
             </span>
             <p className="text-3xl font-bold">{stats.total}</p>
           </div>
 
-          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-300 p-6 ">
             <span className="text-gray-600 text-sm font-medium">Pending</span>
             <p className="text-3xl font-bold">{stats.pending}</p>
           </div>
 
-          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-300 p-6 ">
             <span className="text-gray-600 text-sm font-medium">
               In Progress
             </span>
             <p className="text-3xl font-bold">{stats.inProgress}</p>
           </div>
 
-          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
+          <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-300 p-6 ">
             <span className="text-gray-600 text-sm font-medium">
               Completed
             </span>
             <p className="text-3xl font-bold">{stats.done}</p>
           </div>
-        </div>
+        </div> */}
 
         {/* MAIN TASKS PANEL */}
-        <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-200 p-6 ">
+        <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-300 p-6 ">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">My Tasks</h2>
 
@@ -192,7 +265,7 @@ export default function SynchroDeskDashboard() {
           </div>
 
           {/* FILTER TABS */}
-          <div className="flex gap-2 mb-4 border-b-2 border-gray-400 shadow-sm">
+          <div className="flex gap-2 mb-4 border-b border-gray-300 shadow-sm">
             {["All", "Pending", "In Progress", "Done"].map(f => (
               <button
                 key={f}
@@ -217,12 +290,12 @@ export default function SynchroDeskDashboard() {
               return (
                 <div
                   key={id}
-                  className={`p-4 rounded-lg border-l-4 ${
+                  className={`p-4 rounded-lg border-l-4 border-b-2 ${
                     task.status === "DONE"
-                      ? "border-green-500 bg-green-50"
+                      ? "border-green-500 bg-green-100"
                       : task.status === "IN_PROGRESS"
-                      ? "border-purple-500 bg-purple-50"
-                      : "border-yellow-500 bg-yellow-50"
+                      ? "border-purple-500 bg-purple-100"
+                      : "border-yellow-500 bg-yellow-100"
                   }`}
                 >
                   {/* TOP AREA */}
@@ -260,7 +333,7 @@ export default function SynchroDeskDashboard() {
                         className="sr-only peer" // hide default checkbox
                       />
                       <div
-                        className="w-6 h-6 bg-white border-2 border-gray-300 rounded-md
+                        className="w-6 h-6 bg-white border-2 border-gray-300 shadow-sm rounded-md
                                   peer-checked:bg-green-500 peer-checked:border-green-500
                                   transition-colors shrink-0"
                       >
@@ -384,7 +457,7 @@ export default function SynchroDeskDashboard() {
 
                   {/* EXPANDED SECTION */}
                   {isOpen && (
-                    <div className="mt-3 bg-white p-3 rounded border">
+                    <div className="mt-3 bg-white p-3 rounded border border-gray-300 shadow-sm">
                       <p className="text-gray-700 mb-3">
                         {task.description || "No description"}
                       </p>
@@ -398,12 +471,12 @@ export default function SynchroDeskDashboard() {
                         return (
                           <div
                             key={index}
-                            className="bg-gray-50 p-2 rounded border mb-2"
+                            className="bg-gray-50 p-2 rounded border border-gray-300 shadow-sm mb-2"
                           >
                             {editing ? (
                               <>
                                 <textarea
-                                  className="w-full p-2 border rounded"
+                                  className="w-full p-2 border border-gray-300 shadow-sm rounded"
                                   value={editingText[id] || ""}
                                   onChange={e =>
                                     setEditingText(prev => ({
@@ -467,7 +540,7 @@ export default function SynchroDeskDashboard() {
 
                       {/* ADD COMMENT */}
                       <textarea
-                        className="w-full p-2 border rounded mt-2"
+                        className="w-full p-2 border border-gray-300 shadow-sm rounded mt-2"
                         placeholder="Write a comment..."
                         value={newCommentText[id] || ""}
                         onChange={e =>
@@ -506,7 +579,7 @@ export default function SynchroDeskDashboard() {
               onChange={e =>
                 setNewTaskData({ ...newTaskData, title: e.target.value })
               }
-              className="w-full p-3 border rounded mb-2"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
             <textarea
@@ -515,7 +588,7 @@ export default function SynchroDeskDashboard() {
               onChange={e =>
                 setNewTaskData({ ...newTaskData, description: e.target.value })
               }
-              className="w-full p-3 border rounded mb-2"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
             <input
@@ -524,7 +597,7 @@ export default function SynchroDeskDashboard() {
               onChange={e =>
                 setNewTaskData({ ...newTaskData, dueDate: e.target.value })
               }
-              className="w-full p-3 border rounded mb-2"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
             <select
@@ -535,7 +608,7 @@ export default function SynchroDeskDashboard() {
                   priority: e.target.value as TaskPriority
                 })
               }
-              className="w-full p-3 border rounded mb-4"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-4"
             >
               {TASK_PRIORITIES.map(p => (
                 <option key={p}>{p}</option>
@@ -545,7 +618,7 @@ export default function SynchroDeskDashboard() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowTaskModal(false)}
-                className="flex-1 p-3 border rounded"
+                className="flex-1 p-3 border border-gray-300 shadow-sm rounded"
               >
                 Cancel
               </button>
@@ -573,7 +646,7 @@ export default function SynchroDeskDashboard() {
               onChange={e =>
                 setEditTaskData({ ...editTaskData, title: e.target.value })
               }
-              className="w-full p-3 border rounded mb-2"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
             <textarea
@@ -584,7 +657,7 @@ export default function SynchroDeskDashboard() {
                   description: e.target.value
                 })
               }
-              className="w-full p-3 border rounded mb-2"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
             <input
@@ -596,7 +669,7 @@ export default function SynchroDeskDashboard() {
                   dueDate: e.target.value
                 })
               }
-              className="w-full p-3 border rounded mb-2"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
             <select
@@ -607,7 +680,7 @@ export default function SynchroDeskDashboard() {
                   priority: e.target.value as TaskPriority
                 })
               }
-              className="w-full p-3 border rounded mb-4"
+              className="w-full p-3 border border-gray-300 shadow-sm rounded mb-4"
             >
               {TASK_PRIORITIES.map(p => (
                 <option key={p}>{p}</option>
@@ -617,7 +690,7 @@ export default function SynchroDeskDashboard() {
             <div className="flex gap-3">
               <button
                 onClick={() => setEditTaskData(null)}
-                className="flex-1 p-3 border rounded"
+                className="flex-1 p-3 border border-gray-300 shadow-sm rounded"
               >
                 Cancel
               </button>
