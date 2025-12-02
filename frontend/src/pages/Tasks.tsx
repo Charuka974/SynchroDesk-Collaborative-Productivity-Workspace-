@@ -250,15 +250,18 @@ export default function SynchroDeskDashboard() {
             <p className="text-3xl font-bold">{stats.done}</p>
           </div>
         </div> */}
+        
 
         {/* MAIN TASKS PANEL */}
         <div className="space-y-6 rounded-xl bg-white shadow-sm border border-gray-300 p-6 ">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">My Tasks</h2>
+            <h2 className="font-extrabold text-2xl bg-linear-to-r from-slate-600 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              My Tasks
+            </h2>
 
             <button
               onClick={() => setShowTaskModal(true)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
+              className="px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg"
             >
               Add Task
             </button>
@@ -463,7 +466,7 @@ export default function SynchroDeskDashboard() {
                       </p>
 
                       {/* COMMENTS */}
-                      <h4 className="font-semibold mb-2">Comments</h4>
+                      <h4 className="font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-2">Comments</h4>
 
                       {(task.comments || []).map((c, index) => {
                         const editing = editingIndex[id] === index;
@@ -553,7 +556,7 @@ export default function SynchroDeskDashboard() {
 
                       <button
                         onClick={() => addComment(task)}
-                        className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded"
+                        className="mt-2 px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded"
                       >
                         Add Comment
                       </button>
@@ -570,8 +573,11 @@ export default function SynchroDeskDashboard() {
       {showTaskModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Add New Task</h2>
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4 text-center">Add New Task</h2>
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Title
+            </label>
             <input
               type="text"
               placeholder="Task title..."
@@ -582,6 +588,9 @@ export default function SynchroDeskDashboard() {
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Description
+            </label>
             <textarea
               placeholder="Description..."
               value={newTaskData.description}
@@ -591,6 +600,9 @@ export default function SynchroDeskDashboard() {
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Due Date
+            </label>
             <input
               type="date"
               value={newTaskData.dueDate}
@@ -600,6 +612,9 @@ export default function SynchroDeskDashboard() {
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Priority
+            </label>
             <select
               value={newTaskData.priority}
               onChange={e =>
@@ -625,7 +640,7 @@ export default function SynchroDeskDashboard() {
 
               <button
                 onClick={handleAddTask}
-                className="flex-1 p-3 bg-indigo-600 text-white rounded"
+                className="flex-1 p-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded"
               >
                 Add Task
               </button>
@@ -638,8 +653,11 @@ export default function SynchroDeskDashboard() {
       {editTaskData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Edit Task</h2>
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4 text-center">Edit Task</h2>
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Title
+            </label>
             <input
               type="text"
               value={editTaskData.title}
@@ -649,6 +667,9 @@ export default function SynchroDeskDashboard() {
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Description
+            </label>
             <textarea
               value={editTaskData.description}
               onChange={e =>
@@ -660,6 +681,9 @@ export default function SynchroDeskDashboard() {
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Due Date
+            </label>
             <input
               type="date"
               value={editTaskData.dueDate?.slice(0, 10) || ""}
@@ -672,6 +696,9 @@ export default function SynchroDeskDashboard() {
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
 
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Priority
+            </label>
             <select
               value={editTaskData.priority}
               onChange={e =>
@@ -711,7 +738,7 @@ export default function SynchroDeskDashboard() {
                   refreshTasks();
                   setEditTaskData(null);
                 }}
-                className="flex-1 p-3 bg-indigo-600 text-white rounded"
+                className="flex-1 p-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded"
               >
                 Save
               </button>

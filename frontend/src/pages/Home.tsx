@@ -80,7 +80,7 @@ export default function SynchroDeskDashboard() {
           <div className="space-y-6 rounded-xl overflow-hidden bg-white shadow-sm border border-gray-200">
             {/* Upcoming Events */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Upcoming Events</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Upcoming Events</h2>
               <div className="space-y-3">
                 {events.map((event) => (
                   <div
@@ -88,7 +88,7 @@ export default function SynchroDeskDashboard() {
                     className="p-4 bg-linear-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg flex items-center justify-center shrink-0">
                         <svg
                           className="w-5 h-5 text-white"
                           fill="none"
@@ -129,7 +129,7 @@ export default function SynchroDeskDashboard() {
               />
               <button
                 onClick={handleSaveNote}
-                className="mt-3 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                className="mt-3 w-full px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg transition"
               >
                 Save Note
               </button>

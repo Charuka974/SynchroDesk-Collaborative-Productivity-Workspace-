@@ -2,19 +2,22 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getMyWorkspacesAPI, getWorkspaceByIdAPI } from "../services/workspace";
 import Swal from "sweetalert2";
-import ChatWindow from "../components/Chat";
+// SelectedWorkspace.tsx
 import { motion } from "framer-motion";
 import { TaskProvider, useTasks, type ICreateTaskPayload} from "../context/taskContext";
 import { TaskPanel } from "../components/Tasks";
 import { ChatProvider } from "../context/messageContext";
 import { useAuth } from "../context/authContext";
-
+import { Chat } from "../components/Chat";
+import { NotesPanel } from "../components/WorkspaceNotes";
+import { ResourcesPanel } from "../components/WorkspaceFiles";
+import {CalendarPanel} from "../components/WorkspaceCalender";
 
 export default function WorkspacesPage() {
   const { user } = useAuth();
   const [params] = useSearchParams();
   const id = params.get("id");
-  const [currentTab, setCurrentTab] = useState("Woerkspace");
+  const [currentTab, setCurrentTab] = useState("Tasks");
 
   const Toast = Swal.mixin({
     toast: true,
@@ -119,14 +122,14 @@ export default function WorkspacesPage() {
   const WorkspaceLayout = ({ workspace }: { workspace: Workspace }) => (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-60 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 bg-linear-to-r from-indigo-500 to-purple-600 text-white">
+      <aside className="w-60 bg-white border-r-2 border-gray-400 flex flex-col">
+        <div className="p-6 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 text-white">
           <h1 className="text-2xl font-bold">{workspace.name}</h1>
           <p className="text-white text-opacity-90">{workspace.description}</p>
         </div>
 
         {/* Members */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b-2 border-gray-400">
           <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
             Team Members
           </h3>
@@ -187,9 +190,10 @@ export default function WorkspacesPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Tabs */}
-        <div className="bg-white border-b border-gray-200 px-6">
+        <div className="bg-white border-b border-gray-600 px-6">
           <div className="flex gap-1">
-            {["Home", "Chat", "Tasks", "Notes", "Files", "Calendar"].map((tab) => (
+            {/* {["Home", "Chat", "Tasks", "Notes", "Files", "Calendar"].map((tab) => ( */}
+            {["Chat", "Tasks", "Notes", "Files", "Events"].map((tab) => (
               <button
                 key={tab}
                 className={`px-4 py-3 text-sm font-medium transition-all duration-200 relative ${
@@ -217,7 +221,7 @@ export default function WorkspacesPage() {
           {currentTab === "Chat" && (
             <div className="w-full h-full">
               <ChatProvider currentUser={user}>
-                <ChatWindow userId={user._id} workspaceId={workspace.id} />
+                <Chat initialWorkspaceId={workspace.id} />
               </ChatProvider>
               {/* <ChatWindow
                 userId="me"
@@ -228,14 +232,14 @@ export default function WorkspacesPage() {
 
           {currentTab !== "Chat" && (
             <div className="flex-1 overflow-y-auto">
-              {currentTab === "Home" && (
+              {/* {currentTab === "Home" && (
                 <>
                   <h2 className="text-xl font-bold mb-4">
                     Welcome to {workspace.name}
                   </h2>
                   <p>Workspace details and tasks will appear here.</p>
                 </>
-              )}
+              )} */}
 
               {currentTab === "Tasks" && (
                 <TaskProvider>
@@ -244,9 +248,18 @@ export default function WorkspacesPage() {
               )}
 
 
-              {currentTab === "Notes" && <p>Notes panel</p>}
-              {currentTab === "Files" && <p>Files list</p>}
-              {currentTab === "Events" && <p>Calendar UI</p>}
+              {currentTab === "Notes" && (
+                  <NotesPanel />
+              )}
+
+              {currentTab === "Files" && (
+                <ResourcesPanel />
+              )}
+
+              {currentTab === "Events" && (
+                <CalendarPanel />
+              )}
+
             </div>
           )}
         </div>

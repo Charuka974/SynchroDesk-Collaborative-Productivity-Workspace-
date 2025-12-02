@@ -33,7 +33,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 p-6 hidden lg:block transition-all duration-300 z-50 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+      <aside className={`fixed left-0 top-0 h-full bg-white border-r-2 border-gray-400 p-6 hidden lg:block transition-all duration-300 z-50 ${isCollapsed ? 'w-20' : 'w-64'}`}>
         {/* Header with Logo and Toggle */}
         <div className="flex items-center justify-between mb-8">
           <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
@@ -42,12 +42,12 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            {!isCollapsed && <h1 className="text-xl font-bold text-gray-900 whitespace-nowrap">SynchroDesk</h1>}
+            {!isCollapsed && <h1 className="text-xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent whitespace-nowrap">SynchroDesk</h1>}
           </div>
           
           <button
             onClick={onCollapseToggle}
-            className={`absolute top-1/2 left-full transform -translate-y-1/2 -translate-x-1/2 p-2  bg-white border border-gray-200 hover:bg-gray-300 rounded-lg shadow-lg transition`}
+            className={`absolute top-1/2 left-full transform -translate-y-1/2 -translate-x-1/2 p-2  bg-white border border-gray-400 hover:bg-gray-300 rounded-lg shadow-lg transition`}
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
             <svg
@@ -151,7 +151,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {/* Upgrade Card - Expanded */}
         {!isCollapsed && (
           <div className="absolute bottom-1 left-6 right-6">
-            <div className="bg-linear-to-r from-gray-500 to-gray-600 rounded-lg p-2 text-white shadow-lg">
+            <div className="bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 font-bold rounded-lg p-2 text-white shadow-lg">
               <h3 className="font-semibold mb-1">Upgrade to Pro</h3>
               <p className="text-xs text-gray-100 mb-3">Unlock unlimited tasks and more features</p>
               <button className="w-full bg-white text-gray-900 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
@@ -165,7 +165,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {isCollapsed && (
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
             <button 
-              className="w-10 h-10 bg-linear-to-r from-gray-800 to-gray-600 rounded-lg flex items-center justify-center hover:from-gray-900 hover:to-gray-700 transition shadow-lg"
+              className="w-10 h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 font-bold text-white rounded-lg flex items-center justify-center hover:from-gray-900 hover:to-gray-700 transition shadow-lg"
               title="Upgrade to Pro"
             >
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,7 +181,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {/* Header with Logo and Close Button */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-linear-to-br from-gray-800 to-gray-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
+            <div className="w-10 h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg flex items-center justify-center transform group-hover:scale-105 transition">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>

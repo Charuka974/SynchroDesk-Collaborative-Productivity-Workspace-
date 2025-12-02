@@ -6,20 +6,6 @@ import cloudinary from "../config/cloudinary";
 import { getReceiverSocketId, io } from "../lib/socket";
 import { Workspace } from "../models/workspace.model";
 
-// GET all users except logged-in user
-// export const getUsersForSidebar = async (req: AUthRequest, res: Response) => {
-//   try {
-//     const loggedInUserId = req.user?.sub;
-
-//     const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
-
-//     res.status(200).json(filteredUsers);
-//   } catch (error: any) {
-//     console.error("Error in getUsersForSidebar:", error.message);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
 export const getUsersForSidebar = async (req: AUthRequest, res: Response) => {
   try {
     const loggedInUserId = req.user?.sub;
@@ -44,12 +30,15 @@ export const getMessages = async (req: AUthRequest, res: Response) => {
     const userToChatId = req.params.id;
     const myId = req.user?.sub;
 
+    // Populate sender info
     const messages: IMessage[] = await Message.find({
       $or: [
         { senderId: myId, receiverId: userToChatId },
         { senderId: userToChatId, receiverId: myId },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .sort({ createdAt: 1 })
+      .populate("senderId", "name avatar"); // populate sender's name & avatar
 
     res.status(200).json(messages);
   } catch (error: any) {
@@ -57,6 +46,7 @@ export const getMessages = async (req: AUthRequest, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 // POST send a new message
 export const sendMessage = async (req: AUthRequest, res: Response) => {
@@ -154,15 +144,16 @@ export const getGroupMessages = async (req: AUthRequest, res: Response) => {
       return res.status(400).json({ error: "Workspace ID is required" });
     }
 
-    // Optional: check if the user is a member of the workspace
+    // Check membership
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace || !workspace.members.some(m => m.userId.toString() === userId)) {
       return res.status(403).json({ error: "You are not a member of this workspace" });
     }
 
-    // Fetch all messages in this workspace
+    // Fetch messages and populate sender
     const messages: IMessage[] = await Message.find({ workspaceId })
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .populate("senderId", "name avatar"); // populate sender's name & avatar
 
     res.status(200).json(messages);
   } catch (error: any) {
@@ -170,3 +161,4 @@ export const getGroupMessages = async (req: AUthRequest, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+

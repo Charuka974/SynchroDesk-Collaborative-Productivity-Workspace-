@@ -14,7 +14,11 @@ export interface IWorkspace {
 
 export interface IMessage {
   _id: string;
-  senderId: string;
+  senderId: {
+    _id: string;
+    name: string;
+    avatar?: string;
+  };
   receiverId?: string;
   text?: string;
   image?: string;

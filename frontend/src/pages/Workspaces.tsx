@@ -366,9 +366,12 @@ export default function WorkspacesPage() {
       pink: "from-pink-500 to-pink-600",
       blue: "from-blue-500 to-blue-600",
       green: "from-green-500 to-green-600",
+      slate: "from-slate-700 via-slate-800 to-slate-900",
     };
+
     return colors[color] || colors.indigo;
   };
+
 
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-gray-50 to-gray-100">
@@ -376,14 +379,14 @@ export default function WorkspacesPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Workspaces</h1>
+              <h1 className="text-3xl font-extrabold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">Workspaces</h1>
               <p className="text-gray-600 mt-1">
                 Manage and collaborate across multiple workspaces
               </p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-sm"
+              className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 text-white rounded-lg hover:bg-gray-700 transition font-medium shadow-sm"
             >
               <svg
                 className="w-5 h-5"
@@ -408,7 +411,7 @@ export default function WorkspacesPage() {
                 onClick={() => setViewMode("grid")}
                 className={`px-4 py-2 rounded-md transition ${
                   viewMode === "grid"
-                    ? "bg-white shadow-sm text-indigo-600"
+                    ? "bg-white shadow-sm text-gray-800"
                     : "text-gray-600"
                 }`}
               >
@@ -430,7 +433,7 @@ export default function WorkspacesPage() {
                 onClick={() => setViewMode("list")}
                 className={`px-4 py-2 rounded-md transition ${
                   viewMode === "list"
-                    ? "bg-white shadow-sm text-indigo-600"
+                    ? "bg-white shadow-sm text-gray-800"
                     : "text-gray-600"
                 }`}
               >
@@ -482,7 +485,7 @@ export default function WorkspacesPage() {
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+              className="px-6 py-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 text-white rounded-lg hover:bg-gray-700 transition font-medium"
             >
               Create Workspace
             </button>
@@ -502,7 +505,7 @@ export default function WorkspacesPage() {
               >
                 <div
                   className={`h-24 bg-linear-to-r ${getColorClass(
-                    workspace.color
+                    "slate" // or get from backend
                   )} p-6 relative`}
                 >
                   <div className="flex items-start justify-between">
@@ -516,10 +519,10 @@ export default function WorkspacesPage() {
                     </div>
                     <button
                       onClick={() => openSettings(workspace)}
-                      className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition opacity-0 group-hover:opacity-100"
+                      className="p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
                     >
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-5 h-5 text-slate-300 hover:text-white transition-colors duration-200"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -594,11 +597,11 @@ export default function WorkspacesPage() {
                     </div>
                     {workspace.role === "ADMIN" ||
                       (workspace.role === "OWNER" && (
-                        <button
-                          onClick={() => openInvite(workspace)}
-                          className="ml-3 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-                        >
-                          + Invite
+                        <button 
+                          onClick={() => openInvite(workspace)} 
+                          className="ml-3 px-4 py-2 text-sm font-bold text-white bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 rounded-md hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out hover:animate-none" 
+                        > 
+                          + Invite 
                         </button>
                       ))}
                   </div>
@@ -617,9 +620,25 @@ export default function WorkspacesPage() {
                         });
                       }
                     }}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium"
+                    className="w-full px-6 py-3 font-bold text-white bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-lg shadow-lg hover:shadow-2xl hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 active:scale-98 transform transition-all duration-300 ease-out hover:scale-[1.02] border border-slate-600/50 hover:border-slate-500 relative overflow-hidden group"
                   >
-                     Open {workspace.name} {/* Workspace */}
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      <svg 
+                        className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                        />
+                      </svg>
+                      Open {workspace.name}
+                    </span>
+                    <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transform -translate-x-full group-hover:translate-x-full transition-all duration-700 ease-out"></div>
                   </button>
                 </div>
               </div>
@@ -637,7 +656,7 @@ export default function WorkspacesPage() {
             className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 mt-8 mb-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4">
               Create New Workspace
             </h2>
             <div className="space-y-4">
@@ -675,7 +694,7 @@ export default function WorkspacesPage() {
               </button>
               <button
                 onClick={handleCreateWorkspace}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                className="flex-1 px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg hover:bg-gray-700 transition"
               >
                 Create
               </button>
@@ -694,7 +713,7 @@ export default function WorkspacesPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
                 Workspace Settings
               </h2>
               <button
@@ -757,7 +776,7 @@ export default function WorkspacesPage() {
                 selectedWorkspace.role === "OWNER") && (
                 <button
                   onClick={handleUpdateWorkspace}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                  className="px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg hover:bg-gray-700 transition"
                 >
                   Save Changes
                 </button>
@@ -872,7 +891,7 @@ export default function WorkspacesPage() {
             className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 mt-8 mb-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4">
               Invite Member
             </h2>
             <p className="text-gray-600 mb-4">
@@ -916,7 +935,7 @@ export default function WorkspacesPage() {
               </button>
               <button
                 onClick={handleInviteMember}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                className="flex-1 px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg hover:bg-gray-700 transition"
               >
                 Send Invite
               </button>

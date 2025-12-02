@@ -1,180 +1,471 @@
-import React, { useState, useEffect, useRef, type ChangeEvent } from "react";
-import { Send, Paperclip, X, FileText } from "lucide-react";
-import { useChat, ChatProvider } from "../context/messageContext"; // Chat context
-import { connectSocket } from "../lib/messagesocket";
+import React, { useState, useEffect } from "react";
+import { ChatProvider, useChat } from "../context/messageContext";
+// import { connectSocket } from "../lib/messagesocket";
+import { useAuth } from "../context/authContext";
+import toast from "react-hot-toast";
 
-interface SelectedFile {
-  name: string;
-  size: string;
-  type: string;
-  preview: string | null;
-  file: File;
-}
+interface ChatProps {}
 
-interface ChatWindowProps {
-  userId: string;
-  workspaceId?: string;
-  otherUserName?: string;
-  otherUserAvatar?: string;
-  workspaceName?: string;
-  members?: Array<{ id: string; name: string; avatar?: string }>;
-}
+const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
+  const {
+    // users,
+    workspaces,
+    // selectedUser,
+    selectedWorkspace,
+    setSelectedUser,
+    setSelectedWorkspace,
+    // isUsersLoading,
+  } = useChat();
 
-export default function ChatWindow({
-  userId,
-  workspaceId,
-  otherUserName = "Chat User",
-  otherUserAvatar,
-  workspaceName = "Group Chat",
-  members = [],
-}: ChatWindowProps) {
-  const isGroupChat = !!workspaceId;
-
-  // Connect socket on mount
-  useEffect(() => {
-    if (!userId) return;
-    const initSocket = async () => {
-      try {
-        await connectSocket(userId); // wait for socket to connect
-      } catch (err) {
-        console.error("Socket connection failed:", err);
-      }
-    };
-    initSocket();
-  }, [userId]);
-
-  const { selectedUser, messages, fetchMessages, sendMessage } = useChat();
-  const [input, setInput] = useState("");
-  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-
-  // Fetch messages when selectedUser changes
-  useEffect(() => {
-    if (selectedUser) fetchMessages(selectedUser._id);
-  }, [selectedUser, fetchMessages]);
-
-  // Scroll to bottom when messages update
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [messages]);
-
-  // Handle file selection
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : null;
-    setSelectedFile({ name: file.name, size: `${fileSizeMB} MB`, type: file.type, preview, file });
-  };
-
-  const removeSelectedFile = () => {
-    if (selectedFile?.preview) URL.revokeObjectURL(selectedFile.preview);
-    setSelectedFile(null);
-  };
-
-  // Send message (text or file)
-  const handleSend = async () => {
-    if ((!input.trim() && !selectedFile) || !selectedUser) return;
-
-    try {
-      if (selectedFile) {
-        // Convert file to base64
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const base64 = reader.result as string; // this is a string
-          await sendMessage({ file: base64 });
-        };
-        reader.readAsDataURL(selectedFile.file);
-
-        removeSelectedFile();
-      }
-
-      if (input.trim()) {
-        await sendMessage({ text: input });
-        setInput("");
-      }
-    } catch (err) {
-      console.error("Error sending message:", err);
-    }
-  };
-
-
-  const formatTime = (dateString: string) =>
-    new Date(dateString).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  // Filter workspaces to only show the selected one (if initialWorkspaceId is set)
+  const displayedWorkspaces = initialWorkspaceId
+    ? workspaces.filter((ws) => ws._id === initialWorkspaceId)
+    : workspaces;
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b px-4 py-3 shadow-sm shrink-0 flex items-center gap-3">
-        {otherUserAvatar ? (
-          <img src={otherUserAvatar} alt={otherUserName} className="w-10 h-10 rounded-full object-cover" />
+    <div className="hidden w-64 border-r border-gray-200 bg-white shrink-0">
+      <ul>
+        {displayedWorkspaces.length === 0 ? (
+          <p className="px-4 text-gray-500">No workspaces found</p>
         ) : (
-          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-            {otherUserName.slice(0, 2).toUpperCase()}
-          </div>
+          displayedWorkspaces.map((ws) => (
+            <li
+              key={ws._id}
+              onClick={() => {
+                setSelectedWorkspace(ws);
+                setSelectedUser(null);
+              }}
+              className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${
+                selectedWorkspace?._id === ws._id ? "bg-indigo-100 font-semibold" : ""
+              }`}
+            >
+              {ws.name}
+            </li>
+          ))
         )}
-        <div>
-          <h2 className="font-semibold text-gray-900">{otherUserName}</h2>
-          <p className="text-xs text-green-500">Online</p>
-        </div>
+      </ul>
+    </div>
+  );
+};
+
+
+const ChatPanel: React.FC = () => {
+  const { user, loading } = useAuth();
+  const {
+    messages,
+    selectedUser,
+    selectedWorkspace,
+    fetchMessages,
+    sendMessage,
+    isMessagesLoading,
+    fetchGroupMessages,
+  } = useChat();
+
+  const [newMessage, setNewMessage] = useState("");
+
+  // Fetch messages when selectedUser or selectedWorkspace changes
+  useEffect(() => {
+    if (selectedUser) fetchMessages(selectedUser._id);
+    else if (selectedWorkspace) fetchGroupMessages(selectedWorkspace._id);
+  }, [selectedUser, selectedWorkspace]);
+
+  const handleSend = async () => {
+    if (!newMessage.trim() || (!selectedUser && !selectedWorkspace)) return;
+
+    try {
+      await sendMessage({ text: newMessage });
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      toast.error("Failed to send message");
+    }
+  };
+
+  if (loading || !user) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-500">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!selectedUser && !selectedWorkspace) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-50">
+        <svg className="w-20 h-20 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <p className="text-lg font-medium">No conversation selected</p>
+        <p className="text-sm">Select a user or workspace to start chatting</p>
+      </div>
+    );
+  }
+
+  const chatName = selectedUser?.name || selectedWorkspace?.name;
+
+  return (
+    <div className="flex-1 flex flex-col h-full bg-gray-100">
+      {/* Header */}
+      <div className="p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 flex items-center justify-center shadow-xl border-b border-slate-600">
+        <h2 className="text-2xl font-bold text-center text-white tracking-tight">
+          {chatName}
+        </h2>
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2">
-        {messages.map((msg) => {
-          const isMe = msg.senderId === userId;
-          return (
-            <div key={msg._id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-              <div className={`px-4 py-2 rounded-2xl max-w-xs wrap-break-word ${isMe ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"}`}>
-                {msg.text || msg.file || "Attachment"}
-                <div className="text-xs text-gray-400 mt-1">{formatTime(msg.createdAt)}</div>
-              </div>
+      {/* Messages Container */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+        {isMessagesLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading messages...</p>
             </div>
-          );
-        })}
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-center">
+            <div>
+              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <p className="text-gray-500 text-lg font-medium">No messages yet</p>
+              <p className="text-gray-400 text-sm">Start the conversation!</p>
+            </div>
+          </div>
+        ) : (
+          messages.map((msg) => {
+            const senderId =
+              typeof msg.senderId === "string" ? msg.senderId : msg.senderId?._id;
+            const isMine = senderId === user.id;
+            const senderName = isMine ? "You" : msg.senderId?.name || "Unknown";
+            const senderAvatar = msg.senderId?.avatar || "/images/avatar.jpg";
+
+            return (
+              <div
+                key={msg._id}
+                className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+              >
+                <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-xs sm:max-w-md`}>
+                  {/* Sender name - only show for others' messages */}
+                  {!isMine && (
+                    <div className="flex items-center gap-2 mb-1 px-2">
+                      <img
+                        src={senderAvatar}
+                        alt={msg.senderId?.name}
+                        className="w-6 h-6 rounded-full"
+                      />
+                      <span className="text-xs text-gray-600 font-medium">
+                        {senderName}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Message bubble */}
+                  <div
+                    className={`px-4 py-2 rounded-2xl wrap-break-word ${
+                      isMine
+                        ? "bg-gray-600 text-white rounded-br-sm"
+                        : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed">
+                      {msg.text || (
+                        <span className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          Attachment
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  
+                  {/* Timestamp - you can add this if you have timestamp data */}
+                  <span className="text-xs text-gray-500 mt-1 px-2">
+                    {new Date(msg.createdAt).toLocaleDateString()}
+                    {", "}
+                    {new Date(msg.createdAt).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {/* File Preview */}
-      {selectedFile && (
-        <div className="p-2 bg-blue-50 border-t border-blue-100 flex items-center gap-3">
-          {selectedFile.preview ? (
-            <img src={selectedFile.preview} alt="preview" className="w-12 h-12 object-cover rounded" />
-          ) : (
-            <FileText size={24} />
-          )}
-          <div className="flex-1">
-            <p className="text-sm font-medium">{selectedFile.name}</p>
-            <p className="text-xs text-gray-500">{selectedFile.size}</p>
-          </div>
-          <button onClick={removeSelectedFile}>
-            <X size={18} />
+      {/* Input Area */}
+      <div className="p-4 bg-white border-t border-gray-200">
+        <div className="flex items-center gap-2">
+          <button className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+          </button>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Type a message..."
+            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <button
+            onClick={handleSend}
+            className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
           </button>
         </div>
-      )}
-
-      {/* Input */}
-      <div className="p-4 bg-white flex items-center gap-3">
-        <label className="cursor-pointer">
-          <Paperclip size={20} />
-          <input type="file" className="hidden" onChange={handleFileChange} />
-        </label>
-        <input
-          type="text"
-          className="flex-1 border px-4 py-2 rounded-lg focus:outline-none"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
-        <button onClick={handleSend} className="p-2 bg-blue-600 text-white rounded-lg">
-          <Send size={20} />
-        </button>
       </div>
     </div>
   );
+};
+
+interface ChatProps {
+  initialWorkspaceId?: string; // optional prop to pre-select a workspace
 }
+
+export const Chat: React.FC<ChatProps> = ({ initialWorkspaceId }) => {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  return (
+    <ChatProvider currentUser={user}>
+      <InnerChat initialWorkspaceId={initialWorkspaceId} />
+    </ChatProvider>
+  );
+};
+
+// Separate component to access chat context AFTER provider
+const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
+  const { setSelectedWorkspace, workspaces } = useChat();
+
+  // Set the workspace automatically on mount
+  useEffect(() => {
+    if (initialWorkspaceId) {
+      // Check if workspace is already loaded in context
+      const ws = workspaces.find((w) => w._id === initialWorkspaceId);
+      if (ws) setSelectedWorkspace(ws);
+      else
+        // If not loaded yet, create a temporary placeholder
+        setSelectedWorkspace({ _id: initialWorkspaceId, name: "Loading...", members: [] });
+    }
+  }, [initialWorkspaceId, setSelectedWorkspace, workspaces]);
+
+  return (
+    <div className="flex h-full min-h-[500px] bg-gray-50">
+      <ChatSidebar initialWorkspaceId={initialWorkspaceId} />
+      <ChatPanel />
+    </div>
+  );
+};
+
+
+
+// import React, { useState, useEffect } from "react";
+// import { ChatProvider, useChat } from "../context/messageContext";
+// // import { connectSocket } from "../lib/messagesocket";
+// import { useAuth } from "../context/authContext";
+// import toast from "react-hot-toast";
+
+// interface ChatProps {}
+
+// const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
+//   const {
+//     // users,
+//     workspaces,
+//     // selectedUser,
+//     selectedWorkspace,
+//     setSelectedUser,
+//     setSelectedWorkspace,
+//     // isUsersLoading,
+//   } = useChat();
+
+//   // Filter workspaces to only show the selected one (if initialWorkspaceId is set)
+//   const displayedWorkspaces = initialWorkspaceId
+//     ? workspaces.filter((ws) => ws._id === initialWorkspaceId)
+//     : workspaces;
+
+//   return (
+//     <div className="hidden w-64 border-r border-gray-200 bg-white shrink-0">
+//       <ul>
+//         {displayedWorkspaces.length === 0 ? (
+//           <p className="px-4 text-gray-500">No workspaces found</p>
+//         ) : (
+//           displayedWorkspaces.map((ws) => (
+//             <li
+//               key={ws._id}
+//               onClick={() => {
+//                 setSelectedWorkspace(ws);
+//                 setSelectedUser(null);
+//               }}
+//               className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${
+//                 selectedWorkspace?._id === ws._id ? "bg-indigo-100 font-semibold" : ""
+//               }`}
+//             >
+//               {ws.name}
+//             </li>
+//           ))
+//         )}
+//       </ul>
+//     </div>
+//   );
+// };
+
+
+// const ChatPanel: React.FC = () => {
+//   const { user, loading } = useAuth();
+//   const {
+//     messages,
+//     selectedUser,
+//     selectedWorkspace,
+//     fetchMessages,
+//     sendMessage,
+//     isMessagesLoading,
+//     fetchGroupMessages,
+//   } = useChat();
+
+//   const [newMessage, setNewMessage] = useState("");
+
+//   // Fetch messages when selectedUser or selectedWorkspace changes
+//   useEffect(() => {
+//     if (selectedUser) fetchMessages(selectedUser._id);
+//     else if (selectedWorkspace) fetchGroupMessages(selectedWorkspace._id);
+//   }, [selectedUser, selectedWorkspace]);
+
+//   const handleSend = async () => {
+//     if (!newMessage.trim() || (!selectedUser && !selectedWorkspace)) return;
+
+//     try {
+//       await sendMessage({ text: newMessage });
+//       setNewMessage("");
+//     } catch (err) {
+//       console.error("Error sending message:", err);
+//       toast.error("Failed to send message");
+//     }
+//   };
+
+//   if (loading || !user) {
+//     return (
+//       <div className="flex-1 flex items-center justify-center text-gray-500">
+//         Loading...
+//       </div>
+//     );
+//   }
+
+//   if (!selectedUser && !selectedWorkspace) {
+//     return (
+//       <div className="flex-1 flex items-center justify-center text-gray-500">
+//         Select a user or workspace to start chatting
+//       </div>
+//     );
+//   }
+
+//   const chatName = selectedUser?.name || selectedWorkspace?.name;
+
+//   return (
+//     <div className="flex-1 flex flex-col h-150 bg-white">
+//       <div className="p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 flex items-center justify-center shadow-xl border-b border-slate-600">
+//         <h2 className="text-3xl font-bold text-center text-white tracking-tight">
+//           {chatName} Chat
+//         </h2>
+//       </div>
+//       <div className="flex-1 p-4 overflow-y-auto space-y-2">
+//         {isMessagesLoading ? (
+//           <p className="text-gray-500">Loading messages...</p>
+//         ) : (
+//           messages.map((msg) => {
+//             const senderId =
+//               typeof msg.senderId === "string" ? msg.senderId : msg.senderId?._id;
+//             const isMine = senderId === user.id;
+//             const senderName = isMine ? "You" : msg.senderId?.name || "Unknown";
+//             const senderAvatar = msg.senderId?.avatar || "/images/avatar.jpg";
+
+//             return (
+//               <div
+//                 key={msg._id}
+//                 className={`flex items-start gap-2 ${isMine ? "justify-end" : "justify-start"}`}
+//               >
+//                 {!isMine && (
+//                   <img
+//                     src={senderAvatar}
+//                     alt={msg.senderId?.name}
+//                     className="w-6 h-6 rounded-full"
+//                   />
+//                 )}
+//                 <div
+//                   className={`p-2 rounded-lg max-w-xs wrap-break-word ${
+//                     isMine ? "bg-gray-600 text-white" : "bg-indigo-100"
+//                   }`}
+//                 >
+//                   <span className="font-semibold">{senderName}: </span>
+//                   {msg.text || "Attachment"}
+//                 </div>
+//               </div>
+//             );
+//           })
+//         )}
+//       </div>
+//       <div className="p-4 border-t border-gray-200 flex items-center gap-2">
+//         <input
+//           type="text"
+//           value={newMessage}
+//           onChange={(e) => setNewMessage(e.target.value)}
+//           onKeyDown={(e) => e.key === "Enter" && handleSend()}
+//           placeholder="Type a message..."
+//           className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+//         />
+//         <button
+//           onClick={handleSend}
+//           className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+//         >
+//           Send
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// interface ChatProps {
+//   initialWorkspaceId?: string; // optional prop to pre-select a workspace
+// }
+
+// export const Chat: React.FC<ChatProps> = ({ initialWorkspaceId }) => {
+//   const { user } = useAuth();
+
+//   if (!user) return null;
+
+//   return (
+//     <ChatProvider currentUser={user}>
+//       <InnerChat initialWorkspaceId={initialWorkspaceId} />
+//     </ChatProvider>
+//   );
+// };
+
+// // Separate component to access chat context AFTER provider
+// const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
+//   const { setSelectedWorkspace, workspaces } = useChat();
+
+//   // Set the workspace automatically on mount
+//   useEffect(() => {
+//     if (initialWorkspaceId) {
+//       // Check if workspace is already loaded in context
+//       const ws = workspaces.find((w) => w._id === initialWorkspaceId);
+//       if (ws) setSelectedWorkspace(ws);
+//       else
+//         // If not loaded yet, create a temporary placeholder
+//         setSelectedWorkspace({ _id: initialWorkspaceId, name: "Loading...", members: [] });
+//     }
+//   }, [initialWorkspaceId, setSelectedWorkspace, workspaces]);
+
+//   return (
+//     <div className="flex h-full min-h-[500px] bg-gray-50">
+//       <ChatSidebar initialWorkspaceId={initialWorkspaceId} />
+//       <ChatPanel />
+//     </div>
+//   );
+// };
+
+

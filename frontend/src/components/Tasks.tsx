@@ -107,26 +107,33 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
   };
 
   return (
-    <div className="bg-white shadow-sm border border-gray-200 p-6 w-full h-full flex flex-col ">
+    <div className="bg-white w-full h-full flex flex-col ">
       {/* Header */}
-      <div className="flex justify-between mb-4">
-        <h2 className="text-xl font-bold">Tasks</h2>
+      <div className="p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 flex items-center justify-center">
+        <h2 className="text-3xl font-bold text-center text-white tracking-tight">
+          Tasks
+        </h2>
+      </div>
+
+      {/* Add Task button below header */}
+      <div className="flex justify-end mt-4 mb-4 pr-6">
         <button
           onClick={() => setShowTaskModal(true)}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
+          className="px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg cursor-pointer"
         >
           Add Task
         </button>
       </div>
 
+
       {/* Filters */}
-      <div className="flex gap-2 mb-4 border-b border-gray-200">
+      <div className="flex gap-2 mb-4 border-b border-gray-400 pl-6 pr-6">
         {["All", "Pending", "In Progress", "Done"].map(f => (
           <button
             key={f}
             onClick={() => setActiveFilter(f)}
             className={`px-4 py-2 text-sm font-medium border-b-2 ${
-              activeFilter === f ? "border-indigo-600 text-indigo-600" : "border-transparent text-gray-600"
+              activeFilter === f ? "border-blue-600 text-blue-600" : "border-transparent text-gray-600"
             }`}
           >
             {f}
@@ -135,7 +142,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
       </div>
 
       {/* Task List */}
-      <div className="space-y-3 max-h-96 overflow-y-auto">
+      <div className="space-y-3 max-h-96 overflow-y-auto pl-6 pr-6">
         {filteredTasks.map(task => {
           const id = task._id!;
           const isOpen = openTaskId === id;
@@ -223,7 +230,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
               {isOpen && (
                 <div className="mt-3 bg-white p-3 rounded border border-gray-300 shadow-sm">
                   <p className="text-gray-700 mb-3">{task.description || "No description"}</p>
-                  <h4 className="font-semibold mb-2">Comments</h4>
+                  <h4 className="font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-2">Comments</h4>
                   {(task.comments || []).map((c, index) => {
                     const editing = editingIndex[id] === index;
                     return (
@@ -259,7 +266,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
                     value={newCommentText[id] || ""}
                     onChange={e => setNewCommentText(prev => ({ ...prev, [id]: e.target.value }))}
                   />
-                  <button onClick={() => addComment(task)} className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded">Add Comment</button>
+                  <button onClick={() => addComment(task)} className="mt-2 px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded">Add Comment</button>
                 </div>
               )}
             </div>
@@ -271,7 +278,11 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
       {showTaskModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Add New Task</h2>
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4 text-center">Add New Task</h2>
+
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Title
+            </label>
             <input
               type="text"
               placeholder="Task title..."
@@ -279,18 +290,27 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
               onChange={e => setNewTaskData({ ...newTaskData, title: e.target.value })}
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Description
+            </label>
             <textarea
               placeholder="Description..."
               value={newTaskData.description}
               onChange={e => setNewTaskData({ ...newTaskData, description: e.target.value })}
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Due Date
+            </label>
             <input
               type="date"
               value={newTaskData.dueDate}
               onChange={e => setNewTaskData({ ...newTaskData, dueDate: e.target.value })}
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Priority
+            </label>
             <select
               value={newTaskData.priority}
               onChange={e => setNewTaskData({ ...newTaskData, priority: e.target.value as TaskPriority })}
@@ -300,7 +320,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
             </select>
             <div className="flex gap-3">
               <button onClick={() => setShowTaskModal(false)} className="flex-1 p-3 border border-gray-300 shadow-sm rounded">Cancel</button>
-              <button onClick={handleAddTask} className="flex-1 p-3 bg-indigo-600 text-white rounded">Add Task</button>
+              <button onClick={handleAddTask} className="flex-1 p-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded">Add Task</button>
             </div>
           </div>
         </div>
@@ -310,24 +330,36 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
       {editTaskData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">Edit Task</h2>
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4 text-center">Edit Task</h2>
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Title
+            </label>
             <input
               type="text"
               value={editTaskData.title}
               onChange={e => setEditTaskData({ ...editTaskData, title: e.target.value })}
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Description
+            </label>
             <textarea
               value={editTaskData.description}
               onChange={e => setEditTaskData({ ...editTaskData, description: e.target.value })}
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Due Date
+            </label>
             <input
               type="date"
               value={editTaskData.dueDate?.slice(0, 10) || ""}
               onChange={e => setEditTaskData({ ...editTaskData, dueDate: e.target.value })}
               className="w-full p-3 border border-gray-300 shadow-sm rounded mb-2"
             />
+            <label className="text-sm font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+              Priority
+            </label>
             <select
               value={editTaskData.priority}
               onChange={e => setEditTaskData({ ...editTaskData, priority: e.target.value as TaskPriority })}
@@ -337,7 +369,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
             </select>
             <div className="flex gap-3">
               <button onClick={() => setEditTaskData(null)} className="flex-1 p-3 border border-gray-300 shadow-sm rounded">Cancel</button>
-              <button onClick={saveEditTask} className="flex-1 p-3 bg-indigo-600 text-white rounded">Save</button>
+              <button onClick={saveEditTask} className="flex-1 p-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded">Save</button>
             </div>
           </div>
         </div>
