@@ -102,7 +102,7 @@ io.on("connection", (socket: Socket) => {
     if (userId) delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
-});
+}); 
 
 // ---------------------------------------------------------------
 

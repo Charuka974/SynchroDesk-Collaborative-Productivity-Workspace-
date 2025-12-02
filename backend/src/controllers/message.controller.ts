@@ -4,15 +4,34 @@ import { User } from "../models/user.model";
 import { AUthRequest } from "../middleware/auth";
 import cloudinary from "../config/cloudinary";
 import { getReceiverSocketId, io } from "../lib/socket";
+import { Workspace } from "../models/workspace.model";
 
 // GET all users except logged-in user
+// export const getUsersForSidebar = async (req: AUthRequest, res: Response) => {
+//   try {
+//     const loggedInUserId = req.user?.sub;
+
+//     const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+
+//     res.status(200).json(filteredUsers);
+//   } catch (error: any) {
+//     console.error("Error in getUsersForSidebar:", error.message);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
 export const getUsersForSidebar = async (req: AUthRequest, res: Response) => {
   try {
     const loggedInUserId = req.user?.sub;
 
     const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    
+    const filteredWorkspaces = await Workspace.find({ members: { $elemMatch: { userId: loggedInUserId } } });
 
-    res.status(200).json(filteredUsers);
+    res.status(200).json({
+      users: filteredUsers,
+      workspaces: filteredWorkspaces
+    });
   } catch (error: any) {
     console.error("Error in getUsersForSidebar:", error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -82,3 +101,72 @@ export const sendMessage = async (req: AUthRequest, res: Response) => {
   }
 };
 
+
+export const sendGroupMessage = async (req: AUthRequest, res: Response) => {
+  try {
+    const { text, image, file, audio } = req.body;
+    const workspaceId = req.params.id; // workspace ID from route
+    const senderId = req.user?.sub; // authenticated user ID
+
+    if (!workspaceId) {
+      return res.status(400).json({ error: "Workspace ID is required" });
+    }
+
+    // Optional: handle image upload
+    let imageUrl: string | undefined;
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    // Create the message document
+    const newMessage = new Message({
+      senderId,
+      workspaceId,
+      text,
+      image: imageUrl,
+      file,
+      audio,
+    });
+
+    await newMessage.save();
+
+    // Emit message to all users in the workspace
+    // Here we assume you have a way to get all user IDs in the workspace
+    // For simplicity, you can emit to all connected sockets (adjust if needed)
+    io.emit(`workspace-${workspaceId}`, newMessage);
+
+    res.status(201).json(newMessage);
+  } catch (error: any) {
+    console.error("Error in sendGroupMessage:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+// GET all messages in a workspace
+export const getGroupMessages = async (req: AUthRequest, res: Response) => {
+  try {
+    const workspaceId = req.params.id;
+    const userId = req.user?.sub;
+
+    if (!workspaceId) {
+      return res.status(400).json({ error: "Workspace ID is required" });
+    }
+
+    // Optional: check if the user is a member of the workspace
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace || !workspace.members.some(m => m.userId.toString() === userId)) {
+      return res.status(403).json({ error: "You are not a member of this workspace" });
+    }
+
+    // Fetch all messages in this workspace
+    const messages: IMessage[] = await Message.find({ workspaceId })
+      .sort({ createdAt: 1 });
+
+    res.status(200).json(messages);
+  } catch (error: any) {
+    console.error("Error in getGroupMessages:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

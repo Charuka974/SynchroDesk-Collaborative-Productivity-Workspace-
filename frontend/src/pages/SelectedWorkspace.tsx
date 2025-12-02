@@ -6,9 +6,12 @@ import ChatWindow from "../components/Chat";
 import { motion } from "framer-motion";
 import { TaskProvider, useTasks, type ICreateTaskPayload} from "../context/taskContext";
 import { TaskPanel } from "../components/Tasks";
+import { ChatProvider } from "../context/messageContext";
+import { useAuth } from "../context/authContext";
 
 
 export default function WorkspacesPage() {
+  const { user } = useAuth();
   const [params] = useSearchParams();
   const id = params.get("id");
   const [currentTab, setCurrentTab] = useState("Woerkspace");
@@ -213,10 +216,13 @@ export default function WorkspacesPage() {
         <div className="flex-1 flex bg-gray-300 h-100">
           {currentTab === "Chat" && (
             <div className="w-full h-full">
-              <ChatWindow
+              <ChatProvider currentUser={user}>
+                <ChatWindow userId={user._id} workspaceId={workspace.id} />
+              </ChatProvider>
+              {/* <ChatWindow
                 userId="me"
                 workspaceId={workspace.id}
-              />
+              /> */}
             </div>
           )}
 
