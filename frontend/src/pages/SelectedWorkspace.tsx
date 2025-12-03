@@ -139,8 +139,10 @@ export default function WorkspacesPage() {
                 key={m.id ?? m.email ?? index} // <= safe and guaranteed unique
                 className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg"
               >
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                  {m.avatar ?? m.name?.charAt(0)?.toUpperCase() ?? "?"}
+                <div className="w-10 h-10 rounded-full bg-linear-to-r from-gray-500 to-gray-900 flex items-center justify-center text-white font-semibold">
+                  {m.avatar
+                  ? <img src={m.avatar} className="w-full h-full object-cover rounded-4xl" />
+                  : (m.name?.charAt(0)?.toUpperCase() || "?")}
                 </div>
                 <div>
                   <p className="font-medium text-gray-900 text-sm">
@@ -158,12 +160,12 @@ export default function WorkspacesPage() {
           <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
             Quick Actions
           </h3>
-          <button className="w-full mb-2 px-4 py-2 bg-indigo-50 text-red-600 rounded-lg"
+          <button className="w-full mb-2 px-4 py-2 bg-gray-50 text-red-600 rounded-lg"
             onClick={() => setCurrentTab("Chat")}
             >
             Chat
           </button>
-          <button className="w-full mb-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg"
+          <button className="w-full mb-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg"
             onClick={() => setCurrentTab("Tasks")}
             >
             Tasks
@@ -198,7 +200,7 @@ export default function WorkspacesPage() {
                 key={tab}
                 className={`px-4 py-3 text-sm font-medium transition-all duration-200 relative ${
                   currentTab === tab 
-                    ? "text-indigo-600" 
+                    ? "text-gray-600" 
                     : "text-gray-600 hover:text-gray-900"
                 }`}
                 onClick={() => setCurrentTab(tab)}
@@ -207,7 +209,7 @@ export default function WorkspacesPage() {
                 {currentTab === tab && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-600"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -286,7 +288,7 @@ export default function WorkspacesPage() {
                 <h3 className="text-xl font-bold mb-1">{ws.name}</h3>
                 <p className="text-gray-500 text-sm mb-2">{ws.description}</p>
 
-                <span className="inline-block bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-medium">
+                <span className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
                   {ws.role}
                 </span>
               </div>

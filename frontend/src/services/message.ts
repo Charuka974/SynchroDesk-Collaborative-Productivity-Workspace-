@@ -1,6 +1,7 @@
 import api from "./api";
 
 export interface IUser {
+  avatar: string | undefined;
   _id: string;
   name: string;
   email: string;
@@ -68,21 +69,28 @@ export const sendMessageAPI = async (data: {
   receiverId?: string;
   workspaceId?: string;
   text?: string;
-  image?: string;
-  file?: string;
-  audio?: string;
+  image?: File;
+  file?: File;
+  audio?: File;
 }): Promise<IMessage> => {
-  if (data.receiverId) {
-    // User chat
-    const res = await api.post(`/messages/send/dm/${data.receiverId}`, data);
-    return res.data;
-  }
+  const form = new FormData();
 
-  if (data.workspaceId) {
-    // Workspace chat
-    const res = await api.post(`/messages/send/group/${data.workspaceId}`, data);
-    return res.data;
-  }
+  if (data.receiverId) form.append("receiverId", data.receiverId);
+  if (data.workspaceId) form.append("workspaceId", data.workspaceId);
+  if (data.text) form.append("text", data.text);
 
-  throw new Error("receiverId or workspaceId is required");
+  // Append files only if they exist
+  if (data.image) form.append("image", data.image);
+  if (data.file) form.append("file", data.file);
+  if (data.audio) form.append("audio", data.audio);
+
+  const url = data.receiverId
+    ? `/messages/send/dm/${data.receiverId}`
+    : `/messages/send/group/${data.workspaceId}`;
+
+  const res = await api.post(url, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return res.data;
 };

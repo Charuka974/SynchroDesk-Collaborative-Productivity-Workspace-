@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChatProvider, useChat } from "../context/messageContext";
 import { connectSocket } from "../lib/messagesocket";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/authContext";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatSidebar = () => {
   const {
@@ -34,7 +35,7 @@ const ChatSidebar = () => {
         </div>
         {isUsersLoading ? (
           <div className="p-4 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mb-2"></div>
             <p className="text-sm text-gray-500">Loading users...</p>
           </div>
         ) : users.length === 0 ? (
@@ -50,20 +51,30 @@ const ChatSidebar = () => {
                   setSelectedWorkspace(null);
                   setSelectedUser(user);
                 }}
-                className={`cursor-pointer px-4 py-3 hover:bg-indigo-50 transition-colors ${
-                  selectedUser?._id === user._id ? "bg-indigo-100 border-l-4 border-indigo-600" : ""
+                className={`cursor-pointer px-4 py-3 hover:bg-gray-50 transition-colors ${
+                  selectedUser?._id === user._id ? "bg-gray-100 border-l-4 border-gray-600" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white font-semibold">
-                      {user.name?.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-gray-900 to-gray-600 flex items-center justify-center text-white font-semibold">
+                      {user?.avatar? (
+                        <img
+                          src={user.avatar}
+                          alt={user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span>
+                          {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
+                        </span>
+                      )}
                     </div>
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                    {/* <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div> */}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium truncate ${
-                      selectedUser?._id === user._id ? "text-indigo-900" : "text-gray-900"
+                      selectedUser?._id === user._id ? "text-gray-900" : "text-gray-600"
                     }`}>
                       {user.name}
                     </p>
@@ -97,17 +108,17 @@ const ChatSidebar = () => {
                   setSelectedWorkspace(ws);
                   setSelectedUser(null);
                 }}
-                className={`px-4 py-3 cursor-pointer hover:bg-indigo-50 transition-colors ${
-                  selectedWorkspace?._id === ws._id ? "bg-indigo-100 border-l-4 border-indigo-600" : ""
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+                  selectedWorkspace?._id === ws._id ? "bg-gray-100 border-l-4 border-gray-600" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold shadow-md">
+                  <div className="w-10 h-10 rounded-lg bg-linear-to-br from-gray-400 to-gray-800 flex items-center justify-center text-white font-semibold shadow-md">
                     {ws.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium truncate ${
-                      selectedWorkspace?._id === ws._id ? "text-indigo-900" : "text-gray-900"
+                      selectedWorkspace?._id === ws._id ? "text-gray-900" : "text-gray-600"
                     }`}>
                       {ws.name}
                     </p>
@@ -132,7 +143,7 @@ const ChatPanel = () => {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4"></div>
           <p className="text-gray-500">Loading...</p>
         </div>
       </div>
@@ -149,6 +160,10 @@ const ChatPanel = () => {
     fetchGroupMessages,
   } = useChat();
   const [newMessage, setNewMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Fetch messages whenever selectedUser or selectedWorkspace changes
   useEffect(() => {
@@ -160,11 +175,19 @@ const ChatPanel = () => {
   }, [selectedUser, selectedWorkspace]);
 
   const handleSend = async () => {
-    if (!newMessage.trim() || (!selectedUser && !selectedWorkspace)) return;
+    if (!newMessage.trim() && !attachment) return;
+    if (!selectedUser && !selectedWorkspace) return;
 
     try {
-      await sendMessage({ text: newMessage });
+      await sendMessage({
+        text: newMessage || undefined,
+        image: attachment?.type.startsWith("image/") ? attachment : undefined,
+        file: attachment && !attachment.type.startsWith("image/") ? attachment : undefined,
+      });
+
       setNewMessage("");
+      setAttachment(null);
+      setPreviewUrl(null); // reset preview
     } catch (err) {
       console.error("Error sending message:", err);
       toast.error("Failed to send message");
@@ -191,11 +214,27 @@ const ChatPanel = () => {
       <div className="p-4 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center gap-3">
           {selectedUser ? (
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white font-semibold">
-              {selectedUser.name?.charAt(0).toUpperCase()}
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-gray-900 to-gray-600 flex items-center justify-center text-white font-semibold">
+              {selectedUser?.avatar ? (
+                <img
+                  src={selectedUser.avatar}
+                  alt={
+                    selectedUser.name?.charAt(0)?.toUpperCase() ||
+                    selectedUser.email?.charAt(0)?.toUpperCase() ||
+                    "U"
+                  }
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <span>
+                  {selectedUser?.name?.charAt(0)?.toUpperCase() ||
+                    selectedUser?.email?.charAt(0)?.toUpperCase() ||
+                    "U"}
+                </span>
+              )}
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold">
+            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-gray-400 to-gray-800 flex items-center justify-center text-white font-semibold">
               {selectedWorkspace?.name?.charAt(0).toUpperCase()}
             </div>
           )}
@@ -262,16 +301,33 @@ const ChatPanel = () => {
                         : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">
-                      {msg.text || (
-                        <span className="flex items-center gap-2 italic text-gray-500">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                          </svg>
-                          Attachment
-                        </span>
-                      )}
-                    </p>
+                    {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
+
+                    {msg.image && (
+                      <img
+                        src={msg.image}
+                        alt="image"
+                        className="mt-2 max-w-xs rounded-md"
+                      />
+                    )}
+
+                    {msg.file && (
+                      <a
+                        href={msg.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 text-blue-600 underline block text-sm"
+                      >
+                        {msg.file.split("/").pop()} {/* shows file name */}
+                      </a>
+                    )}
+
+                    {msg.audio && (
+                      <audio controls className="mt-2 w-full">
+                        <source src={msg.audio} />
+                        Your browser does not support the audio element.
+                      </audio>
+                    )}
                   </div>
                   
                   {/* Timestamp - uncomment if you have timestamp data */}
@@ -287,26 +343,116 @@ const ChatPanel = () => {
         )}
       </div>
 
+      {/* Attachment preview */}
+      {attachment && (
+        <div className="flex items-center mb-2 p-2 border border-gray-300 rounded-lg bg-gray-100 relative">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="preview"
+              className="w-16 h-16 object-cover rounded-md"
+            />
+          ) : (
+            <div className="flex items-center gap-2 text-gray-700">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                />
+              </svg>
+              <span className="truncate">{attachment.name}</span>
+            </div>
+          )}
+
+          {/* Remove button */}
+          <button
+            className="absolute top-1 right-1 text-gray-600 hover:text-gray-900 text-xl"
+            onClick={() => {
+              setAttachment(null);
+              setPreviewUrl(null);
+            }}
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
+
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-gray-200">
         <div className="flex items-center gap-2">
-          <button className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors">
+          <label className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
+            <input
+              type="file"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  setAttachment(file);
+
+                  if (file.type.startsWith("image/")) {
+                    setPreviewUrl(URL.createObjectURL(file));
+                  } else {
+                    setPreviewUrl(null);
+                  }
+
+                  // Reset the input so the same file can be selected again
+                  e.target.value = "";
+                }
+              }}
+            />
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
             </svg>
+          </label>
+
+          {/* Emoji Button */}
+          <button
+            className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 9h.01M15 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
           </button>
+
+          {/* The Emoji Picker */}
+          {showEmojiPicker && (
+            <div className="absolute bottom-16 left-4 z-50">
+              <EmojiPicker
+                onEmojiClick={(emoji) => {
+                  setNewMessage((prev) => prev + emoji.emoji);
+                  setShowEmojiPicker(false);
+                }}
+                
+              />
+            </div>
+          )}
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
           />
           <button
             onClick={handleSend}
-            className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!newMessage.trim()}
+            className="p-3 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!newMessage.trim() && !attachment}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

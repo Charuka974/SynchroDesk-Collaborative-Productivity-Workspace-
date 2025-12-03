@@ -1,10 +1,10 @@
 import { Response } from "express";
 import Message, { IMessage } from "../models/message.model";
 import { User } from "../models/user.model";
-import { AUthRequest } from "../middleware/auth";
-import cloudinary from "../config/cloudinary";
+import { AUthRequest } from "../middleware/auth"; 
 import { getReceiverSocketId, io } from "../lib/socket";
 import { Workspace } from "../models/workspace.model";
+import { uploadImage } from "../utils/cloudinary";
 
 export const getUsersForSidebar = async (req: AUthRequest, res: Response) => {
   try {
@@ -51,14 +51,33 @@ export const getMessages = async (req: AUthRequest, res: Response) => {
 // POST send a new message
 export const sendMessage = async (req: AUthRequest, res: Response) => {
   try {
-    const { text, image, file, audio } = req.body;
-    const receiverId = req.params.id;
     const senderId = req.user?.sub;
+    const receiverId = req.params.id;
+    const { text } = req.body;
+
+    const files = req.files as {
+      image?: Express.Multer.File[];
+      file?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+    };
 
     let imageUrl: string | undefined;
-    if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      imageUrl = uploadResponse.secure_url;
+    let fileUrl: string | undefined;
+    let audioUrl: string | undefined;
+
+    // Upload image
+    if (files?.image?.[0]) {
+      imageUrl = await uploadImage(files.image[0].buffer, "chat/images");
+    }
+
+    // Upload file (PDF, docs, etc)
+    if (files?.file?.[0]) {
+      fileUrl = await uploadImage(files.file[0].buffer, "chat/files");
+    }
+
+    // Upload audio
+    if (files?.audio?.[0]) {
+      audioUrl = await uploadImage(files.audio[0].buffer, "chat/audio");
     }
 
     const newMessage = new Message({
@@ -66,25 +85,22 @@ export const sendMessage = async (req: AUthRequest, res: Response) => {
       receiverId,
       text,
       image: imageUrl,
-      file,
-      audio,
+      file: fileUrl,
+      audio: audioUrl,
     });
 
     await newMessage.save();
 
-    // Emit to receiver
+    // Emit to users
     const receiverSocketId = getReceiverSocketId(receiverId);
-    if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", newMessage);
-    }
+    if (receiverSocketId) io.to(receiverSocketId).emit("newMessage", newMessage);
 
-    // Optionally also emit to sender (for consistency)
     const senderSocketId = getReceiverSocketId(senderId!);
-    if (senderSocketId && senderSocketId !== receiverSocketId) {
-        io.to(senderSocketId).emit("newMessage", newMessage);
-    }
+    if (senderSocketId && senderSocketId !== receiverSocketId)
+      io.to(senderSocketId).emit("newMessage", newMessage);
 
     res.status(201).json(newMessage);
+
   } catch (error: any) {
     console.error("Error in sendMessage:", error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -94,44 +110,54 @@ export const sendMessage = async (req: AUthRequest, res: Response) => {
 
 export const sendGroupMessage = async (req: AUthRequest, res: Response) => {
   try {
-    const { text, image, file, audio } = req.body;
-    const workspaceId = req.params.id; // workspace ID from route
-    const senderId = req.user?.sub; // authenticated user ID
+    const senderId = req.user?.sub;
+    const workspaceId = req.params.id;
+    const { text } = req.body;
 
-    if (!workspaceId) {
-      return res.status(400).json({ error: "Workspace ID is required" });
-    }
+    const files = req.files as {
+      image?: Express.Multer.File[];
+      file?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+    };
 
-    // Optional: handle image upload
     let imageUrl: string | undefined;
-    if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      imageUrl = uploadResponse.secure_url;
+    let fileUrl: string | undefined;
+    let audioUrl: string | undefined;
+
+    if (files?.image?.[0]) {
+      imageUrl = await uploadImage(files.image[0].buffer, "chat/images");
     }
 
-    // Create the message document
+    if (files?.file?.[0]) {
+      fileUrl = await uploadImage(files.file[0].buffer, "chat/files");
+    }
+
+    if (files?.audio?.[0]) {
+      audioUrl = await uploadImage(files.audio[0].buffer, "chat/audio");
+    }
+
     const newMessage = new Message({
       senderId,
       workspaceId,
       text,
       image: imageUrl,
-      file,
-      audio,
+      file: fileUrl,
+      audio: audioUrl,
     });
 
     await newMessage.save();
 
-    // Emit message to all users in the workspace
-    // Here we assume you have a way to get all user IDs in the workspace
-    // For simplicity, you can emit to all connected sockets (adjust if needed)
+    // Emit to workspace channel
     io.emit(`workspace-${workspaceId}`, newMessage);
 
     res.status(201).json(newMessage);
+
   } catch (error: any) {
     console.error("Error in sendGroupMessage:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 
 // GET all messages in a workspace

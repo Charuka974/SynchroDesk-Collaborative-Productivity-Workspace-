@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import {
   getMyProfileAPI,
   updateMyProfileAPI,
@@ -40,7 +40,7 @@ interface UserContextType {
 
   refreshUser: () => Promise<void>;
   fetchWorkspaceRoles: () => Promise<void>;
-  updateProfile: (data: Partial<IUser>) => Promise<void>;
+  updateProfile: (data: { name?: string; avatar?: File | string }) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
@@ -57,6 +57,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       const data = await getMyProfileAPI();
       setUser(data);
+      setError(undefined);
     } catch (err: any) {
       setError(err.message || "Failed to load user");
     } finally {
@@ -68,23 +69,37 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       const roles = await getMyWorkspaceRolesAPI();
       setWorkspaces(roles);
+      setError(undefined);
     } catch (err: any) {
       setError(err.message || "Failed to load workspace roles");
     }
   };
 
-  const updateProfile = async (data: Partial<IUser>) => {
+  const updateProfile = async (data: { name?: string; avatar?: File | string }) => {
     try {
-      const updated = await updateMyProfileAPI(data);
+      let payload: { name?: string; avatar?: File | string } = {};
+
+      // Only include name if provided
+      if (data.name) payload.name = data.name;
+
+      // If avatar is File or base64, include it
+      if (data.avatar) payload.avatar = data.avatar;
+
+      const updated = await updateMyProfileAPI(payload);
+
+      // Update context state
       setUser(updated);
+      setError(undefined);
     } catch (err: any) {
       setError(err.message || "Failed to update profile");
     }
   };
 
+
   const changePassword = async (currentPassword: string, newPassword: string) => {
     try {
       await changeMyPasswordAPI({ currentPassword, newPassword });
+      setError(undefined);
     } catch (err: any) {
       setError(err.message || "Failed to change password");
     }
@@ -96,7 +111,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, workspaces, loading, error, refreshUser, fetchWorkspaceRoles, updateProfile, changePassword }}>
+    <UserContext.Provider
+      value={{
+        user,
+        workspaces,
+        loading,
+        error,
+        refreshUser,
+        fetchWorkspaceRoles,
+        updateProfile,
+        changePassword
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

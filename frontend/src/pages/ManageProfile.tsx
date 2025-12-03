@@ -122,31 +122,24 @@ export default function ProfileManagement() {
   const handleSavePersonal = async () => {
     setIsSaving(true);
     try {
-      let avatarUrl = profile?.avatar;
+      const formData = new FormData();
+      formData.append("name", editData.name);
+      if (avatarFile) {
+        formData.append("avatar", avatarFile); // File object
+      }
 
-      // Upload avatar if needed
-    //   if (avatarFile) {
-    //     const formData = new FormData();
-    //     formData.append("avatar", avatarFile);
-    //     const res = await uploadAvatarAPI(formData);
-    //     avatarUrl = res.avatar;
-    //   }
-
-      // Update profile
-      await updateMyProfileAPI({
-        name: editData.name,
-        avatar: avatarUrl
-      });
-
-      await refreshUser();
-
+      await updateMyProfileAPI(formData); // make sure your API accepts FormData
+      await refreshUser(); // refresh context
       setSuccessMessage("Profile updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError(err.message || "Failed to update profile");
     }
     setIsSaving(false);
   };
+
+
 
   // Change Password
   const handleChangePassword = async () => {
@@ -189,14 +182,14 @@ export default function ProfileManagement() {
     }
   };
 
-  const getStatusBadge = (status: any) => {
+  // const getStatusBadge = (status: any) => {
 
-    return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium`}>
-        {status}
-      </span>
-    );
-  };
+  //   return (
+  //     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium`}>
+  //       {status}
+  //     </span>
+  //   );
+  // };
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -208,8 +201,8 @@ export default function ProfileManagement() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-          <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
+          <h1 className="text-3xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent pb-3">Profile Settings</h1>
+          <p className="font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">Manage your account settings and preferences</p>
         </div>
 
         {/* Success Message */}
@@ -238,7 +231,7 @@ export default function ProfileManagement() {
               <button
                 key={tab.id}
                 className={`px-4 py-3 text-sm font-medium transition-all duration-200 relative flex items-center gap-2 ${
-                  activeTab === tab.id ? "text-indigo-600" : "text-gray-600 hover:text-gray-900"
+                  activeTab === tab.id ? "text-blue-900" : "text-gray-600 hover:text-gray-900"
                 }`}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
               >
@@ -247,7 +240,7 @@ export default function ProfileManagement() {
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-800"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -264,23 +257,23 @@ export default function ProfileManagement() {
               {/* Avatar Section */}
               <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-full bg-linear-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-3xl font-semibold overflow-hidden">
+                  <div className="w-24 h-24 rounded-full bg-linear-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-3xl font-semibold overflow-hidden">
                     {avatarPreview ? (
                       <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
                       profile.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <label className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-700 transition-colors shadow-lg">
+                  <label className="absolute bottom-0 right-0 w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700 transition-colors shadow-lg">
                     <Camera size={16} className="text-white" />
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                   </label>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{profile.name}</h3>
+                  <h3 className="text-lg font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">{profile.name}</h3>
                   <p className="text-sm text-gray-600">{profile.email}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    {getStatusBadge(profile.approved)}
+                    {/* {getStatusBadge(profile.approved)} */}
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       profile.subscriptionPlan === "PREMIUM" 
                         ? "bg-linear-to-r from-yellow-400 to-orange-500 text-white" 
@@ -300,7 +293,7 @@ export default function ProfileManagement() {
                     type="text"
                     value={editData.name}
                     onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                   />
                 </div>
 
@@ -310,7 +303,7 @@ export default function ProfileManagement() {
                     type="email"
                     value={editData.email}
                     onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                   />
                 </div>
 
@@ -341,7 +334,7 @@ export default function ProfileManagement() {
                 <button
                   onClick={handleSavePersonal}
                   disabled={isSaving}
-                  className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   <Save size={18} />
                   {isSaving ? "Saving..." : "Save Changes"}
@@ -362,7 +355,7 @@ export default function ProfileManagement() {
                       type="password"
                       value={editData.currentPassword}
                       onChange={(e) => setEditData({ ...editData, currentPassword: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                     />
                   </div>
 
@@ -372,7 +365,7 @@ export default function ProfileManagement() {
                       type="password"
                       value={editData.newPassword}
                       onChange={(e) => setEditData({ ...editData, newPassword: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                     />
                   </div>
 
@@ -382,7 +375,7 @@ export default function ProfileManagement() {
                       type="password"
                       value={editData.confirmPassword}
                       onChange={(e) => setEditData({ ...editData, confirmPassword: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                     />
                   </div>
                 </div>
@@ -402,7 +395,7 @@ export default function ProfileManagement() {
                 <button
                   onClick={handleChangePassword}
                   disabled={isSaving || !editData.currentPassword || !editData.newPassword}
-                  className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   <Lock size={18} />
                   {isSaving ? "Updating..." : "Update Password"}
@@ -420,7 +413,7 @@ export default function ProfileManagement() {
                     <p className="text-sm text-gray-600">Manage your workspace memberships</p>
                 </div>
 
-                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
                     {workspaces.length} Workspace{workspaces.length !== 1 ? "s" : ""}
                 </span>
                 </div>
@@ -428,8 +421,8 @@ export default function ProfileManagement() {
                 <div className="space-y-3">
                     {workspacesForRole.map((workspace) => {
                         // Make sure user and workspace.owner exist
-                        const userIdStr = user?._id?.toString();
-                        const ownerIdStr = workspace.role?.toString();
+                        // const userIdStr = user?._id?.toString();
+                        // const ownerIdStr = workspace.role?.toString();
 
                         // Determine current user's role safely
                         const myRole = workspace.role
@@ -444,7 +437,7 @@ export default function ProfileManagement() {
                             <div className="flex items-start justify-between">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
-                                <div className="w-12 h-12 bg-linear-to-br from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center text-white font-semibold">
+                                <div className="w-12 h-12 bg-linear-to-br from-gray-400 to-gray-600 rounded-lg flex items-center justify-center text-white font-semibold">
                                     {workspace.name?.charAt(0).toUpperCase() || "?"}
                                 </div>
 
@@ -491,7 +484,7 @@ export default function ProfileManagement() {
                                     });
                                 }
                                 }}
-                                className="px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-sm font-medium">
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-sm font-medium">
                                     View
                             </button>
                             </div>
@@ -505,7 +498,7 @@ export default function ProfileManagement() {
                 <div className="text-center py-12">
                     <Building2 size={48} className="mx-auto text-gray-300 mb-3" />
                     <p className="text-gray-600">You're not part of any workspaces yet</p>
-                    <button className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <button className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
                     Create Workspace
                     </button>
                 </div>

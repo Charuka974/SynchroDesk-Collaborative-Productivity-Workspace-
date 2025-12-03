@@ -11,13 +11,44 @@ export const getMyProfileAPI = async () => {
 };
 
 // Update my profile (name, avatar, etc.)
-export const updateMyProfileAPI = async (payload: {
-  name?: string;
-  avatar?: string;
-}) => {
-  const res = await api.put("/users/me", payload);
+export const updateMyProfileAPI = async (data: { name?: string; avatar?: File | string } | FormData) => {
+  // Detect FormData
+  if (data instanceof FormData) {
+    const res = await api.post("/users/me", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
+
+  // Previous logic for JSON / base64
+  if (data.avatar instanceof File) {
+    const formData = new FormData();
+    if (data.name) formData.append("name", data.name);
+    formData.append("avatar", data.avatar);
+    const res = await api.put("/users/me", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
+
+  if (typeof data.avatar === "string" && data.avatar.startsWith("data:image")) {
+    const blob = await (await fetch(data.avatar)).blob();
+    const file = new File([blob], "avatar.png", { type: blob.type });
+
+    const formData = new FormData();
+    if (data.name) formData.append("name", data.name);
+    formData.append("avatar", file);
+
+    const res = await api.put("/users/me", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  }
+
+  const res = await api.put("/users/me", data);
   return res.data;
 };
+
 
 // Change my password
 export const changeMyPasswordAPI = async (payload: {

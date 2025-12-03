@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth";
+import { upload } from "../middleware/upload";
 
 import {
   getMyProfile,
@@ -16,7 +17,10 @@ const router = Router();
 // USER PROFILE ROUTES
 // ─────────────────────────────
 router.get("/me", authenticate, getMyProfile);
-router.put("/me", authenticate, updateProfile);
+
+// ADD MULTER HERE
+router.post("/me", authenticate, upload.single("avatar"), updateProfile);
+
 router.put("/me/password", authenticate, changePassword);
 
 // ─────────────────────────────
@@ -28,7 +32,6 @@ router.get("/", authenticate, getAllUsers);
 // WORKSPACE RELATED USERS
 // ─────────────────────────────
 router.get("/workspace-members", authenticate, getUsersInMyWorkspaces);
-
 router.get("/workspace-my-roles", authenticate, getMyWorkspaceRoles);
 
 export default router;

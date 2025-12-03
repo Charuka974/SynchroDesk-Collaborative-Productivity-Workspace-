@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChatProvider, useChat } from "../context/messageContext";
 // import { connectSocket } from "../lib/messagesocket";
 import { useAuth } from "../context/authContext";
 import toast from "react-hot-toast";
+import EmojiPicker from "emoji-picker-react";
 
 interface ChatProps {}
 
@@ -50,7 +51,7 @@ const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspa
 
 
 const ChatPanel: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const {
     messages,
     selectedUser,
@@ -62,7 +63,11 @@ const ChatPanel: React.FC = () => {
   } = useChat();
 
   const [newMessage, setNewMessage] = useState("");
-
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
   // Fetch messages when selectedUser or selectedWorkspace changes
   useEffect(() => {
     if (selectedUser) fetchMessages(selectedUser._id);
@@ -70,24 +75,25 @@ const ChatPanel: React.FC = () => {
   }, [selectedUser, selectedWorkspace]);
 
   const handleSend = async () => {
-    if (!newMessage.trim() || (!selectedUser && !selectedWorkspace)) return;
+    if (!newMessage.trim() && !attachment) return; // nothing to send
+    if (!selectedUser && !selectedWorkspace) return; // no target
 
     try {
-      await sendMessage({ text: newMessage });
+      await sendMessage({
+        text: newMessage || undefined,
+        image: attachment?.type.startsWith("image/") ? attachment : undefined,
+        file: attachment && !attachment.type.startsWith("image/") ? attachment : undefined,
+      });
+
       setNewMessage("");
+      setAttachment(null);
+      setPreviewUrl(null); // clear preview
     } catch (err) {
       console.error("Error sending message:", err);
       toast.error("Failed to send message");
     }
   };
 
-  if (loading || !user) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-gray-500">
-        Loading...
-      </div>
-    );
-  }
 
   if (!selectedUser && !selectedWorkspace) {
     return (
@@ -108,7 +114,7 @@ const ChatPanel: React.FC = () => {
       {/* Header */}
       <div className="p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 flex items-center justify-center shadow-xl border-b border-slate-600">
         <h2 className="text-2xl font-bold text-center text-white tracking-tight">
-          {chatName}
+          {chatName} Chat
         </h2>
       </div>
 
@@ -167,16 +173,33 @@ const ChatPanel: React.FC = () => {
                         : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">
-                      {msg.text || (
-                        <span className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                          </svg>
-                          Attachment
-                        </span>
-                      )}
-                    </p>
+                    {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
+
+                    {msg.image && (
+                      <img
+                        src={msg.image}
+                        alt="image"
+                        className="mt-2 max-w-xs rounded-md"
+                      />
+                    )}
+
+                    {msg.file && (
+                      <a
+                        href={msg.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 text-blue-600 underline block text-sm"
+                      >
+                        {msg.file.split("/").pop()} {/* shows file name */}
+                      </a>
+                    )}
+
+                    {msg.audio && (
+                      <audio controls className="mt-2 w-full">
+                        <source src={msg.audio} />
+                        Your browser does not support the audio element.
+                      </audio>
+                    )}
                   </div>
                   
                   {/* Timestamp - you can add this if you have timestamp data */}
@@ -192,25 +215,116 @@ const ChatPanel: React.FC = () => {
         )}
       </div>
 
+      {/* Attachment preview */}
+      {attachment && (
+        <div className="flex items-center mb-2 p-2 border border-gray-300 rounded-lg bg-gray-100 relative">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="preview"
+              className="w-16 h-16 object-cover rounded-md"
+            />
+          ) : (
+            <div className="flex items-center gap-2 text-gray-700">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                />
+              </svg>
+              <span className="truncate">{attachment.name}</span>
+            </div>
+          )}
+
+          {/* Remove button */}
+          <button
+            className="absolute top-1 right-1 text-gray-600 hover:text-gray-900 text-xl"
+            onClick={() => {
+              setAttachment(null);
+              setPreviewUrl(null);
+            }}
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-gray-200">
         <div className="flex items-center gap-2">
-          <button className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors">
+          <label className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
+            <input
+              type="file"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  setAttachment(file);
+
+                  if (file.type.startsWith("image/")) {
+                    setPreviewUrl(URL.createObjectURL(file));
+                  } else {
+                    setPreviewUrl(null);
+                  }
+
+                  // Reset the input so the same file can be selected again
+                  e.target.value = "";
+                }
+              }}
+            />
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
             </svg>
-          </button>
+          </label>
+
+          {/* Emoji Button */}
+          <button
+            className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 9h.01M15 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button> 
+
+          {/* The Emoji Picker */}
+          {showEmojiPicker && (
+            <div className="absolute bottom-16 left-4 z-50">
+              <EmojiPicker
+                onEmojiClick={(emoji) => {
+                  setNewMessage((prev) => prev + emoji.emoji);
+                  setShowEmojiPicker(false);
+                }}
+                
+              />
+            </div>
+          )}
+
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
           />
           <button
             onClick={handleSend}
-            className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md"
+            className="p-3 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!newMessage.trim() && !attachment}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

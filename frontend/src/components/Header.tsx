@@ -147,8 +147,18 @@ export default function Header() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-3 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 transition border border-gray-200"
               >
-                <div className="w-8 h-8 bg-linear-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                  {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
+                <div className="w-8 h-8 bg-linear-to-br from-gray-800 to-gray-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span>
+                      {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  )}
                 </div>
                 <div className="hidden lg:block text-left">
                   <p className="text-sm font-medium text-gray-900">{user?.name || "User"}</p>

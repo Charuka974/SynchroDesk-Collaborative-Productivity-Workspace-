@@ -18,7 +18,7 @@ interface ChatContextType {
   fetchUsers: () => void;
   fetchMessages: (userId: string) => void;
   fetchGroupMessages: (workspaceId: string) => void;
-  sendMessage: (messageData: { text?: string; image?: string; file?: string; audio?: string }) => void;
+  sendMessage: (messageData: {text?: string; image?: File; file?: File; audio?: File; }) => void;
 }
 
 interface ChatProviderProps {
@@ -116,29 +116,30 @@ export const ChatProvider = ({ children, currentUser }: ChatProviderProps) => {
   //   }
   // };
 
-  const sendMessage = async (messageData: {text?: string; image?: string; file?: string; audio?: string;}) => {
+  const sendMessage = async (messageData: {
+    text?: string;
+    image?: File;
+    file?: File;
+    audio?: File;
+  }) => {
     if (!socket) return;
 
     try {
-      let newMessage;
+      let newMessage: IMessage | null = null;
 
-      // Case 1 → user chat
       if (selectedUser) {
         newMessage = await sendMessageAPI({
           receiverId: selectedUser._id,
           ...messageData,
         });
-      }
-
-      // Case 2 → workspace chat
-      else if (selectedWorkspace) {
+      } else if (selectedWorkspace) {
         newMessage = await sendMessageAPI({
           workspaceId: selectedWorkspace._id,
           ...messageData,
         });
-      } else {
-        return;
       }
+
+      if (!newMessage) return;
 
       setMessages(prev => [...prev, newMessage]);
       socket.emit("sendMessage", newMessage);

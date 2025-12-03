@@ -12,6 +12,7 @@ import bcrypt from "bcryptjs";
 import { User } from "../models/user.model";
 import { Workspace } from "../models/workspace.model";
 import { AUthRequest } from "../middleware/auth";
+import { uploadImage } from "../utils/cloudinary";
 
 // ===============================================
 // GET MY PROFILE
@@ -78,19 +79,29 @@ export const getUsersInMyWorkspaces = async (req: AUthRequest, res: Response) =>
 
 // ===============================================
 // UPDATE PROFILE
-// ===============================================
+// =============================================== 
 export const updateProfile = async (req: AUthRequest, res: Response) => {
   try {
     const userId = req.user?.sub;
-    const { name, avatar } = req.body;
+    const { name } = req.body;
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { name, avatar },
-      { new: true }
-    )
-      .select("-password")
-      .lean();
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const updateFields: any = {};
+    if (name) updateFields.name = name;
+
+    // ===========================
+    // Handle avatar upload via multer
+    // ===========================
+    if (req.file) {
+      const buffer = req.file.buffer; // multer stores the file in memory
+      const imageUrl = await uploadImage(buffer, "avatars"); // your Cloudinary helper
+      updateFields.avatar = imageUrl;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true
+    }).select("-password").lean();
 
     res.status(200).json(updatedUser);
   } catch (error) {
