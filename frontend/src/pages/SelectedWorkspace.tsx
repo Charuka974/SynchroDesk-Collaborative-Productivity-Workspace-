@@ -61,14 +61,14 @@ export default function WorkspacesPage() {
   // };
 
   const WorkspaceTasks = ({ workspaceId }: { workspaceId: string }) => {
-    const { tasks,loadWorkspaceTasks, loadPersonalTasks, changeStatus, updateTask, createTask } = useTasks();
+    const { tasks,loadWorkspaceTasks, changeStatus, updateTask, createTask } = useTasks();
     const [activeFilter, setActiveFilter] = useState("Pending");
 
     // Load tasks for this workspace
     useEffect(() => {
       loadWorkspaceTasks(workspaceId); // You may need to adjust API to accept workspaceId
     }, [workspaceId]);
-    const refreshTasks = () => loadPersonalTasks();
+    const refreshTasks = () => loadWorkspaceTasks(workspaceId);
     const createTaskWithWorkspace = async (task: Omit<ICreateTaskPayload, "workspaceId">) => {
       await createTask({ ...task, workspaceId });
       refreshTasks();
@@ -228,7 +228,7 @@ export default function WorkspacesPage() {
                 workspaceId={workspace.id}
               /> */}
             </div>
-          )}
+          )} 
 
           {currentTab !== "Chat" && (
             <div className="flex-1 overflow-y-auto">

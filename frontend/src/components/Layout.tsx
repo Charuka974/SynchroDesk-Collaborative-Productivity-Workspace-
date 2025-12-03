@@ -22,7 +22,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header"
 import Footer from "./Footer"
-import FloatButtonContainer from "./FloatButton"
+// import FloatButtonContainer from "./FloatButton"
 
 function Layout() {
   // Lift the sidebar collapsed state to layout to adjust main content

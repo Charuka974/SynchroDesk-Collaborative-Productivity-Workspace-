@@ -6,7 +6,7 @@ import { WorkspaceProvider } from "../context/workspaceContext"
 import { TaskProvider } from "../context/taskContext"
 import { UserProvider } from "../context/profileContext"
 
-const Index = lazy(() => import("../pages"))
+// const Index = lazy(() => import("../pages"))
 const Login = lazy(() => import("../pages/Login"))
 const Register = lazy(() => import("../pages/Register"))
 const Home = lazy(() => import("../pages/Home"))
@@ -71,11 +71,7 @@ export default function Router() {
               </RequireAuth>
             }
           >
-            <Route path="/home" element={
-              <TaskProvider>
-                <Home />
-              </TaskProvider>} 
-            />
+            <Route path="/home" element={<Home />} />
             
             <Route 
               path="/messages" 

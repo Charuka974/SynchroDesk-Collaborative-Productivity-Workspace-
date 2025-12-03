@@ -138,7 +138,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
           >
             {f}
           </button>
-        ))}
+        ))} 
       </div>
 
       {/* Task List */}

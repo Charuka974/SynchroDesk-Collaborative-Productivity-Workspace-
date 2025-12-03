@@ -103,7 +103,7 @@ export default function SynchroDeskLanding() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -118,9 +118,9 @@ export default function SynchroDeskLanding() {
               <a href="#demo" className="text-gray-600 hover:text-gray-900 transition font-medium">Demo</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition font-medium">Pricing</a>
               <button 
-                onClick={() => handleNavigation("/register")}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
-                Sign In
+                onClick={() => handleNavigation("/login")}
+                className="px-6 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white hover:bg-gray-700 transition rounded-lg">
+                Log In
               </button>
             </nav>
           </div>
@@ -131,12 +131,12 @@ export default function SynchroDeskLanding() {
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-block mb-4">
-            <span className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+            <span className="px-4 py-2 bg-indigo-100 text-gray-700 rounded-full text-sm font-semibold">
               The Future of Team Productivity
             </span>
           </div>
           <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Work Smarter, <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600">Together</span>
+            Work Smarter, <span className="text-transparent bg-clip-text bg-linear-to-r from-slate-700 via-slate-800 to-slate-900">Together</span>
           </h2>
           <p className="text-xl text-gray-600 mb-10 leading-relaxed">
             SynchroDesk brings your team's tasks, communication, and knowledge into one powerful workspace. Collaborate seamlessly, stay organized, and achieve more.
@@ -155,7 +155,7 @@ export default function SynchroDeskLanding() {
             <button
               // onClick={handleGetStarted}
               onClick={() => handleNavigation("/register")}
-              className="w-full sm:w-auto px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold text-base shadow-lg shadow-indigo-200"
+              className="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white hover:bg-gray-700 transition text-base shadow-indigo-200 rounded-lg"
             >
               Get Started Free 
             </button>
@@ -267,7 +267,7 @@ export default function SynchroDeskLanding() {
               key={index}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1"
             >
-              <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-white mb-4">
+              <div className="w-12 h-12 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-lg flex items-center justify-center text-white mb-4">
                 {feature.icon}
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
@@ -278,7 +278,7 @@ export default function SynchroDeskLanding() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-linear-to-r from-indigo-600 to-purple-600 py-16">
+      <section className="bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center text-white">
             <div>
@@ -311,7 +311,7 @@ export default function SynchroDeskLanding() {
           <button
             // onClick={() => setShowDemo(true)}
             onClick={() => handleNavigation("/register")}
-            className="px-8 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold text-lg shadow-lg shadow-indigo-200"
+            className="px-8 py-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white hover:bg-gray-700 transition text-lg shadow-indigo-200 rounded-lg"
           >
             Start Your Free Trial
           </button>
@@ -324,7 +324,7 @@ export default function SynchroDeskLanding() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -394,7 +394,7 @@ export default function SynchroDeskLanding() {
                   alert("Thanks! We'll be in touch soon.")
                   setShowDemo(false)
                 }}
-                className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                className="flex-1 px-4 py-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white hover:bg-gray-700 transition"
               >
                 Request Demo
               </button>

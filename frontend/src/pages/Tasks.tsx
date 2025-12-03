@@ -143,10 +143,10 @@ export default function SynchroDeskDashboard() {
       <main className="p-6">
         {/* HEADER */}
         <header className="flex flex-col md:flex-row justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
             Welcome back, {user.name}
           </h1>
-          <p className="text-gray-600 mt-1">Here's your targets for today</p>
+          <p className="font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mt-1">Here's your targets for today</p>
         </header>
 
         {/* STATS */}

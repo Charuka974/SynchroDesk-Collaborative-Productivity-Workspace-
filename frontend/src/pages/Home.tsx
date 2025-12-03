@@ -3,7 +3,7 @@ import { useAuth } from "../context/authContext";
 import { AIAssistant } from "../components/AiAssistant";
 import { AIProvider } from "../context/aiContext";
 import { TaskPanel } from "../components/Tasks";
-import { useTasks } from "../context/taskContext";
+import { TaskProvider, useTasks, type ICreateTaskPayload } from "../context/taskContext";
 // import { useNavigate } from "react-router-dom";
 
 export default function SynchroDeskDashboard() {
@@ -15,7 +15,46 @@ export default function SynchroDeskDashboard() {
   //   navigate(navipath);
   // };
 
-  const [events, setEvents] = useState([
+  // Tasks functions
+  // const [activeFilter, setActiveFilter] = useState("Pending");
+  // const { tasks, loadPersonalTasks, changeStatus, createTask, updateTask } = useTasks();
+  // const refreshTasks = () => loadPersonalTasks();
+  // useEffect(() => {
+  //   loadPersonalTasks();
+  // }, [loadPersonalTasks]);
+
+  const DashboardTasks = () => {
+    const { tasks, loadPersonalTasks, changeStatus, updateTask, createTask } = useTasks();
+    const [activeFilter, setActiveFilter] = useState("Pending");
+
+    // Load personal tasks (assigned to me)
+    useEffect(() => {
+      loadPersonalTasks();
+    }, []);   //  Only load once
+
+    const refreshTasks = () => loadPersonalTasks();
+
+    const createTaskNoWorkspace = async (task: Omit<ICreateTaskPayload, "workspaceId">) => {
+      await createTask(task);  // dashboard tasks are personal
+      refreshTasks();
+    };
+
+    return (
+      <TaskPanel
+        tasks={tasks}
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
+        createTask={createTaskNoWorkspace}
+        updateTask={updateTask}
+        changeStatus={changeStatus}
+        refreshTasks={refreshTasks}
+      />
+    );
+  };
+
+  
+
+  const [events] = useState([
     { id: 1, title: "Sprint Planning", date: "2025-11-18", time: "10:00 AM", type: "meeting" },
     { id: 2, title: "Client Call", date: "2025-11-19", time: "2:00 PM", type: "call" },
     { id: 3, title: "Project Deadline", date: "2025-11-22", time: "EOD", type: "deadline" },
@@ -26,13 +65,6 @@ export default function SynchroDeskDashboard() {
     { id: 1, content: "Remember to follow up with design team", timestamp: "2025-11-15 09:30" },
     { id: 2, content: "API integration needs testing", timestamp: "2025-11-14 14:20" },
   ]);
-
-  const [activeFilter, setActiveFilter] = useState("Pending");
-  const { tasks, loadPersonalTasks, changeStatus, createTask, updateTask } = useTasks();
-  const refreshTasks = () => loadPersonalTasks();
-  useEffect(() => {
-    loadPersonalTasks();
-  }, [loadPersonalTasks]);
 
   
   const handleSaveNote = () => {
@@ -54,8 +86,8 @@ export default function SynchroDeskDashboard() {
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.name}</h1>
-            <p className="text-gray-600 mt-1">Here's what's happening today</p>
+            <h1 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">Welcome back, {user.name}</h1>
+            <p className="font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mt-1">Here's what's happening today</p>
           </div>
         </header>
 
@@ -65,7 +97,7 @@ export default function SynchroDeskDashboard() {
           {/* Left Column */}
           <div className="space-y-6 rounded-xl overflow-hidden bg-white shadow-sm border border-gray-200">
             {/* Tasks Panel */}
-            <TaskPanel
+            {/* <TaskPanel
               tasks={tasks}
               activeFilter={activeFilter}
               setActiveFilter={setActiveFilter}
@@ -73,7 +105,10 @@ export default function SynchroDeskDashboard() {
               updateTask={updateTask}
               changeStatus={changeStatus}
               refreshTasks={refreshTasks}
-            />
+            /> */}
+            <TaskProvider>
+              <DashboardTasks />
+            </TaskProvider>
           </div>
 
           {/* Right Column */}
