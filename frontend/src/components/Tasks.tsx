@@ -133,7 +133,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
             key={f}
             onClick={() => setActiveFilter(f)}
             className={`px-4 py-2 text-sm font-medium border-b-2 ${
-              activeFilter === f ? "border-blue-600 text-blue-600" : "border-transparent text-gray-600"
+              activeFilter === f ? "border-blue-900 text-blue-900" : "border-transparent text-gray-600"
             }`}
           >
             {f}
@@ -243,7 +243,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
                               onChange={e => setEditingText(prev => ({ ...prev, [id]: e.target.value }))}
                             />
                             <div className="flex gap-2 mt-2">
-                              <button onClick={() => saveCommentEdit(task, index)} className="px-3 py-1 bg-indigo-500 text-white rounded">Save</button>
+                              <button onClick={() => saveCommentEdit(task, index)} className="px-3 py-1 bg-gray-500 text-white rounded">Save</button>
                               <button onClick={() => setEditingIndex(prev => ({ ...prev, [id]: null }))} className="px-3 py-1 bg-gray-300 rounded">Cancel</button>
                             </div>
                           </>
@@ -251,7 +251,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
                           <>
                             <p>{c.message}</p>
                             <div className="flex gap-3 mt-1 text-xs text-gray-500">
-                              <button onClick={() => { setEditingIndex(prev => ({ ...prev, [id]: index })); setEditingText(prev => ({ ...prev, [id]: c.message })); }} className="hover:text-indigo-600">Edit</button>
+                              <button onClick={() => { setEditingIndex(prev => ({ ...prev, [id]: index })); setEditingText(prev => ({ ...prev, [id]: c.message })); }} className="hover:text-gray-600">Edit</button>
                               <button onClick={() => deleteComment(task, index)} className="hover:text-red-600">Delete</button>
                             </div>
                           </>

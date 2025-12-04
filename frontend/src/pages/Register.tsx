@@ -11,7 +11,7 @@ export default function Register() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading] = useState(false)
 
   const Toast = Swal.mixin({
     toast: true,

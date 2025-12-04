@@ -1,67 +1,28 @@
-import { useState, useEffect } from "react";
-import {
-  changeRoleAPI,
-  createWorkspaceAPI,
-  deleteWorkspaceAPI,
-  getMyWorkspacesAPI,
-  inviteMemberAPI,
-  leaveWorkspaceAPI,
-  removeMemberAPI,
-  updateWorkspaceAPI,
-} from "../services/workspace";
+import { useState } from "react";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { useWorkspace, type Workspace } from "../context/workspaceContext";
 import { useAuth } from "../context/authContext";
 
-import { useNavigate } from "react-router-dom"
-
-
-
 export default function WorkspacesPage() {
-  const navigate = useNavigate()
-  
-  type Member = {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-
-  type Workspace = {
-    id: string;
-    name: string;
-    description: string;
-    role: string;
-    members: Member[];
-    createdAt: string;
-    taskCount: number;
-    color: string;
-  };
-
-  // Toast notification
-  const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end", // top-right
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-  });
-
-  // ----------------------
-  // State
-  // ----------------------
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  // const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
-  //   null
-  // );
+  const navigate = useNavigate();
+  const currentUser = useAuth();
+  const {
+    workspaces,
+    fetchWorkspaces,
+    createWorkspace,
+    updateWorkspace,
+    deleteWorkspace,
+    leaveWorkspace,
+    inviteMember,
+    removeMember,
+    changeRole,
+  } = useWorkspace();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
-
-  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
-    null
-  );
-
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
@@ -73,120 +34,73 @@ export default function WorkspacesPage() {
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
-  // Current user
-  const currentUser = useAuth();
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+  });
 
-  useEffect(() => {
-    const fetchWorkspaces = async () => {
-      try {
-        const data = await getMyWorkspacesAPI();
-        setWorkspaces(data);
-      } catch (error) {
-        console.error(error);
-        Toast.fire({
-          icon: "error",
-          title: "Error fetching workspaces",
-        });
-      }
-    };
-
-    fetchWorkspaces();
-  }, []);
+  // ---------- Handlers ----------
 
   const handleCreateWorkspace = async () => {
     if (!newWorkspaceName.trim()) {
-      Toast.fire({
-        icon: "warning",
-        title: "Please enter a workspace name",
-      });
-      return;
+      return Toast.fire({ icon: "warning", title: "Please enter a workspace name" });
     }
-
-    try {
-      const newWS = await createWorkspaceAPI({
-        name: newWorkspaceName,
-        description: newWorkspaceDescription,
-      });
-
-      setWorkspaces((prev) => [...prev, newWS]);
+    const newWS = await createWorkspace(newWorkspaceName, newWorkspaceDescription);
+    if (newWS) {
       setShowCreateModal(false);
       setNewWorkspaceName("");
       setNewWorkspaceDescription("");
-
-      Toast.fire({
-        icon: "success",
-        title: "Workspace created successfully!",
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Error creating workspace",
-      });
+      Toast.fire({ icon: "success", title: "Workspace created successfully!" });
+      refreshWorkspaces();
+    } else {
+      Toast.fire({ icon: "error", title: "Error creating workspace" });
     }
   };
 
   const handleUpdateWorkspace = async () => {
     if (!selectedWorkspace) return;
-    if (!editName.trim()) {
-      Toast.fire({
-        icon: "warning",
-        title: "Please enter a workspace name",
-      });
-      return;
-    }
-
-    try {
-      const updatedWS = await updateWorkspaceAPI(selectedWorkspace.id, {
-        name: editName,
-        description: editDescription,
-      });
-
-      setWorkspaces((ws) =>
-        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
-      );
-
+    if (!editName.trim()) return Toast.fire({ icon: "warning", title: "Please enter a workspace name" });
+    const updated = await updateWorkspace(selectedWorkspace.id, {
+      name: editName,
+      description: editDescription,
+    });
+    if (updated) {
       setShowSettingsModal(false);
-      Toast.fire({
-        icon: "success",
-        title: "Workspace updated successfully!",
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Error updating workspace",
-      });
+      Toast.fire({ icon: "success", title: "Workspace updated successfully!" });
+      refreshWorkspaces();
+    } else {
+      Toast.fire({ icon: "error", title: "Error updating workspace" });
     }
   };
 
   const handleDeleteWorkspace = async () => {
     if (!selectedWorkspace) return;
 
-    if (
-      selectedWorkspace.role !== "ADMIN" &&
-      selectedWorkspace.role !== "OWNER"
-    ) {
-      Toast.fire({
-        icon: "warning",
-        title: "Only admins can delete workspaces",
-      });
-      return;
-    }
+    const result = await Swal.fire({
+      title: `Delete "${selectedWorkspace.name}"?`,
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    });
 
-    if (!window.confirm(`Delete "${selectedWorkspace.name}"?`)) return;
+    if (!result.isConfirmed) return;
 
-    try {
-      await deleteWorkspaceAPI(selectedWorkspace.id);
-      setWorkspaces((ws) => ws.filter((w) => w.id !== selectedWorkspace.id));
+    const success = await deleteWorkspace(selectedWorkspace.id);
+
+    if (success) {
       setShowSettingsModal(false);
-
       Toast.fire({
         icon: "success",
         title: "Workspace deleted successfully!",
       });
-    } catch (error) {
-      console.error(error);
+      refreshWorkspaces();
+    } else {
       Toast.fire({
         icon: "error",
         title: "Error deleting workspace",
@@ -194,156 +108,72 @@ export default function WorkspacesPage() {
     }
   };
 
+
   const handleLeaveWorkspace = async () => {
     if (!selectedWorkspace) return;
-
-    if (selectedWorkspace.role === "ADMIN") {
-      Toast.fire({
-        icon: "warning",
-        title: "Admins cannot leave the workspace.",
-      });
-      return;
-    }
-
-    // Use Swal instead of native confirm
     const result = await Swal.fire({
       title: `Leave "${selectedWorkspace.name}"?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, leave",
-      cancelButtonText: "Cancel",
-      reverseButtons: true,
     });
-
-    if (!result.isConfirmed) return; // User canceled
-
-    try {
-      await leaveWorkspaceAPI( selectedWorkspace.id, currentUser.id);
-
-      setWorkspaces((ws) => ws.filter((w) => w.id !== selectedWorkspace.id));
+    if (!result.isConfirmed) return;
+    const success = await leaveWorkspace(selectedWorkspace.id, currentUser.id);
+    if (success) {
       setShowSettingsModal(false);
-
-      Toast.fire({
-        icon: "success",
-        title: "You left the workspace",
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Error leaving workspace",
-      });
+      Toast.fire({ icon: "success", title: "You left the workspace" });
+      refreshWorkspaces();
+    } else {
+      Toast.fire({ icon: "error", title: "Error leaving workspace" });
     }
   };
 
-
   const handleInviteMember = async () => {
-    if (!selectedWorkspace) return;
-    if (!inviteEmail.trim()) {
-      Toast.fire({
-        icon: "warning",
-        title: "Please enter an email",
-      });
-      return;
+    if (!selectedWorkspace || !inviteEmail.trim()) {
+      return Toast.fire({ icon: "warning", title: "Please enter an email" });
     }
-
-    try {
-      const updatedWS = await inviteMemberAPI(selectedWorkspace.id, {
-        email: inviteEmail,
-        role: inviteRole,
-      });
-
-      setWorkspaces((ws) =>
-        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
-      );
-
+    const updated = await inviteMember(selectedWorkspace.id, inviteEmail, inviteRole);
+    if (updated) {
       setInviteEmail("");
       setInviteRole("MEMBER");
       setShowInviteModal(false);
-
-      Toast.fire({
-        icon: "success",
-        title: `Invitation sent to ${inviteEmail}`,
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Error inviting member",
-      });
+      Toast.fire({ icon: "success", title: `Invitation sent to ${inviteEmail}` });
+      refreshWorkspaces();
+    } else {
+      Toast.fire({ icon: "error", title: "Error inviting member" });
     }
   };
 
   const handleRemoveMember = async (memberId: string) => {
     if (!selectedWorkspace) return;
-    if (
-      selectedWorkspace.role !== "ADMIN" &&
-      selectedWorkspace.role !== "OWNER"
-    ) {
-      Toast.fire({
-        icon: "warning",
-        title: "Only admins can remove members",
+    const updated = await removeMember(selectedWorkspace.id, memberId);
+
+    if (updated) {
+      // Ensure members is always an array
+      setSelectedWorkspace({
+        ...updated,
+        members: updated.members || [],
       });
-      return;
-    }
 
-    try {
-      const updatedWS = await removeMemberAPI(selectedWorkspace.id, memberId);
-
-      setWorkspaces((ws) =>
-        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
-      );
-
-      setSelectedWorkspace(updatedWS);
-
-      Toast.fire({
-        icon: "success",
-        title: "Member removed successfully",
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Error removing member",
-      });
+      setShowSettingsModal(false);
+      Toast.fire({ icon: "success", title: "Member removed successfully" });
+      refreshWorkspaces();
+    } else {
+      Toast.fire({ icon: "error", title: "Error removing member" });
     }
   };
 
+
   const handleChangeRole = async (memberId: string, newRole: string) => {
     if (!selectedWorkspace) return;
-    if (
-      selectedWorkspace.role !== "ADMIN" &&
-      selectedWorkspace.role !== "OWNER"
-    ) {
-      Toast.fire({
-        icon: "warning",
-        title: "Only admins can change roles",
-      });
-      return;
-    }
-
-    try {
-      const updatedWS = await changeRoleAPI(selectedWorkspace.id, {
-        userId: memberId,
-        role: newRole,
-      });
-
-      setWorkspaces((ws) =>
-        ws.map((w) => (w.id === updatedWS.id ? updatedWS : w))
-      );
-
-      setSelectedWorkspace(updatedWS);
-
-      Toast.fire({
-        icon: "success",
-        title: "Member role updated",
-      });
-    } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Error changing role",
-      });
+    const updated = await changeRole(selectedWorkspace.id, memberId, newRole);
+    if (updated) {
+      setSelectedWorkspace(updated);
+      setShowSettingsModal(false);
+      Toast.fire({ icon: "success", title: "Member role updated" });
+      refreshWorkspaces();
+    } else {
+      Toast.fire({ icon: "error", title: "Error changing role" });
     }
   };
 
@@ -359,6 +189,7 @@ export default function WorkspacesPage() {
     setShowInviteModal(true);
   };
 
+  // UI logic for color and viewMode remains unchanged
   const getColorClass = (color: string) => {
     const colors: Record<string, string> = {
       indigo: "from-indigo-500 to-indigo-600",
@@ -368,8 +199,11 @@ export default function WorkspacesPage() {
       green: "from-green-500 to-green-600",
       slate: "from-slate-700 via-slate-800 to-slate-900",
     };
+    return colors[color] || colors.slate;
+  };
 
-    return colors[color] || colors.indigo;
+  const refreshWorkspaces = async () => {
+    await fetchWorkspaces(); // re-fetches from backend and updates state
   };
 
 
@@ -580,10 +414,10 @@ export default function WorkspacesPage() {
 
                   <div className="flex items-center mb-4">
                     <div className="flex -space-x-2">
-                      {workspace.members.slice(0, 3).map((member, idx) => (
+                      {workspace.members.slice(0, 3).map((member) => (
                         <div
-                          key={idx}
-                          className="w-8 h-8 rounded-full bg-linear-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold border-2 border-white"
+                          key={member.id} // unique key
+                          className="w-8 h-8 rounded-full bg-linear-to-r from-blue-400 to-blue-900 flex items-center justify-center text-white text-xs font-semibold border-2 border-white"
                           title={member.name}
                         >
                           {(member.name?.charAt(0) ?? "?").toUpperCase()}
@@ -669,7 +503,7 @@ export default function WorkspacesPage() {
                   value={newWorkspaceName}
                   onChange={(e) => setNewWorkspaceName(e.target.value)}
                   placeholder="e.g., Marketing Team"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
               </div>
               <div>
@@ -681,7 +515,7 @@ export default function WorkspacesPage() {
                   onChange={(e) => setNewWorkspaceDescription(e.target.value)}
                   placeholder="What is this workspace for?"
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none"
                 />
               </div>
             </div>
@@ -752,7 +586,7 @@ export default function WorkspacesPage() {
                       selectedWorkspace.role === "OWNER"
                     )
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:bg-gray-100"
                 />
               </div>
               <div>
@@ -769,7 +603,7 @@ export default function WorkspacesPage() {
                     )
                   }
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none disabled:bg-gray-100"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 resize-none disabled:bg-gray-100"
                 />
               </div>
               {(selectedWorkspace.role === "ADMIN" ||
@@ -785,27 +619,25 @@ export default function WorkspacesPage() {
 
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Members ({selectedWorkspace.members.length})
+                Members ({selectedWorkspace?.members?.length ?? 0})
               </h3>
+
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                {selectedWorkspace.members.map((member) => (
+                {(selectedWorkspace?.members || []).map((member) => (
                   <div
                     key={member.id}
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-linear-to-r from-gray-500 to-gray-800 flex items-center justify-center text-white font-semibold">
                         {(member.name?.charAt(0) ?? "?").toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">
-                          {member.name}
-                        </p>
+                        <p className="font-medium text-gray-900">{member.name}</p>
                         <p className="text-sm text-gray-600">{member.email}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {/* Only Admins/Owner can change roles or remove members */}
                       {(selectedWorkspace.role === "ADMIN" ||
                         selectedWorkspace.role === "OWNER") &&
                       member.id !== currentUser.id ? (
@@ -817,7 +649,7 @@ export default function WorkspacesPage() {
                                 onChange={(e) =>
                                   handleChangeRole(member.id, e.target.value)
                                 }
-                                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                               >
                                 <option value="ADMIN">Admin</option>
                                 <option value="MEMBER">Member</option>
@@ -825,7 +657,7 @@ export default function WorkspacesPage() {
 
                               <button
                                 onClick={() => handleRemoveMember(member.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                className="p-2 text-red-800 hover:bg-red-50 rounded-lg transition"
                                 title="Remove member"
                               >
                                 <svg
@@ -854,24 +686,25 @@ export default function WorkspacesPage() {
                   </div>
                 ))}
               </div>
+
             </div>
 
             <div className="border-t border-red-200 pt-6 mt-6">
-              <h3 className="text-lg font-semibold text-red-600 mb-4">
+              <h3 className="text-lg font-semibold text-red-800 mb-4">
                 Danger Zone
               </h3>
               <div className="space-y-3">
                 {selectedWorkspace.role === "OWNER" ? (
                   <button
                     onClick={handleDeleteWorkspace}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                    className="w-full px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 transition font-medium"
                   >
                     Delete Workspace
                   </button>
                 ) : (
                   <button
                     onClick={handleLeaveWorkspace}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                    className="w-full px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 transition font-medium"
                   >
                     Leave Workspace
                   </button>
@@ -907,7 +740,7 @@ export default function WorkspacesPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="colleague@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
               </div>
               <div>
@@ -919,7 +752,7 @@ export default function WorkspacesPage() {
                   onChange={(e) =>
                     setInviteRole(e.target.value as "MEMBER" | "ADMIN")
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   <option value="member">Member</option>
                   <option value="ADMIN">Admin</option>

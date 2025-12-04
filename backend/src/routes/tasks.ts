@@ -17,7 +17,8 @@ import {
   // Comments
   addComment,
   updateComment,
-  deleteComment
+  deleteComment,
+  getAllMyWorkspaceTasks
 } from "../controllers/task.controller";
 
 const router = Router();
@@ -44,6 +45,9 @@ router.get("/workspace/:workspaceId", authenticate, getTasksByWorkspace);
 
 // Tasks assigned to the logged-in user
 router.get("/assigned/me", authenticate, getTasksAssignedToMe);
+
+// All Tasks of workspace of a user
+router.get("/workspace-all", authenticate, getAllMyWorkspaceTasks);
 
 // ─────────────────────────────
 // TASK OPERATIONS

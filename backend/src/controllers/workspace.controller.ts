@@ -311,3 +311,31 @@ export const changeWorkspaceRole = async (req: AUthRequest, res: Response) => {
     res.status(500).json({ message: "Server error changing role" });
   }
 };
+
+// -------------------------
+// LEAVE WORKSPACE
+// -------------------------
+export const leaveWorkspace = async (req: AUthRequest, res: Response) => {
+  try {
+    const { id } = req.params; // workspace ID
+    const userId = req.user?.sub;
+
+    const workspace = await Workspace.findById(id);
+    if (!workspace) return res.status(404).json({ message: "Workspace not found" });
+
+    // Cannot leave if owner
+    if (workspace.owner.toString() === userId)
+      return res.status(400).json({ message: "Owner cannot leave workspace" });
+
+    workspace.members = workspace.members.filter(
+      (m) => m.userId.toString() !== userId
+    );
+
+    await workspace.save();
+
+    res.status(200).json({ message: "Left workspace successfully", workspace });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error leaving workspace" });
+  }
+};

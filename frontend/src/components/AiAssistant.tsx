@@ -114,16 +114,16 @@ export const AIAssistant = ({ userName = "", onTaskCreate }: AIAssistantProps) =
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={`fixed inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-6 sm:right-6 bg-gray-600 rounded-2xl shadow-2xl z-50 flex flex-col ${
+            className={`fixed inset-x-4 bottom-0 right-0 sm:inset-x-auto sm:right-0 shadow-2xl z-50 flex flex-col ${
               isMinimized 
-                ? "sm:w-80 h-16" 
-                : "sm:w-96 h-[85vh] sm:h-[600px] max-h-[600px]"
+                ? "sm:w-80 h-16 rounded-tl-2xl" 
+                : "sm:w-96 h-[85vh] sm:h-[600px] max-h-[600px] rounded-tl-2xl"
             }`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-400 bg-linear-to-r from-gray-500 to-gray-600 rounded-t-2xl">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-400 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-tl-2xl">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center border border-gray-600">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-full flex items-center justify-center border border-gray-600">
                   <Bot className="text-gray-300" size={20} />
                 </div>
                 <div className="text-gray-100">
@@ -210,7 +210,7 @@ export const AIAssistant = ({ userName = "", onTaskCreate }: AIAssistantProps) =
                 </div>
 
                 {/* Input */}
-                <div className="p-3 sm:p-4 bg-gray-500 rounded-b-2xl">
+                <div className="p-3 sm:p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900">
                   <form 
                     onSubmit={e => { e.preventDefault(); handleSend(); }} 
                     className="flex gap-2"

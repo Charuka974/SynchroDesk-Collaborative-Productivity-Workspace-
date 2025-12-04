@@ -15,6 +15,7 @@ import {
   updateCommentAPI,
   deleteCommentAPI,
   getTasksAssignedToMeAPI,
+  getAllWorkspaceTasksAPI,
 } from "../services/tasks";
 
 // Frontend Task interface
@@ -36,6 +37,22 @@ export interface ITask {
   updatedAt?: string;
 }
 
+// Workspace tasks
+export interface IWorkspaceTasks {
+  workspaceId: string;
+  workspaceName: string;
+  workspaceDescription?: string;
+  settings?: {
+    theme: "light" | "dark";
+    color?: string;
+    allowUploads: boolean;
+    notifications: boolean;
+  };
+  role: "OWNER" | "ADMIN" | "MEMBER";
+  tasks: ITask[];
+}
+
+
 // Payload for creating a task
 export interface ICreateTaskPayload {
   title: string; // required
@@ -54,9 +71,11 @@ export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
 interface TaskContextType {
   tasks: ITask[];
+  allWorkspaceTasks: IWorkspaceTasks[];
   loading: boolean;
   loadWorkspaceTasks: (workspaceId: string) => Promise<void>;
   loadPersonalTasks: () => Promise<void>;   // <-- ADD THIS
+  loadAllWorkspaceTasks: () => Promise<void>;
   createTask: (taskData: ICreateTaskPayload) => Promise<void>;
   updateTask: (taskId: string, updates: Partial<ITask>) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
@@ -83,6 +102,8 @@ interface Props {
 export const TaskProvider = ({ children }: Props) => {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(false);
+  const [allWorkspaceTasks, setAllWorkspaceTasks] = useState<IWorkspaceTasks[]>([]);
+
 
   const loadWorkspaceTasks = async (workspaceId: string) => {
     setLoading(true);
@@ -100,6 +121,12 @@ export const TaskProvider = ({ children }: Props) => {
     }
   };
 
+  const loadAllWorkspaceTasks = async () => {
+    setLoading(true);
+    const data = await getAllWorkspaceTasksAPI();
+    setAllWorkspaceTasks(data); // store here
+    setLoading(false);
+  };
 
   const createTask = async (taskData: ICreateTaskPayload) => {
     const task = await createTaskAPI(taskData);
@@ -164,9 +191,11 @@ export const TaskProvider = ({ children }: Props) => {
     <TaskContext.Provider
       value={{
         tasks,
+        allWorkspaceTasks,
         loading,
         loadWorkspaceTasks,
         loadPersonalTasks,
+        loadAllWorkspaceTasks,
         createTask,
         updateTask,
         deleteTask,

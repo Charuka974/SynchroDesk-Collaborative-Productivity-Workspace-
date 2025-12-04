@@ -9,27 +9,21 @@ import {
   Shield,
   Users,
   CheckCircle,
-  XCircle,
-  Clock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useUser } from "../context/profileContext";
-import { useWorkspace } from "../context/workspaceContext";
-import {
-  updateMyProfileAPI,
-  changeMyPasswordAPI
-} from "../services/profile";
+import { updateMyProfileAPI, changeMyPasswordAPI } from "../services/profile";
 import { getMyWorkspacesAPI } from "../services/workspace";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"; 
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileManagement() {
   const { user, refreshUser } = useUser();
-  const navigate = useNavigate()
-  const { workspaces } = useWorkspace();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>();
+  const navigate = useNavigate();
+
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState<string>();
 
   type Member = {
     id: string;
@@ -47,23 +41,24 @@ export default function ProfileManagement() {
     taskCount: number;
     color: string;
   };
-  const [workspacesForRole, setWorkspacesForRole] = useState<Workspace[]>([]);
+
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
 
   const fetchWorkspaces = async () => {
-      setLoading(true);
-      try {
-        const data = await getMyWorkspacesAPI();
-        setWorkspacesForRole(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch workspaces");
-      } finally {
-        setLoading(false);
-      }
+    // setLoading(true);
+    try {
+      const data = await getMyWorkspacesAPI();
+      setWorkspaces(data);
+    } catch (err: any) {
+      // setError(err.message || "Failed to fetch workspaces");
+      console.error(err);
+    } finally {
+      // setLoading(false);
+    }
   };
 
   const [activeTab, setActiveTab] = useState<"personal" | "security" | "workspaces">("personal");
 
-  // Local profile state
   const [profile, setProfile] = useState(user);
   const [editData, setEditData] = useState({
     name: "",
@@ -73,34 +68,28 @@ export default function ProfileManagement() {
     confirmPassword: ""
   });
 
-    // Toast notification
   const Toast = Swal.mixin({
     toast: true,
-    position: "top-end", // top-right
+    position: "top-end",
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
   });
-  
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
-
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Load profile + workspace data
+  // Load profile on mount
   useEffect(() => {
     if (!user) return;
     setProfile(user);
-    setEditData((prev) => ({
-      ...prev,
-      name: user.name,
-      email: user.email
-    }));
+    setEditData({ ...editData, name: user.name, email: user.email });
     setAvatarPreview(user.avatar);
   }, [user]);
 
+  // Fetch workspaces on mount
   useEffect(() => {
     refreshUser();
     fetchWorkspaces();
@@ -134,7 +123,7 @@ export default function ProfileManagement() {
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to update profile");
+      // setError(err.message || "Failed to update profile");
     }
     setIsSaving(false);
   };
@@ -419,7 +408,7 @@ export default function ProfileManagement() {
                 </div>
 
                 <div className="space-y-3">
-                    {workspacesForRole.map((workspace) => {
+                    {workspaces.map((workspace) => {
                         // Make sure user and workspace.owner exist
                         // const userIdStr = user?._id?.toString();
                         // const ownerIdStr = workspace.role?.toString();

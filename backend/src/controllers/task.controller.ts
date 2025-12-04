@@ -25,6 +25,7 @@ import mongoose from "mongoose";
 import { Task, ITask, TaskStatus, TaskPriority } from "../models/task.model";
 import { AUthRequest } from "../middleware/auth";
 import { User } from "../models/user.model";
+import { Workspace } from "../models/workspace.model";
 
 // ---------------------------------------------------------------------
 // CREATE TASK
@@ -126,10 +127,65 @@ export const getTasksAssignedToMe = async (req: AUthRequest, res: Response) => {
 
     const tasks = await Task.find({ assignedTo: userId }).lean();
 
-    res.status(200).json(tasks);
+    res.status(200).json(tasks); 
   } catch (error) {
     console.error("getTasksAssignedToMe error:", error);
     res.status(500).json({ message: "Server error fetching tasks" });
+  }
+};
+
+// ---------------------------------------------------------------------
+// GET ALL MY WORKSPACE TASKS
+// ---------------------------------------------------------------------
+
+export const getAllMyWorkspaceTasks = async (req: AUthRequest, res: Response) => {
+  try {
+    const userId = req.user?.sub;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Find all workspaces the user belongs to (owner or member)
+    const workspaces = await Workspace.find({
+      $or: [
+        { owner: userId },
+        { "members.userId": userId }
+      ],
+      isArchived: false,
+    })
+      .lean()
+      .select("_id name description settings owner members");
+
+    if (!workspaces.length) {
+      return res.status(200).json([]);
+    }
+
+    const workspaceIds = workspaces.map(ws => ws._id);
+
+    // Fetch all tasks inside these workspaces
+    const tasks = await Task.find({ workspaceId: { $in: workspaceIds } })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Group tasks by workspace + include workspace metadata
+    const result = workspaces.map(ws => ({
+      workspaceId: ws._id,
+      workspaceName: ws.name,
+      workspaceDescription: ws.description || "",
+      settings: ws.settings,
+      role:
+        ws.owner.toString() === userId
+          ? "OWNER"
+          : ws.members.find(m => m.userId.toString() === userId)?.role || "MEMBER",
+
+      tasks: tasks.filter(task => task.workspaceId?.toString() === ws._id.toString()),
+    }));
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("getAllMyWorkspaceTasks error:", error);
+    res.status(500).json({ message: "Server error fetching workspace tasks" });
   }
 };
 

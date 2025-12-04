@@ -49,7 +49,8 @@ export const changeRoleAPI = async (
   return res.data;
 };
 
-export const leaveWorkspaceAPI = async (workspaceId: string, userId: string) => {
-  const res = await api.delete(`/workspaces/${workspaceId}/remove/${userId}`);
+export const leaveWorkspaceAPI = async (workspaceId: string) => {
+  const res = await api.delete(`/workspaces/${workspaceId}/leave`);
   return res.data;
 };
+

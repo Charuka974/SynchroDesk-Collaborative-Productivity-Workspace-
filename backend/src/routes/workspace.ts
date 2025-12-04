@@ -6,9 +6,10 @@ import {
   removeMember,
   getMyWorkspaces,
   getWorkspace,
-  updateWorkspace,
+  updateWorkspace, 
   deleteWorkspace,
-  changeWorkspaceRole
+  changeWorkspaceRole,
+  leaveWorkspace
 } from "../controllers/workspace.controller";
 
 const router = Router();
@@ -28,6 +29,8 @@ router.delete("/:id", authenticate, deleteWorkspace);
 router.post("/:id/invite", authenticate, inviteMember);
 router.delete("/:id/remove/:userId", authenticate, removeMember);
 router.patch("/:id/role", authenticate, changeWorkspaceRole);
+router.delete("/:id/leave", authenticate, leaveWorkspace);
+
 
 
 export default router;

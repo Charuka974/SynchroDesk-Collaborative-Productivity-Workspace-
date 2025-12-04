@@ -56,6 +56,12 @@ export const getTasksAssignedToMeAPI = async () => {
   return res.data;
 };
 
+// All workspace tasks
+export const getAllWorkspaceTasksAPI = async () => {
+  const res = await api.get(`/tasks/workspace-all`);
+  return res.data;
+}
+
 // ─────────────────────────────
 // TASK OPERATIONS
 // ─────────────────────────────
@@ -106,7 +112,7 @@ export const deleteSubtaskAPI = async (taskId: string, subtaskId: string) => {
 
 // ─────────────────────────────
 // COMMENTS
-// ─────────────────────────────
+// ───────────────────────────── 
 
 // Add comment
 export const addCommentAPI = async (
