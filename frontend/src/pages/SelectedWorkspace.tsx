@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getMyWorkspacesAPI, getWorkspaceByIdAPI } from "../services/workspace";
 import Swal from "sweetalert2";
-// SelectedWorkspace.tsx
+
 import { motion } from "framer-motion";
 import { TaskProvider, useTasks, type ICreateTaskPayload} from "../context/taskContext";
 import { TaskPanel } from "../components/Tasks";
@@ -12,6 +11,7 @@ import { Chat } from "../components/Chat";
 import { NotesPanel } from "../components/WorkspaceNotes";
 import { ResourcesPanel } from "../components/WorkspaceFiles";
 import {CalendarPanel} from "../components/WorkspaceCalender";
+import { getWorkspaceByIdContext, getWorkspaceDataContext } from "../context/workspaceContext";
 
 export default function WorkspacesPage() {
   const { user } = useAuth();
@@ -52,14 +52,6 @@ export default function WorkspacesPage() {
   );
   const [loading, setLoading] = useState(true);
 
-  // const [showTaskModal, setShowTaskModal] = useState(false);
-  // const [activeFilter, setActiveFilter] = useState("Pending");
-  // const [editTaskData, setEditTaskData] = useState<ITask | null>(null);
-  // const { tasks, loadPersonalTasks, changeStatus } = useTasks();
-  // const refreshTasks = () => {
-  //   loadPersonalTasks();
-  // };
-
   const WorkspaceTasks = ({ workspaceId }: { workspaceId: string }) => {
     const { tasks,loadWorkspaceTasks, changeStatus, updateTask, createTask } = useTasks();
     const [activeFilter, setActiveFilter] = useState("Pending");
@@ -89,10 +81,9 @@ export default function WorkspacesPage() {
   };
 
 
-
   // Load workspace list
   useEffect(() => {
-    getMyWorkspacesAPI()
+    getWorkspaceDataContext()
       .then(setWorkspaces)
       .finally(() => setLoading(false));
   }, []);
@@ -106,7 +97,7 @@ export default function WorkspacesPage() {
   const openWorkspace = async (workspaceId: string) => {
     setLoading(true);
     try {
-      const ws = await getWorkspaceByIdAPI(workspaceId);
+      const ws = await getWorkspaceByIdContext(workspaceId);
       setActiveWorkspace(ws);
     } catch (err) {
       console.error(err);

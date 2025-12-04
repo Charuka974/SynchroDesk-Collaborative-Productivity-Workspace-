@@ -251,7 +251,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
             <span className="whitespace-nowrap">Team</span>
           </button>
           
-          <button 
+          {/* <button 
             onClick={() => handleNavigation("/settings")}
             className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition"
           >
@@ -260,7 +260,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span className="whitespace-nowrap">Settings</span>
-          </button>
+          </button> */}
 
           <button 
             onClick={handleLogout}

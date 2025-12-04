@@ -12,18 +12,14 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useUser } from "../context/profileContext";
-import { updateMyProfileAPI, changeMyPasswordAPI } from "../services/profile";
-import { getMyWorkspacesAPI } from "../services/workspace";
+import { changeMyPasswordContext, updateMyProfileContext, useUser } from "../context/profileContext";
+import { getWorkspaceDataContext } from "../context/workspaceContext"
 import Swal from "sweetalert2"; 
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileManagement() {
   const { user, refreshUser } = useUser();
   const navigate = useNavigate();
-
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState<string>();
 
   type Member = {
     id: string;
@@ -47,7 +43,7 @@ export default function ProfileManagement() {
   const fetchWorkspaces = async () => {
     // setLoading(true);
     try {
-      const data = await getMyWorkspacesAPI();
+      const data = await getWorkspaceDataContext();
       setWorkspaces(data);
     } catch (err: any) {
       // setError(err.message || "Failed to fetch workspaces");
@@ -117,7 +113,7 @@ export default function ProfileManagement() {
         formData.append("avatar", avatarFile); // File object
       }
 
-      await updateMyProfileAPI(formData); // make sure your API accepts FormData
+      await updateMyProfileContext(formData); // make sure your API accepts FormData
       await refreshUser(); // refresh context
       setSuccessMessage("Profile updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -139,7 +135,7 @@ export default function ProfileManagement() {
 
     setIsSaving(true);
     try {
-      await changeMyPasswordAPI({
+      await changeMyPasswordContext({
         currentPassword: editData.currentPassword,
         newPassword: editData.newPassword
       });

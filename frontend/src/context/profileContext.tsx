@@ -55,7 +55,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const refreshUser = async () => {
     try {
       setLoading(true);
-      const data = await getMyProfileAPI();
+      const data = await getMyProfileAPI(); 
       setUser(data);
       setError(undefined);
     } catch (err: any) {
@@ -132,4 +132,16 @@ export const useUser = () => {
   const ctx = useContext(UserContext);
   if (!ctx) throw new Error("useUser must be used inside UserProvider");
   return ctx;
+};
+
+
+
+
+export const updateMyProfileContext = async (data: { name?: string; avatar?: File | string } | FormData) => {
+  return await updateMyProfileAPI(data)
+};
+
+// Change my password
+export const changeMyPasswordContext = async (payload: {currentPassword: string; newPassword: string;}) => {
+  return await changeMyPasswordAPI(payload)
 };
