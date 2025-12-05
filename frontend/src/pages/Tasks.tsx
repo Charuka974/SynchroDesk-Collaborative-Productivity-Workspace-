@@ -7,7 +7,8 @@ import {
   useTasks,
   type ITask,
 } from "../context/taskContext";
-import { CheckCircle2, Clock, ListTodo, PlayCircle } from "lucide-react";
+import { CheckCircle2, Clock, ListTodo } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function SynchroDeskDashboard() {
   const { user } = useAuth();
@@ -18,7 +19,8 @@ export default function SynchroDeskDashboard() {
     loadAllWorkspaceTasks,
     createTask,
     updateTask,
-    changeStatus
+    changeStatus,
+    deleteTask
   } = useTasks();
 
   const { workspaceId } = useParams<{ workspaceId: string }>();
@@ -128,6 +130,11 @@ export default function SynchroDeskDashboard() {
     await loadAllWorkspaceTasks();
   };
 
+  const handleDeleteTask = async (id: string) => {
+    await deleteTask(id);
+    refreshTasks();
+  };
+
 
   // Filters
   const filteredTasks = tasks.filter(task => {
@@ -135,7 +142,7 @@ export default function SynchroDeskDashboard() {
 
     const map: Record<string, TaskStatus> = {
       Pending: "TODO",
-      "In Progress": "IN_PROGRESS",
+      // "In Progress": "IN_PROGRESS",
       Done: "DONE"
     };
 
@@ -151,7 +158,7 @@ export default function SynchroDeskDashboard() {
   const stats = {
     total: allTasksCombined.length,
     pending: allTasksCombined.filter(t => t.status === "TODO").length,
-    inProgress: allTasksCombined.filter(t => t.status === "IN_PROGRESS").length,
+    // inProgress: allTasksCombined.filter(t => t.status === "IN_PROGRESS").length,
     done: allTasksCombined.filter(t => t.status === "DONE").length
   };
 
@@ -169,7 +176,7 @@ export default function SynchroDeskDashboard() {
 
       const map: Record<string, TaskStatus> = {
         Pending: "TODO",
-        "In Progress": "IN_PROGRESS",
+        // "In Progress": "IN_PROGRESS",
         Done: "DONE"
       };
 
@@ -192,7 +199,8 @@ export default function SynchroDeskDashboard() {
         {/* STATS */}
         <div className="p-8 bg-linear-to-br from-gray-50 to-gray-100">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"></div> */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {/* Total Tasks */}
               <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
@@ -228,7 +236,7 @@ export default function SynchroDeskDashboard() {
               </div>
 
               {/* In Progress */}
-              <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-purple-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              {/* <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-purple-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
@@ -242,7 +250,7 @@ export default function SynchroDeskDashboard() {
                   </p>
                   <div className="h-1 w-16 bg-purple-300 rounded-full group-hover:w-24 transition-all duration-300"></div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Completed */}
               <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 to-green-600 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -283,7 +291,8 @@ export default function SynchroDeskDashboard() {
 
           {/* FILTER TABS */}
           <div className="flex gap-2 mb-4 border-b border-gray-300 shadow-sm">
-            {["All", "Pending", "In Progress", "Done"].map(f => (
+            {/* {["All", "Pending", "In Progress", "Done"].map(f => ( */}
+            {["All", "Pending", "Done"].map(f => (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
@@ -442,7 +451,7 @@ export default function SynchroDeskDashboard() {
 
                     </div>
 
-                    <div className="relative">
+                    <div className="relative flex items-center gap-2 h-full">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -450,7 +459,7 @@ export default function SynchroDeskDashboard() {
                           setEditingIndex({}); // close comment edits
                           setEditTaskData(task); // <-- THIS OPENS THE EDIT MODAL
                         }}
-                        className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
+                        className="flex items-center gap-1 text-gray-600 hover:text-gray-800 font-bold text-s"
                       >
                         <span>Edit</span>
                         <svg
@@ -465,6 +474,49 @@ export default function SynchroDeskDashboard() {
                             strokeLinejoin="round"
                             strokeWidth={2}
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-4-4l5-5m0 0l-5 5m5-5L13 7"
+                          />
+                        </svg>
+                      </button>
+                      <div className="border border-gray-400 h-7"></div>
+                      <button
+                        onClick={async () => {
+                          const result = await Swal.fire({
+                            title: "Delete Task?",
+                            text: "This action cannot be undone.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#dc2626", // red-600
+                            cancelButtonColor: "#6b7280",  // gray-500
+                            confirmButtonText: "Yes, delete it",
+                          });
+
+                          if (result.isConfirmed) {
+                            handleDeleteTask(task._id);
+                            Swal.fire({
+                              icon: "success",
+                              title: "Deleted!",
+                              text: "The task has been removed.",
+                              timer: 1400,
+                              showConfirmButton: false
+                            });
+                          }
+                        }}
+                        className="flex items-center gap-1 text-red-400 hover:text-red-600 font-bold text-s"
+                      >
+                        <span>Delete</span>
+
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4 text-red-500 hover:text-red-700 transition"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z"
                           />
                         </svg>
                       </button>
@@ -596,7 +648,8 @@ export default function SynchroDeskDashboard() {
 
             {/* FILTER TABS */}
             <div className="flex gap-2 mb-4 border-b border-gray-300 shadow-sm">
-              {["All", "Pending", "In Progress", "Done"].map(f => (
+              {/* {["All", "Pending", "In Progress", "Done"].map(f => ( */}
+              {["All", "Pending", "Done"].map(f => (
                 <button
                   key={f}
                   onClick={() => setWorkspaceFilter(f)}

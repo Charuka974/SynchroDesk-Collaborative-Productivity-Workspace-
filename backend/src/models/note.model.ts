@@ -7,11 +7,6 @@ export interface INote extends Document {
   createdBy: mongoose.Types.ObjectId;
   folder?: string;
   tags?: string[];
-  versionHistory?: {
-    content: string;
-    updatedBy: mongoose.Types.ObjectId;
-    timestamp: Date;
-  }[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -24,13 +19,6 @@ const noteSchema = new Schema<INote>(
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     folder: { type: String },
     tags: [{ type: String }],
-    versionHistory: [
-      {
-        content: String,
-        updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
-        timestamp: { type: Date, default: Date.now },
-      },
-    ],
   },
   { timestamps: true }
 );

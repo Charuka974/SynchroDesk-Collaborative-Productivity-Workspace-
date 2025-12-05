@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { ICreateTaskPayload, ITask, TaskPriority, TaskStatus } from "../context/taskContext";
 import { useAuth } from "../context/authContext";
+import Swal from "sweetalert2";
 
 interface TaskPanelProps {
   tasks: ITask[];
@@ -10,6 +11,7 @@ interface TaskPanelProps {
   updateTask: (id: string, updates: Partial<ITask>) => Promise<void>;
   changeStatus: (id: string, status: TaskStatus) => Promise<void>;
   refreshTasks: () => void;
+  deleteTask: (id: string) => Promise<void>;
 }
 
 export const TaskPanel: React.FC<TaskPanelProps> = ({
@@ -19,7 +21,8 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
   createTask,
   updateTask,
   changeStatus,
-  refreshTasks
+  refreshTasks,
+  deleteTask
 }) => {
   const { user } = useAuth();
   const TASK_PRIORITIES: TaskPriority[] = ["LOW", "MEDIUM", "HIGH", "URGENT"];
@@ -43,7 +46,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
     if (activeFilter === "All") return true;
     const map: Record<string, TaskStatus> = {
       Pending: "TODO",
-      "In Progress": "IN_PROGRESS",
+      // "In Progress": "IN_PROGRESS",
       Done: "DONE"
     };
     return task.status === map[activeFilter];
@@ -79,6 +82,11 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
     refreshTasks();
   };
 
+  const handleDeleteTask = async (id: string) => {
+    await deleteTask(id);
+    refreshTasks();
+  };
+
   const addComment = async (task: ITask) => {
     const text = newCommentText[task._id!] || "";
     if (!text.trim()) return;
@@ -107,10 +115,10 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
   };
 
   return (
-    <div className="bg-white w-full h-full flex flex-col ">
+    <div className="bg-white w-full h-full flex flex-col">
       {/* Header */}
       <div className="p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 flex items-center justify-center">
-        <h2 className="text-3xl font-bold text-center text-white tracking-tight">
+        <h2 className="text-2xl font-bold text-center text-white tracking-tight">
           Tasks
         </h2>
       </div>
@@ -128,7 +136,7 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
 
       {/* Filters */}
       <div className="flex gap-2 mb-4 border-b border-gray-400 pl-6 pr-6">
-        {["All", "Pending", "In Progress", "Done"].map(f => (
+        {["All", "Pending", "Done"].map(f => (
           <button
             key={f}
             onClick={() => setActiveFilter(f)}
@@ -224,7 +232,22 @@ export const TaskPanel: React.FC<TaskPanelProps> = ({
                   </div>
                 </div>
 
-                <button onClick={e => { e.stopPropagation(); setEditTaskData(task); }} className="text-gray-400 hover:text-gray-600">Edit</button>
+                {/* Edit / Delete */}
+                <div className="flex gap-1">
+                  <button onClick={e => { e.stopPropagation(); setEditTaskData(task); }} className="text-gray-400 hover:text-gray-600 font-bold text-xs">Edit</button>
+                  <button onClick={() => {
+                    Swal.fire({
+                      title: "Are you sure?",
+                      text: "This task will be permanently deleted.",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonText: "Yes, delete it",
+                    }).then((result) => {
+                      if (result.isConfirmed) handleDeleteTask(task._id);
+                    });
+                  }}
+                  className="text-red-400 hover:text-red-600 font-bold text-xs">Delete</button>
+                </div>
               </div>
 
               {isOpen && (

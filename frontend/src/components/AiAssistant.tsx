@@ -94,7 +94,7 @@ export const AIAssistant = ({ userName = "", onTaskCreate }: AIAssistantProps) =
             >
               <Sparkles className="text-gray-300 group-hover:text-gray-100 transition-colors" size={24} />
             </motion.div>
-            <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full animate-pulse"></span>
+            {/* <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full animate-pulse"></span> */}
             
             {/* Ripple effect on hover */}
             <motion.span

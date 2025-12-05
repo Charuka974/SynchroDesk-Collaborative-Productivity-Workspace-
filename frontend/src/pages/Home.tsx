@@ -4,6 +4,8 @@ import { AIAssistant } from "../components/AiAssistant";
 import { AIProvider } from "../context/aiContext";
 import { TaskPanel } from "../components/Tasks";
 import { TaskProvider, useTasks, type ICreateTaskPayload } from "../context/taskContext";
+import { NotesProvider } from "../context/noteContext";
+import { NotesPanel } from "../components/Notes";
 // import { useNavigate } from "react-router-dom";
 
 export default function SynchroDeskDashboard() {
@@ -24,7 +26,7 @@ export default function SynchroDeskDashboard() {
   // }, [loadPersonalTasks]);
 
   const DashboardTasks = () => {
-    const { tasks, loadPersonalTasks, changeStatus, updateTask, createTask } = useTasks();
+    const { tasks, loadPersonalTasks, changeStatus, updateTask, createTask, deleteTask } = useTasks();
     const [activeFilter, setActiveFilter] = useState("Pending");
 
     // Load personal tasks (assigned to me)
@@ -48,10 +50,10 @@ export default function SynchroDeskDashboard() {
         updateTask={updateTask}
         changeStatus={changeStatus}
         refreshTasks={refreshTasks}
+        deleteTask={deleteTask}
       />
     );
   };
-
   
 
   const [events] = useState([
@@ -59,25 +61,6 @@ export default function SynchroDeskDashboard() {
     { id: 2, title: "Client Call", date: "2025-11-19", time: "2:00 PM", type: "call" },
     { id: 3, title: "Project Deadline", date: "2025-11-22", time: "EOD", type: "deadline" },
   ]);
-
-  const [notes, setNotes] = useState("");
-  const [savedNotes, setSavedNotes] = useState([
-    { id: 1, content: "Remember to follow up with design team", timestamp: "2025-11-15 09:30" },
-    { id: 2, content: "API integration needs testing", timestamp: "2025-11-14 14:20" },
-  ]);
-
-  
-  const handleSaveNote = () => {
-    if (!notes.trim()) return;
-    const newNote = {
-      id: Date.now(),
-      content: notes,
-      timestamp: new Date().toISOString().slice(0, 16).replace("T", " "),
-    };
-    setSavedNotes([newNote, ...savedNotes]);
-    setNotes("");
-    alert("Note saved!");
-  };
 
 
   return (
@@ -92,10 +75,10 @@ export default function SynchroDeskDashboard() {
         </header>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[65%_30%] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-3">
 
           {/* Left Column */}
-          <div className="space-y-6 rounded-xl overflow-hidden bg-white shadow-sm border border-gray-200">
+          <div className="space-y-6 h-[1200px] overflow-y-auto p-1">
             {/* Tasks Panel */}
             {/* <TaskPanel
               tasks={tasks}
@@ -106,13 +89,23 @@ export default function SynchroDeskDashboard() {
               changeStatus={changeStatus}
               refreshTasks={refreshTasks}
             /> */}
-            <TaskProvider>
-              <DashboardTasks />
-            </TaskProvider>
+
+            <div className="h-150 overflow-y-auto space-y-6 border shadow-xl border-gray-200 rounded-xl">
+              <TaskProvider>
+                <DashboardTasks />
+              </TaskProvider>
+            </div>
+
+            {/* Quick Notes */}
+            <div className="flex-1 overflow-y-auto space-y-6 border shadow-xl border-gray-200 rounded-xl">
+              <NotesProvider>
+                <NotesPanel workspace={null}/>
+              </NotesProvider>
+            </div>
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6 rounded-xl overflow-hidden bg-white shadow-sm border border-gray-200">
+          <div className="space-y-6 rounded-xl overflow-hidden p-1">
             {/* Upcoming Events */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Upcoming Events</h2>
@@ -153,34 +146,6 @@ export default function SynchroDeskDashboard() {
               </div>
             </div>
 
-            {/* Quick Notes */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Notes</h2>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                placeholder="Write a quick note..."
-              />
-              <button
-                onClick={handleSaveNote}
-                className="mt-3 w-full px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg transition"
-              >
-                Save Note
-              </button>
-
-              {savedNotes.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <h3 className="text-sm font-semibold text-gray-700">Recent Notes</h3>
-                  {savedNotes.slice(0, 2).map((note) => (
-                    <div key={note.id} className="p-3 bg-gray-50 rounded-lg text-sm">
-                      <p className="text-gray-700">{note.content}</p>
-                      <p className="text-xs text-gray-500 mt-1">{note.timestamp}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </main>

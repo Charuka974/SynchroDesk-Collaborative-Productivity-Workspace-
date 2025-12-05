@@ -11,6 +11,7 @@ import tasksRouter from "./routes/tasks"
 import messageRouter from "./routes/messages"
 import openapiAiRouter from "./routes/airoute"
 import userRouter from "./routes/users"
+import noteRouter from "./routes/notes"
 
 import { authenticate } from "./middleware/auth"
 import { requireRole } from "./middleware/role"
@@ -41,6 +42,7 @@ app.use("/api/v1/tasks", authenticate, tasksRouter)
 app.use("/api/v1/messages", authenticate, messageRouter)
 app.use("/api/v1/aiassistant", authenticate, openapiAiRouter)
 app.use("/api/v1/users", authenticate, userRouter)
+app.use("/api/v1/notes", authenticate, noteRouter)
 
  
 // public
