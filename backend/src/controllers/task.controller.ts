@@ -26,6 +26,8 @@ import { Task, ITask, TaskStatus, TaskPriority } from "../models/task.model";
 import { AUthRequest } from "../middleware/auth";
 import { User } from "../models/user.model";
 import { Workspace } from "../models/workspace.model";
+import { createNotification } from "./notification.controller";
+import { NotificationType } from "../models/notification.model";
 
 // ---------------------------------------------------------------------
 // CREATE TASK
@@ -48,8 +50,31 @@ export const createTask = async (req: AUthRequest, res: Response) => {
       tags: tags || [],
       dueDate: dueDate ? new Date(dueDate) : undefined,
     });
-
     await task.save();
+
+    // Optional: Validate workspace and save notification
+    if (workspaceId) {
+      try {
+        const ws = await Workspace.findById(workspaceId).lean();
+        if (!ws) return res.status(404).json({ message: "Workspace not found" });
+        let message = `A new task "${task.title}" was created in "${ws.name}" workspace.`;
+        message += ` Priority: "${task.priority}".`;
+        if (task.dueDate) {
+          message += ` Due date: "${task.dueDate.toLocaleDateString()}".`;
+        }
+        for (const member of ws.members) {
+          await createNotification({
+            userId: member.userId,
+            workspaceId: ws._id.toString(),
+            type: NotificationType.TASK,
+            message,
+            link: `/workspaces/${ws._id}/tasks`,
+          });
+        }
+      } catch (error) {
+        console.error("Error creating workspace notifications:", error);
+      }
+    }
 
     res.status(201).json(task);
   } catch (error) {
@@ -64,12 +89,41 @@ export const createTask = async (req: AUthRequest, res: Response) => {
 export const updateTask = async (req: AUthRequest, res: Response) => {
   try {
     const { taskId } = req.params;
-
     const updates = req.body;
 
+    const originalTask = await Task.findById(taskId);
     const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
 
     if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // ------Optional: Validate workspace and save notification------------------------
+    if (task.workspaceId) {
+      try {
+        const ws = await Workspace.findById(task.workspaceId).lean();
+        if (!ws) return res.status(404).json({ message: "Workspace not found" });
+        let message = `Task "${task.title}" was updated in "${ws.name}" workspace.`;
+        if (originalTask?.title !== task.title) {
+          message += ` Title changed from "${originalTask?.title}" to "${task.title}".`;
+        }
+        if (originalTask?.dueDate?.toISOString() !== task.dueDate?.toISOString()) {
+          const originalDate = originalTask?.dueDate ? new Date(originalTask?.dueDate).toLocaleDateString() : "N/A";
+          const newDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "N/A";
+          message += ` Due date changed from "${originalDate}" to "${newDate}".`;
+        }
+        for (const member of ws.members) {
+          await createNotification({
+            userId: member.userId,
+            workspaceId: ws._id.toString(),
+            type: NotificationType.TASK,
+            message,
+            link: `/workspaces/${ws._id}/tasks`,
+          });
+        }
+      } catch (error) {
+        console.error("Error creating workspace notifications:", error);
+      }
+    }
+    // ---------------------End-----------------------------------------
 
     res.status(200).json(task);
   } catch (error) {
@@ -88,6 +142,28 @@ export const deleteTask = async (req: AUthRequest, res: Response) => {
     const task = await Task.findById(taskId);
 
     if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // Optional: Validate workspace and save notification
+    if (task.workspaceId) {
+      try {
+        const ws = await Workspace.findById(task.workspaceId).lean();
+        if (!ws) return res.status(404).json({ message: "Workspace not found" });
+        let message = `The task "${task.title}" was deleted in "${ws.name}" workspace.`;
+        for (const member of ws.members) {
+          await createNotification({
+            userId: member.userId,
+            workspaceId: ws._id.toString(),
+            type: NotificationType.TASK,
+            message,
+            link: `/workspaces/${ws._id}/tasks`,
+          });
+        }
+      } catch (error) {
+        console.error("Error creating workspace notifications:", error);
+      }
+    }
+    // ---------------------End-----------------------------------------
+
 
     await task.deleteOne();
 
@@ -201,11 +277,33 @@ export const changeTaskStatus = async (req: AUthRequest, res: Response) => {
       return res.status(400).json({ message: "Invalid status" });
 
     const task = await Task.findById(taskId);
+    const originalTask = task?.toObject();
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     task.status = status;
     await task.save();
+
+    // Optional: Validate workspace and save notification
+    if (task.workspaceId) {
+      try {
+        const ws = await Workspace.findById(task.workspaceId).lean();
+        if (!ws) return res.status(404).json({ message: "Workspace not found" });
+        let message = `The task "${task.title}" status was changed from "${originalTask?.status}" to "${status}" in "${ws.name}" workspace.`;
+        for (const member of ws.members) {
+          await createNotification({
+            userId: member.userId,
+            workspaceId: ws._id.toString(),
+            type: NotificationType.TASK,
+            message,
+            link: `/workspaces/${ws._id}/tasks`,
+          });
+        }
+      } catch (error) {
+        console.error("Error creating workspace notifications:", error);
+      }
+    }
+    // ---------------------End-----------------------------------------
 
     res.status(200).json(task);
   } catch (error) {

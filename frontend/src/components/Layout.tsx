@@ -22,6 +22,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header"
 import Footer from "./Footer"
+import { NotificationsProvider } from "../context/notificationContext";
 // import FloatButtonContainer from "./FloatButton"
 
 function Layout() {
@@ -44,7 +45,9 @@ function Layout() {
         }`}
       >
         {/* Header */}
-        <Header />
+        <NotificationsProvider>
+          <Header />
+        </NotificationsProvider>
         
         {/* Page content */}
         <div className="flex-1">

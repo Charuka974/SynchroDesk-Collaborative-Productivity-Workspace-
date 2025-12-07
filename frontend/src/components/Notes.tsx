@@ -162,7 +162,7 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({ workspace = null }) => {
   return (
     <div className="bg-white w-full h-full flex flex-col min-h-0">
       {/* Header */}
-      <div className="p-4 bg-linear-to-r from-emerald-600 via-emerald-700 to-teal-700 flex items-center justify-center shadow-2xl">
+      <div className="p-4 bg-linear-to-r from-emerald-600 via-emerald-700 to-emerald-900 flex items-center justify-center shadow-2xl">
         <h2 className="text-2xl font-bold text-center text-white tracking-tight">
           {workspace ? `${workspace?.name || "Workspace"} Notes` : "Personal Notes"}
         </h2> 
@@ -215,7 +215,7 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({ workspace = null }) => {
         <button
           // onClick={() => setShowNoteModal(true)}
           onClick={() => openNoteModal()}
-          className="px-6 py-3 bg-linear-to-r from-emerald-600 to-emerald-900 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
+          className="px-6 py-3 bg-linear-to-r from-emerald-600 to-emerald-900 text-white rounded hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
         >
           + New Note
         </button>
@@ -251,7 +251,7 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({ workspace = null }) => {
       </div>
 
       {/* Notes Grid */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-6 pb-6 overflow-y-auto mt-2">
+      <div className="flex-1 h-auto min-h-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-6 pb-6 overflow-y-auto mt-2">
         {filteredNotes.map((note) => (
           <div
             key={note._id}
@@ -259,7 +259,7 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({ workspace = null }) => {
           >
             <div className="flex justify-between items-start mb-3">
               <h3 
-                className="relative font-bold text-gray-900 text-lg flex-1 leading-tight cursor-pointer group"
+                className="relative font-bold text-gray-800 text-lg flex-1 leading-tight cursor-pointer group"
                 onClick={() => openReadModal(note)}
               >
                 {note.title}
@@ -312,13 +312,13 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({ workspace = null }) => {
                   //   setShowNoteModal(true);
                   // }}
                   onClick={() => openNoteModal(note)}
-                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs"
+                  className="text-gray-500 hover:text-gray-800 font-bold transition-colors text-xs"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => deleteNote(note._id)}
-                  className="text-red-600 hover:text-red-800 font-medium transition-colors text-xs"
+                  className="text-red-500 hover:text-red-800 font-bold transition-colors text-xs"
                 >
                   Delete
                 </button>

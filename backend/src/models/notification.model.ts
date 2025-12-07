@@ -18,7 +18,7 @@ export interface INotification extends Document {
   updatedAt?: Date;
 }
 
-const notificationSchema = new Schema<INotification>(
+const notificationSchema = new Schema<INotification>( 
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     workspaceId: { type: Schema.Types.ObjectId, ref: "Workspace" },
