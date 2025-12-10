@@ -26,6 +26,7 @@ export interface IMessage {
   file?: string;
   audio?: string;
   createdAt: string;
+  workspaceId?: string;
 }
 
 // Get all users except logged-in user

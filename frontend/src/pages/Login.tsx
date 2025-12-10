@@ -236,7 +236,7 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <input
                   id="remember"
                   type="checkbox"
@@ -245,7 +245,7 @@ export default function Login() {
                 <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
                   Remember me for 30 days
                 </label>
-              </div>
+              </div> */}
 
               <button
                 onClick={handleLogin}

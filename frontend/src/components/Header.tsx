@@ -147,11 +147,11 @@ export default function Header() {
                           <div
                             key={noti._id}
                             className={`px-4 py-3 group transition flex flex-col border-b border-gray-200 last:border-none 
-                              ${!noti.read ? "bg-blue-50" : "bg-white"} 
-                              hover:bg-gray-50`}
+                              ${!noti.read ? "bg-blue-50 hover:bg-blue-100" : "bg-white hover:bg-gray-100"}`}
                           >
                             <div className="flex justify-between items-start gap-2">
-                              <p className="text-sm text-gray-800 flex-1 wrap-break-word">{noti.message}</p>
+                              <p className={`text-sm text-gray-900 font-semibold flex-1 wrap-break-word
+                                ${!noti.read ? "opacity-100" : "opacity-50"}`}>{noti.message}</p>
 
                               {/* Delete and Mark as Read Buttons */}
                               <div className="flex flex-col sm:flex-row gap-1 shrink-0">
@@ -163,7 +163,7 @@ export default function Header() {
                                       fetchNotifications();
                                       fetchUnreadCount();
                                     }}
-                                    className="text-xs text-gray-500 font-bold hover:text-gray-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition cursor-pointer border border-gray-300 rounded shadow-sm px-2 py-1 whitespace-nowrap hover:bg-gray-100"
+                                    className="bg-white text-xs text-gray-500 font-bold hover:text-gray-800 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition cursor-pointer border border-gray-300 rounded shadow-sm px-2 py-1 whitespace-nowrap hover:bg-gray-100"
                                   >
                                     Mark as read
                                   </button>
@@ -174,7 +174,7 @@ export default function Header() {
                                     fetchNotifications();
                                     fetchUnreadCount();
                                   }}
-                                  className="text-xs text-red-500 font-bold hover:text-red-700 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition cursor-pointer border border-gray-300 rounded shadow-sm px-2 py-1 whitespace-nowrap hover:bg-red-50"
+                                  className="bg-white text-xs text-red-500 font-bold hover:text-red-700 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition cursor-pointer border border-gray-300 rounded shadow-sm px-2 py-1 whitespace-nowrap hover:bg-red-50"
                                 >
                                   Delete
                                 </button>

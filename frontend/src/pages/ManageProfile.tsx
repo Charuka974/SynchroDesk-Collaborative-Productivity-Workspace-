@@ -21,6 +21,10 @@ export default function ProfileManagement() {
   const { user, refreshUser } = useUser();
   const navigate = useNavigate();
 
+  const handleUserIdNavigation = (userId: string, link: string) => {
+    navigate(link, { state: { userId } });
+  };
+
   type Member = {
     id: string;
     name: string;
@@ -483,8 +487,11 @@ export default function ProfileManagement() {
                 <div className="text-center py-12">
                     <Building2 size={48} className="mx-auto text-gray-300 mb-3" />
                     <p className="text-gray-600">You're not part of any workspaces yet</p>
-                    <button className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-                    Create Workspace
+                    <button 
+                    className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    onClick={() => handleUserIdNavigation(user?._id?.toString() || "", "/workspaces")}
+                    >
+                      Create Workspace
                     </button>
                 </div>
                 )}

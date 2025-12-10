@@ -2,7 +2,7 @@ import { Response } from "express";
 import Message, { IMessage } from "../models/message.model";
 import { User } from "../models/user.model";
 import { AUthRequest } from "../middleware/auth"; 
-import { getReceiverSocketId, io } from "../lib/socket";
+import { getReceiverSocketId, io } from "../index";
 import { Workspace } from "../models/workspace.model";
 import { uploadImage } from "../utils/cloudinary";
 
@@ -146,7 +146,7 @@ export const sendGroupMessage = async (req: AUthRequest, res: Response) => {
     });
 
     await newMessage.save();
-
+ 
     // Emit to workspace channel
     io.emit(`workspace-${workspaceId}`, newMessage);
 

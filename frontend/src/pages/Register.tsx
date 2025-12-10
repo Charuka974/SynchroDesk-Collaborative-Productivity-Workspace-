@@ -52,22 +52,45 @@ export default function Register() {
     //   return
     // }
 
+    // try {
+    //   const data: any = await register(name, email, password)
+
+    //   Toast.fire({
+    //     icon: "success",
+    //     title: `Registration successful! Email: ${data.data.email}`
+    //   });
+
+    //   navigate("/login")
+    // } catch (err: any) {
+    //   console.error("Registration error:", err)
+    //   Toast.fire({
+    //     icon: "error",
+    //     title: "Registration failed. Please try again."
+    //   });
+    // }
     try {
-      const data: any = await register(name, email, password)
+      const data: any = await register(name, email, password);
 
       Toast.fire({
         icon: "success",
         title: `Registration successful! Email: ${data.data.email}`
       });
 
-      navigate("/login")
+      navigate("/login");
     } catch (err: any) {
-      console.error("Registration error:", err)
+      console.error("Registration error:", err);
+
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Registration failed. Please try again.";
+
       Toast.fire({
         icon: "error",
-        title: "Registration failed. Please try again."
+        title: message
       });
     }
+
   }
 
   return (
@@ -239,7 +262,7 @@ export default function Register() {
               </div>
 
 
-              <div className="flex items-start">
+              {/* <div className="flex items-start">
                 <input
                   id="terms"
                   type="checkbox"
@@ -251,7 +274,7 @@ export default function Register() {
                   {" "}and{" "}
                   <button className="text-gray-900 hover:underline">Privacy Policy</button>
                 </label>
-              </div>
+              </div> */}
 
               <button
                 onClick={handleRegister}
