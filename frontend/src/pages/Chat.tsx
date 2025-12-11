@@ -7,7 +7,7 @@ import EmojiPicker from "emoji-picker-react";
 
 const ChatSidebar = () => {
   const {
-    users,
+    users, 
     workspaces,
     selectedUser,
     selectedWorkspace,
@@ -268,10 +268,16 @@ const ChatPanel = () => {
           </div>
         ) : (
           messages.map((msg) => {
-            const senderId = typeof msg.senderId === "string" ? msg.senderId : msg.senderId?._id;
-            const isMine = senderId === user.id;
-            const senderName = isMine ? "You" : msg.senderId?.name || "Unknown";
-            const senderAvatar = msg.senderId?.avatar || "/images/avatar.jpg";
+            const senderObj =
+              typeof msg.senderId === "string"
+                ? { _id: msg.senderId, name: "Unknown", avatar: "/images/avatar.jpg" }
+                : msg.senderId;
+
+            const isMine = senderObj._id === user.id;
+
+            const senderName = isMine ? "You" : senderObj.name || "Unknown";
+            const senderAvatar = isMine ? undefined : senderObj.avatar || "/images/avatar.jpg";
+
 
             return (
               <div
@@ -284,12 +290,10 @@ const ChatPanel = () => {
                     <div className="flex items-center gap-2 mb-1 px-2">
                       <img
                         src={senderAvatar}
-                        alt={msg.senderId?.name}
+                        alt={senderName}
                         className="w-6 h-6 rounded-full"
                       />
-                      <span className="text-xs text-gray-600 font-medium">
-                        {senderName}
-                      </span>
+                      <span className="text-xs text-gray-600 font-medium">{senderName}</span>
                     </div>
                   )}
                   

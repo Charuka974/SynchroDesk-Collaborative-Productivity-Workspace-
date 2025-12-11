@@ -48,7 +48,48 @@ export const getMessages = async (req: AUthRequest, res: Response) => {
 };
 
 
-// POST send a new message
+// -------------------------
+// SEND Direct Message
+// -------------------------// Properly format messages before sending to frontend
+const formatMessage = (msg: any) => {
+  const sender = msg.senderId && msg.senderId.name
+    ? { _id: msg.senderId._id.toString(), name: msg.senderId.name, avatar: msg.senderId.avatar }
+    : { _id: msg.senderId.toString(), name: "Unknown", avatar: "/images/avatar.jpg" };  
+
+  return {
+    _id: msg._id.toString(),
+    senderId: sender,
+    receiverId: msg.receiverId?.toString(),
+    workspaceId: msg.workspaceId?.toString(),
+    text: msg.text,
+    image: msg.image,
+    file: msg.file,
+    audio: msg.audio,
+    createdAt: msg.createdAt,
+  };
+};
+
+// const formatMessage = (msg: any) => {
+//   return {
+//     _id: msg._id.toString(),
+//     senderId:
+//       typeof msg.senderId === "string"
+//         ? msg.senderId
+//         : {
+//             _id: msg.senderId._id.toString(),
+//             name: msg.senderId.name,
+//             avatar: msg.senderId.avatar,
+//           },
+//     receiverId: msg.receiverId?.toString(),
+//     workspaceId: msg.workspaceId?.toString(),
+//     text: msg.text,
+//     image: msg.image,
+//     file: msg.file,
+//     audio: msg.audio,
+//     createdAt: msg.createdAt,
+//   };
+// };
+
 export const sendMessage = async (req: AUthRequest, res: Response) => {
   try {
     const senderId = req.user?.sub;
@@ -61,52 +102,38 @@ export const sendMessage = async (req: AUthRequest, res: Response) => {
       audio?: Express.Multer.File[];
     };
 
-    let imageUrl: string | undefined;
-    let fileUrl: string | undefined;
-    let audioUrl: string | undefined;
+    const imageUrl = files?.image?.[0] ? await uploadImage(files.image[0].buffer, "chat/images") : undefined;
+    const fileUrl = files?.file?.[0] ? await uploadImage(files.file[0].buffer, "chat/files") : undefined;
+    const audioUrl = files?.audio?.[0] ? await uploadImage(files.audio[0].buffer, "chat/audio") : undefined;
 
-    // Upload image
-    if (files?.image?.[0]) {
-      imageUrl = await uploadImage(files.image[0].buffer, "chat/images");
-    }
-
-    // Upload file (PDF, docs, etc)
-    if (files?.file?.[0]) {
-      fileUrl = await uploadImage(files.file[0].buffer, "chat/files");
-    }
-
-    // Upload audio
-    if (files?.audio?.[0]) {
-      audioUrl = await uploadImage(files.audio[0].buffer, "chat/audio");
-    }
-
-    const newMessage = new Message({
+    const newMessageDoc = await new Message({
       senderId,
       receiverId,
       text,
       image: imageUrl,
       file: fileUrl,
       audio: audioUrl,
-    });
+    }).save();
 
-    await newMessage.save();
+    // Populate sender's name and avatar
+    const populatedMsg = await newMessageDoc.populate("senderId", "name avatar");
 
-    // Emit to users
+    // Now format for frontend
+    const formattedMsg = formatMessage(populatedMsg);
+
+
     const receiverSocketId = getReceiverSocketId(receiverId);
-    if (receiverSocketId) io.to(receiverSocketId).emit("newMessage", newMessage);
-
     const senderSocketId = getReceiverSocketId(senderId!);
-    if (senderSocketId && senderSocketId !== receiverSocketId)
-      io.to(senderSocketId).emit("newMessage", newMessage);
 
-    res.status(201).json(newMessage);
+    if (receiverSocketId) io.to(receiverSocketId).emit("receiveMessage", formattedMsg);
+    if (senderSocketId) io.to(senderSocketId).emit("receiveMessage", formattedMsg);
 
+    res.status(201).json(formattedMsg);
   } catch (error: any) {
     console.error("Error in sendMessage:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 export const sendGroupMessage = async (req: AUthRequest, res: Response) => {
   try {
@@ -120,38 +147,27 @@ export const sendGroupMessage = async (req: AUthRequest, res: Response) => {
       audio?: Express.Multer.File[];
     };
 
-    let imageUrl: string | undefined;
-    let fileUrl: string | undefined;
-    let audioUrl: string | undefined;
+    const imageUrl = files?.image?.[0] ? await uploadImage(files.image[0].buffer, "chat/images") : undefined;
+    const fileUrl = files?.file?.[0] ? await uploadImage(files.file[0].buffer, "chat/files") : undefined;
+    const audioUrl = files?.audio?.[0] ? await uploadImage(files.audio[0].buffer, "chat/audio") : undefined;
 
-    if (files?.image?.[0]) {
-      imageUrl = await uploadImage(files.image[0].buffer, "chat/images");
-    }
-
-    if (files?.file?.[0]) {
-      fileUrl = await uploadImage(files.file[0].buffer, "chat/files");
-    }
-
-    if (files?.audio?.[0]) {
-      audioUrl = await uploadImage(files.audio[0].buffer, "chat/audio");
-    }
-
-    const newMessage = new Message({
+    const newMessage = await new Message({
       senderId,
       workspaceId,
       text,
       image: imageUrl,
       file: fileUrl,
       audio: audioUrl,
-    });
+    }).save();
 
-    await newMessage.save();
- 
-    // Emit to workspace channel
-    io.emit(`workspace-${workspaceId}`, newMessage);
+    // Populate sender before sending
+    const populatedMsg = await newMessage.populate("senderId", "name avatar");
 
-    res.status(201).json(newMessage);
+    const formattedMsg = formatMessage(populatedMsg);
 
+
+    io.emit(`workspace-${workspaceId}`, formattedMsg);
+    res.status(201).json(formattedMsg);
   } catch (error: any) {
     console.error("Error in sendGroupMessage:", error.message);
     res.status(500).json({ error: "Internal server error" });

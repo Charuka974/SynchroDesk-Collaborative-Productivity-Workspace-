@@ -1,24 +1,23 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import toast from "react-hot-toast";
-import type { AxiosError } from "axios";
-import { getUsersAPI, getMessagesAPI, sendMessageAPI, type IUser, type IMessage, type IWorkspace, getGroupMessagesAPI } from "../services/message";
-import { connectSocket, getSocket } from "../lib/messagesocket";
-import type { Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
+import { getUsersAPI, getMessagesAPI, getGroupMessagesAPI, sendMessageAPI, type IUser, type IMessage, type IWorkspace } from "../services/message";
+import { getSocket, connectSocket } from "../lib/messagesocket";
 
 interface ChatContextType {
   messages: IMessage[];
   users: IUser[];
   workspaces: IWorkspace[];
   selectedUser: IUser | null;
-  selectedWorkspace: IWorkspace | null; // New state
+  selectedWorkspace: IWorkspace | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
   setSelectedUser: (user: IUser | null) => void;
-  setSelectedWorkspace: (workspaces: IWorkspace | null) => void;
+  setSelectedWorkspace: (workspace: IWorkspace | null) => void;
   fetchUsers: () => void;
   fetchMessages: (userId: string) => void;
   fetchGroupMessages: (workspaceId: string) => void;
-  sendMessage: (messageData: {text?: string; image?: File; file?: File; audio?: File; }) => void;
+  sendMessage: (messageData: { text?: string; image?: File; file?: File; audio?: File }) => void;
 }
 
 interface ChatProviderProps {
@@ -33,40 +32,69 @@ export const ChatProvider = ({ children, currentUser }: ChatProviderProps) => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [workspaces, setWorkspaces] = useState<IWorkspace[]>([]);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<IWorkspace | null>(null); // New state
+  const [selectedWorkspace, setSelectedWorkspace] = useState<IWorkspace | null>(null);
   const [isUsersLoading, setIsUsersLoading] = useState(false);
   const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  // Initialize socket connection
+  // Initialize socket
   useEffect(() => {
-    if (!currentUser) return;
+    if (!socket) {
+      const s = connectSocket(currentUser._id);
+      setSocket(s);
+    }
+  }, []);
 
-    const initSocket = async () => {
-      try {
-        await connectSocket(currentUser._id); // wait for socket to connect
-        const s = getSocket(); // now safe to get the socket instance
-        setSocket(s);
-      } catch (err) {
-        toast.error("Failed to connect to chat server");
-        console.error(err);
+  // Normalize senderId
+  const getSenderId = (msg: IMessage) =>
+    typeof msg.senderId === "string" ? msg.senderId : msg.senderId._id;
+
+  const handleIncomingMessage = (msg: IMessage) => {
+    // DM
+    if (selectedUser) {
+      const senderId = getSenderId(msg);
+      if (senderId === selectedUser._id || msg.receiverId === selectedUser._id) {
+        setMessages(prev => [...prev, msg]);
       }
+    }
+    // Workspace
+    if (selectedWorkspace && msg.workspaceId === selectedWorkspace._id) {
+      setMessages(prev => [...prev, msg]);
+    }
+  };
+
+  // Socket listeners for DMs
+  useEffect(() => {
+    if (!socket) return;
+
+    // Personal DM listener
+    socket.on("receiveMessage", handleIncomingMessage);
+
+    return () => {
+      socket.off("receiveMessage", handleIncomingMessage);
     };
+  }, [socket, selectedUser]);
 
-    initSocket();
-  }, [currentUser]);
+  // Socket listener for selected workspace
+  useEffect(() => {
+    if (!socket || !selectedWorkspace) return;
 
-  // Fetch all users except the current user
+    const workspaceChannel = `workspace-${selectedWorkspace._id}`;
+    socket.on(workspaceChannel, handleIncomingMessage);
+
+    return () => {
+      socket.off(workspaceChannel, handleIncomingMessage);
+    };
+  }, [socket, selectedWorkspace]);
+
+
+  // Fetch users
   const fetchUsers = async () => {
     setIsUsersLoading(true);
     try {
-      // const data = await getUsersAPI();
-      // setUsers(data.filter(u => u._id !== currentUser._id));
-
       const { users, workspaces } = await getUsersAPI();
       setUsers(users.filter(u => u._id !== currentUser._id));
       setWorkspaces(workspaces);
-
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Failed to fetch users");
     } finally {
@@ -74,7 +102,6 @@ export const ChatProvider = ({ children, currentUser }: ChatProviderProps) => {
     }
   };
 
-  // Fetch messages with a specific user
   const fetchMessages = async (userId: string) => {
     setIsMessagesLoading(true);
     try {
@@ -99,78 +126,28 @@ export const ChatProvider = ({ children, currentUser }: ChatProviderProps) => {
     }
   };
 
-  // Send a new message
-  // const sendMessage = async (messageData: { text?: string; image?: string; file?: string; audio?: string }) => {
-  //   if (!selectedUser || !socket) return;
-
-  //   try {
-  //     const newMessage = await sendMessageAPI(selectedUser._id, messageData);
-
-  //     // Update local state immediately
-  //     setMessages(prev => [...prev, newMessage]);
-
-  //     // Emit via socket for real-time update
-  //     socket.emit("sendMessage", newMessage);
-  //   } catch (err: any) {
-  //     toast.error(err?.response?.data?.message || "Failed to send message");
-  //   }
-  // };
-
-  const sendMessage = async (messageData: {
-    text?: string;
-    image?: File;
-    file?: File;
-    audio?: File;
-  }) => {
+  const sendMessage = async (messageData: { text?: string; image?: File; file?: File; audio?: File }) => {
     if (!socket) return;
 
     try {
       let newMessage: IMessage | null = null;
 
       if (selectedUser) {
-        newMessage = await sendMessageAPI({
-          receiverId: selectedUser._id,
-          ...messageData,
-        });
+        newMessage = await sendMessageAPI({ receiverId: selectedUser._id, ...messageData });
       } else if (selectedWorkspace) {
-        newMessage = await sendMessageAPI({
-          workspaceId: selectedWorkspace._id,
-          ...messageData,
-        });
+        newMessage = await sendMessageAPI({ workspaceId: selectedWorkspace._id, ...messageData });
       }
 
       if (!newMessage) return;
 
-      setMessages(prev => [...prev, newMessage]);
+      // setMessages(prev => [...prev, newMessage]);
       socket.emit("sendMessage", newMessage);
-
     } catch (err) {
-      const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || "Failed to send message");
+      const error = err as any;
+      toast.error(error?.response?.data?.message || "Failed to send message");
     }
   };
 
-
-  // Listen for incoming messages
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleNewMessage = (newMessage: IMessage) => {
-      if (
-        selectedUser &&
-        (newMessage.senderId._id === selectedUser._id || newMessage.receiverId === selectedUser._id)
-      ) {
-        setMessages(prev => [...prev, newMessage]);
-      }
-    };
-
-    socket.on("newMessage", handleNewMessage);
-    return () => {
-      socket.off("newMessage", handleNewMessage);
-    };
-  }, [selectedUser, socket]);
-
-  // Initial fetch of users
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -180,7 +157,7 @@ export const ChatProvider = ({ children, currentUser }: ChatProviderProps) => {
       value={{
         messages,
         users,
-        workspaces, // added later
+        workspaces,
         selectedUser,
         selectedWorkspace,
         isUsersLoading,
