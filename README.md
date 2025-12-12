@@ -23,7 +23,7 @@ It combines task management, chat, notes, calendars, AI-powered features, and su
 🔗 https://synchro-desk-cpw-frontend.vercel.app/
 
 
-[Click here to try it out](https://synchro-desk-cpw-frontend.vercel.app/login)
+🔗 [Click here to try it out](https://synchro-desk-cpw-frontend.vercel.app/login)
 
 
 ---
