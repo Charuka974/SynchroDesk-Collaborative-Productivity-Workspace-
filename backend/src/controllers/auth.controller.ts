@@ -179,3 +179,29 @@ export const refreshToken = async (req: Request, res: Response) => {
     res.status(403).json({ message: "Invalid or expire token" })
   }
 }
+
+
+
+// Forgot password
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body
+
+    const user = await User.findOne({ email })
+    if (!user) {
+      res.status(403).json({
+        message: "Email not Found "
+      })
+      return
+    }
+
+    
+
+    res.status(200).json({
+      message: "Email sent to " + email,
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}

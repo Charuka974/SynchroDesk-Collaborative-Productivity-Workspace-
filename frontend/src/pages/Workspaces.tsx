@@ -373,12 +373,23 @@ export default function WorkspacesPage() {
                 </div>
 
                 <div className="p-6">
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-10">
+                  <p className="text-gray-600 font-semibold text-sm mb-4 line-clamp-2 min-h-10">
                     {workspace.description || "No description"}
                   </p>
 
+                  <p className="text-gray-600 font-semibold text-xs mb-4 line-clamp-2">
+                    Created At:{" "}
+                    {workspace.createdAt
+                      ? new Date(workspace.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </p>
+
                   <div className="flex items-center justify-between text-sm mb-4">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-100 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 p-1 rounded-xl">
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -392,9 +403,16 @@ export default function WorkspacesPage() {
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         />
                       </svg>
-                      <span>{workspace.taskCount} tasks</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M4 7h16M4 7a2 2 0 012-2h12a2 2 0 012 2M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M9 11h6" />
+                      </svg>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M3 17l6-6 4 4 8-8M3 21h18" />
+                      </svg>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-600 font-semibold">
                       <svg
                         className="w-4 h-4"
                         fill="none"

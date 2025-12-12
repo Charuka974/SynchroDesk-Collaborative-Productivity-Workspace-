@@ -4,7 +4,8 @@ import {
   login,
   refreshToken,
   registerAdmin,
-  registerUser
+  registerUser,
+  forgotPassword
 } from "../controllers/auth.controller"
 import { authenticate } from "../middleware/auth"
 import { requireRole } from "../middleware/role"
@@ -20,6 +21,9 @@ router.post("/login", login)
 
 router.post("/refresh", refreshToken)
 
+// forgot password
+router.post("/forgot-password", forgotPassword)
+
 // register (ADMIN) - Admin only
 router.post(
   "/admin/register",
@@ -30,5 +34,7 @@ router.post(
 
 // me - Admin or User both
 router.get("/me", authenticate, getMyProfile)
+
+
 
 export default router

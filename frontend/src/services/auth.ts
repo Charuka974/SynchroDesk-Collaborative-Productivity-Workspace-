@@ -17,9 +17,15 @@ export const getMyDetails = async () => {
   return res.data
 }
 
+export const forgotPassword = async (email: string) => {
+  const res = await api.post("/auth/forgot-password", { email }) 
+  return res.data
+}
+
 export const refreshTokens = async (refreshToken: string) => {
   const res = await api.post("/auth/refresh", {
     token: refreshToken
   })
   return res.data
 }
+

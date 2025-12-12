@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import toast from "react-hot-toast";
 import { Socket } from "socket.io-client";
 import { getUsersAPI, getMessagesAPI, getGroupMessagesAPI, sendMessageAPI, type IUser, type IMessage, type IWorkspace } from "../services/message";
-import { getSocket, connectSocket } from "../lib/messagesocket";
+import { connectSocket } from "../lib/messagesocket";
 
 interface ChatContextType {
   messages: IMessage[];

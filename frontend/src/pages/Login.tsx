@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { getMyDetails, login } from "../services/auth"
+import { forgotPassword, getMyDetails, login } from "../services/auth"
 import { useAuth } from "../context/authContext"
 import Swal from "sweetalert2"
 
@@ -9,9 +9,11 @@ export default function Login() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading] = useState(false)
   const { setUser } = useAuth()
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
 
   const Toast = Swal.mixin({
@@ -66,6 +68,38 @@ export default function Login() {
     }
 
   }
+
+
+  // Function to handle forgot password
+  const handleSendResetLink = async () => {
+    
+    if (!forgotEmail.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please enter your email",
+      });
+      return;
+    }
+
+    try {
+      const response: any = await forgotPassword(forgotEmail);
+
+      Swal.fire({
+        icon: "success",
+        title: response.data?.message || `Reset link sent to ${forgotEmail}`,
+      });
+
+      setShowForgotPasswordModal(false);
+      setForgotEmail("");
+    } catch (err: any) {
+      console.error("Forgot password error:", err);
+      Swal.fire({
+        icon: "error",
+        title: err.response?.data?.message || "Something went wrong",
+      });
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-50 flex">
@@ -150,8 +184,8 @@ export default function Login() {
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
-              <p className="text-gray-600">Sign in to your workspace</p>
+              <h2 className="text-2xl font-bold text-gray-700 mb-2">Welcome back</h2>
+              <p className="text-gray-600 font-bold">Sign in to your workspace</p>
             </div>
 
             <div className="space-y-5">
@@ -199,6 +233,7 @@ export default function Login() {
                   </label>
                   <button
                     type="button"
+                    onClick={() => setShowForgotPasswordModal(true)}
                     className="text-sm text-gray-600 hover:text-gray-700 font-medium"
                   >
                     Forgot password?
@@ -250,14 +285,23 @@ export default function Login() {
               <button
                 onClick={handleLogin}
                 disabled={isLoading}
-                className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-slate-500/50 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none relative overflow-hidden group"
               >
+                {/* Animated shimmer effect */}
+                <span className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></span>
+                
                 {isLoading ? (
-                  "Signing in..."
+                  <span className="flex items-center gap-2">
+                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </span>
                 ) : (
                   <>
-                    Sign in
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="relative z-10">Sign in</span>
+                    <svg className="w-5 h-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>
@@ -291,6 +335,56 @@ export default function Login() {
           </p>
         </div>
       </div>
+
+      {showForgotPasswordModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto"
+          onClick={() => setShowForgotPasswordModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 mt-8 mb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-4">
+              Forgot Password
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Enter your email address and we'll send you a reset link.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowForgotPasswordModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSendResetLink}
+                className="flex-1 px-4 py-2 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg hover:bg-gray-700 transition"
+              >
+                Send Reset Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
