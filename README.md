@@ -7,7 +7,7 @@ A MERN-based SaaS platform for personal productivity, team collaboration, and AI
 ## Badges
 ![Platform](https://img.shields.io/badge/Platform-MERN-blue)
 ![Status](https://img.shields.io/badge/Status-In%20Development-green)
-![Payment](https://img.shields.io/badge/Payment-Stripe-626CD9)
+<!-- ![Payment](https://img.shields.io/badge/Payment-Stripe-626CD9) -->
 ![AI](https://img.shields.io/badge/AI-OpenAI%20%7C%20Gemini-orange)
 
 ---
@@ -16,6 +16,15 @@ A MERN-based SaaS platform for personal productivity, team collaboration, and AI
 
 **SynchroDesk (CPW)** is a modern, full-stack collaborative productivity workspace for individuals, teams, and organizations.  
 It combines task management, chat, notes, calendars, AI-powered features, and subscription-based premium access.
+
+---
+
+## 🚀 Live Demo
+🔗 https://synchro-desk-cpw-frontend.vercel.app/
+
+
+[Click here to try it out](https://synchro-desk-cpw-frontend.vercel.app/login)
+
 
 ---
 
