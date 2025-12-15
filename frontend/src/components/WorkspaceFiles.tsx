@@ -61,7 +61,15 @@ export const ResourcesPanel = () => {
   };
 
   return (
-    <div className="bg-white w-full h-full flex flex-col">
+    <div className="bg-white w-full h-full flex flex-col relative">  {/* remove relative */}
+      {/* Temp update message */}
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
+        <h2 className="text-xl font-semibold text-gray-800">
+          This feature will be available in a future update
+        </h2>
+      </div>
+
+
       {/* Header */}
       <div className="p-4 bg-linear-to-r from-emerald-600 via-emerald-700 to-emerald-800 flex items-center justify-center shadow-xl border-b border-emerald-600">
         <h2 className="text-3xl font-bold text-center text-white tracking-tight">Resources & Files</h2>

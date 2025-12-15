@@ -8,7 +8,7 @@ interface Event {
   date: string;
   time?: string;
   type: EventType;
-  description: string;
+  description: string; 
 }
 
 export const CalendarPanel = () => {

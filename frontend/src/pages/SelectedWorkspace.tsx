@@ -240,7 +240,7 @@ export default function WorkspacesPage() {
         {/* Tabs */}
         <div className="bg-white border-b border-gray-600 px-2 sm:px-6 overflow-x-auto">
           <div className="flex gap-1 min-w-max">
-            {["Chat", "Tasks", "Notes", "Files", "Events"].map((tab) => (
+            {["Chat", "Tasks", "Notes", "Events", "Files"].map((tab) => (
               <button
                 key={tab}
                 className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-all duration-200 relative whitespace-nowrap ${
@@ -287,13 +287,14 @@ export default function WorkspacesPage() {
                 </NotesProvider>
               )}
 
-              {currentTab === "Files" && (
-                <ResourcesPanel />
-              )}
-
               {currentTab === "Events" && (
                 <CalendarPanel />
               )}
+
+              {currentTab === "Files" && (
+                <ResourcesPanel />
+              )}
+              
             </div>
           )}
         </div>
