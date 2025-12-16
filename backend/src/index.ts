@@ -12,6 +12,7 @@ import messageRouter from "./routes/messages"
 import openapiAiRouter from "./routes/airoute"
 import userRouter from "./routes/users"
 import noteRouter from "./routes/notes"
+import eventRouter from "./routes/event"
 import notificationRouter from "./routes/notification"
 
 import { authenticate } from "./middleware/auth"
@@ -44,13 +45,35 @@ app.use("/api/v1/messages", authenticate, messageRouter)
 app.use("/api/v1/aiassistant", authenticate, openapiAiRouter)
 app.use("/api/v1/users", authenticate, userRouter)
 app.use("/api/v1/notes", authenticate, noteRouter)
+app.use("/api/v1/events", authenticate, eventRouter)
 app.use("/api/v1/notifications", authenticate, notificationRouter)
 
  
+
+// ─────────────────────────────
+// HEALTH / TEST ENDPOINTS
+// ─────────────────────────────
 // public
-app.get("/test-1", (req, res) => {})
+app.get("/test-public", (req, res) => {
+  res.send("Backend is running");
+});
+// authenticated
+app.get("/test-auth", authenticate, (req, res) => {
+  res.send("Auth OK");
+});
 // admin only
-app.get("/test-3", authenticate, requireRole([Role.ADMIN]), (req, res) => {})
+app.get(
+  "/test-admin",
+  authenticate,
+  requireRole([Role.ADMIN]),
+  (req, res) => {
+    res.send("Admin OK");
+  }
+);
+// ─────────────────────────────
+// HEALTH / TEST ENDPOINTS
+// ─────────────────────────────
+
 
 
 

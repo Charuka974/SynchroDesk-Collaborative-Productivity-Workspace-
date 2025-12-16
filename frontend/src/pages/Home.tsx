@@ -6,6 +6,8 @@ import { TaskPanel } from "../components/Tasks";
 import { TaskProvider, useTasks, type ICreateTaskPayload } from "../context/taskContext";
 import { NotesProvider } from "../context/noteContext";
 import { NotesPanel } from "../components/Notes";
+import { EventProvider } from "../context/eventContext";
+import { CalendarPanel } from "../components/Calender";
 // import { useNavigate } from "react-router-dom";
 
 export default function SynchroDeskDashboard() {
@@ -54,13 +56,6 @@ export default function SynchroDeskDashboard() {
       />
     );
   };
-  
-
-  const [events] = useState([
-    { id: 1, title: "Sprint Planning", date: "2025-11-18", time: "10:00 AM", type: "meeting" },
-    { id: 2, title: "Client Call", date: "2025-11-19", time: "2:00 PM", type: "call" },
-    { id: 3, title: "Project Deadline", date: "2025-11-22", time: "EOD", type: "deadline" },
-  ]);
 
 
   return (
@@ -105,48 +100,13 @@ export default function SynchroDeskDashboard() {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6 rounded-xl overflow-hidden p-1">
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Upcoming Events</h2>
-              <div className="space-y-3">
-                {events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="p-4 bg-linear-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white rounded-lg flex items-center justify-center shrink-0">
-                        <svg
-                          className="w-5 h-5 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {event.date} at {event.time}
-                        </p>
-                        <span className="inline-block mt-2 px-2 py-1 bg-white rounded text-xs font-medium text-indigo-600">
-                          {event.type}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+          <div className="space-y-6 rounded-xl overflow-hidden shadow-xl mt-1 lg:mt-1 lg:col-start-2 w-full max-w-full lg:self-start">
+            <EventProvider>
+              <CalendarPanel workspace={null} />
+            </EventProvider>
           </div>
+
+
         </div>
       </main>
 

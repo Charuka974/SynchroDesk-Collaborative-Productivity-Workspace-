@@ -7,10 +7,16 @@ export interface IEvent extends Document {
   start: Date;
   end: Date;
   description?: string;
+  eventType?: string;
   location?: string;
-  onlineMeetingLink?: string;
-  attendees?: mongoose.Types.ObjectId[];
-  reminders?: number[]; // minutes before
+  recurrence?: {
+    frequency: "daily" | "weekly" | "monthly" | "yearly";
+    interval?: number;              // every N units (default: 1)
+    daysOfWeek?: number[];          // 0 = Sun, 6 = Sat (for weekly)
+    until?: Date;                   // stop repeating
+    count?: number;                 // OR stop after N occurrences
+    exceptions?: Date[];            // skipped dates
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -23,10 +29,30 @@ const eventSchema = new Schema<IEvent>(
     start: { type: Date, required: true },
     end: { type: Date, required: true },
     description: String,
+    eventType: String,
     location: String,
-    onlineMeetingLink: String,
-    attendees: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    reminders: [{ type: Number }],
+    recurrence: {
+      frequency: {
+        type: String,
+        enum: ["daily", "weekly", "monthly", "yearly"],
+      },
+      interval: {
+        type: Number,
+        default: 1,
+        min: 1,
+      },
+      daysOfWeek: {
+        type: [Number], // 0–6
+        validate: {
+          validator: (arr: number[]) =>
+            arr.every((d) => d >= 0 && d <= 6),
+          message: "daysOfWeek must be between 0 and 6",
+        },
+      },
+      until: Date,
+      count: Number,
+      exceptions: [Date],
+    },
   },
   { timestamps: true }
 );

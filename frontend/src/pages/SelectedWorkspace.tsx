@@ -10,9 +10,10 @@ import { useAuth } from "../context/authContext";
 import { Chat } from "../components/Chat";
 import { NotesPanel } from "../components/Notes";
 import { ResourcesPanel } from "../components/WorkspaceFiles";
-import {CalendarPanel} from "../components/WorkspaceCalender";
+import {CalendarPanel} from "../components/Calender";
 import { getWorkspaceByIdContext, getWorkspaceDataContext } from "../context/workspaceContext";
 import { NotesProvider } from "../context/noteContext";
+import { EventProvider } from "../context/eventContext";
 
 export default function WorkspacesPage() {
   const { user } = useAuth();
@@ -288,7 +289,9 @@ export default function WorkspacesPage() {
               )}
 
               {currentTab === "Events" && (
-                <CalendarPanel />
+                <EventProvider>
+                  <CalendarPanel workspace={workspace}/>
+                </EventProvider>
               )}
 
               {currentTab === "Files" && (

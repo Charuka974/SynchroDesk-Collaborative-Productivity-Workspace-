@@ -71,8 +71,8 @@ export const ResourcesPanel = () => {
 
 
       {/* Header */}
-      <div className="p-4 bg-linear-to-r from-emerald-600 via-emerald-700 to-emerald-800 flex items-center justify-center shadow-xl border-b border-emerald-600">
-        <h2 className="text-3xl font-bold text-center text-white tracking-tight">Resources & Files</h2>
+      <div className="p-4 bg-linear-to-r from-emerald-600 via-emerald-700 to-emerald-800 flex items-center justify-center shadow-2xl">
+        <h2 className="text-2xl font-bold text-center text-white tracking-tight">Resources & Files</h2>
       </div>
 
       {/* Controls */}
