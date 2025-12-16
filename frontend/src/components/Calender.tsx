@@ -1,6 +1,8 @@
 import { useState, useMemo, type JSX, useEffect } from "react";
 import { useEvents } from "../context/eventContext";
 import Swal from "sweetalert2";
+import HolidayCalendarModal from "./HolidayCalendarModal"; // adjust the path
+
 
 type EventType = "meeting" | "deadline" | "reminder" | "other";
 type RecurrenceType = "" | "daily" | "weekly" | "monthly" | "yearly";
@@ -24,8 +26,9 @@ interface EventPanelProps {
 }
 
 export const CalendarPanel: React.FC<EventPanelProps> = ({ workspace = null }) => {
-  const { events, loading, fetchMyEvents, fetchEventsByWorkspace, createEvent, updateEvent, deleteEvent } =
-    useEvents();
+  const { events, loading, fetchMyEvents, fetchEventsByWorkspace, createEvent, updateEvent, deleteEvent } = useEvents();
+
+  const [showCalendar, setShowCalendar] = useState(false);  
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [newEvent, setNewEvent] = useState<Omit<UIEvent, "id">>({
@@ -172,6 +175,23 @@ export const CalendarPanel: React.FC<EventPanelProps> = ({ workspace = null }) =
         <h2 className="text-2xl font-bold text-center text-white tracking-tight">Calendar & Events</h2>
       </div>
 
+      <div className="flex justify-end items-center mt-4 mb-4 px-6">
+        <button
+          onClick={() => setShowCalendar(true)}
+          className="px-4 py-2 bg-linear-to-r font-bold from-blue-600 to-blue-900 text-white rounded-lg shadow-md"
+        >
+          Show Calendar
+        </button>
+      </div>
+
+      <HolidayCalendarModal
+        show={showCalendar}
+        onClose={() => setShowCalendar(false)}
+      />
+
+
+
+
       {/* Controls */}
       <div className="flex justify-between items-center mt-4 mb-4 px-6">
         <div className="flex gap-1">
@@ -212,7 +232,7 @@ export const CalendarPanel: React.FC<EventPanelProps> = ({ workspace = null }) =
           </div>
         ) : (
           visibleEvents.map((event) => (
-            <div key={event.id} className="p-4 rounded-lg border-l-4 border-indigo-500 bg-indigo-50 shadow-md hover:shadow-lg transition-shadow">
+            <div key={event.id} className="p-4 rounded-lg border-l-4 border-b-2 border-indigo-800 bg-indigo-50 shadow-md hover:shadow-lg transition-shadow">
               <div className="flex-1 justify-between items-start">
                 <div className="flex gap-3 flex-1 items-center">
                   <div className={`w-10 h-10 ${eventTypes[event.type].color} rounded-lg flex items-center justify-center text-white`}>
