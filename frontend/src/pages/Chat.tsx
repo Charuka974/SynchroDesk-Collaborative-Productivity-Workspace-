@@ -635,15 +635,14 @@ export default function ChatPage() {
 
         {/* Mobile Menu Button */}
         <button
-          className="sm:hidden w-18 h-18 bg-linear-to-r from-slate-600 via-slate-700 to-slate-800 border-b-3 border-slate-700  hover:bg-linear-to-r hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 transition-colors"
+          className="sm:hidden absolute top-20 right-4 w-10 h-10 bg-linear-to-r from-slate-600 via-slate-700 to-slate-800 hover:bg-linear-to-r hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 transition-colors z-50 flex items-center justify-center rounded-full"
           onClick={() => setIsSidebarOpen((prev) => !prev)}
         >
           <svg
-            className="w-15 h-10 text-white"
+            className="w-8 h-6 text-white"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
@@ -653,6 +652,7 @@ export default function ChatPage() {
             />
           </svg>
         </button>
+
 
         {/* Mobile Sidebar Overlay */}
         {isSidebarOpen && (
