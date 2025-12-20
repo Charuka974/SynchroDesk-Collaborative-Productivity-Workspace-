@@ -624,11 +624,7 @@ export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user?.id) {
-      connectSocket(user.id);
-    }
-  }, [user]);
+  connectSocket(user.id);
 
   return (
     <ChatProvider currentUser={user}>
