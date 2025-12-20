@@ -7,7 +7,9 @@ import EmojiPicker from "emoji-picker-react";
 
 interface ChatProps {}
 
-const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
+const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({
+  initialWorkspaceId,
+}) => {
   const {
     // users,
     workspaces,
@@ -37,7 +39,9 @@ const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspa
                 setSelectedUser(null);
               }}
               className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${
-                selectedWorkspace?._id === ws._id ? "bg-indigo-100 font-semibold" : ""
+                selectedWorkspace?._id === ws._id
+                  ? "bg-indigo-100 font-semibold"
+                  : ""
               }`}
             >
               {ws.name}
@@ -49,9 +53,10 @@ const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspa
   );
 };
 
-
 const ChatPanel: React.FC = () => {
   const { user } = useAuth();
+  const [modalImage, setModalImage] = useState<string | null>(null);
+
   const {
     messages,
     selectedUser,
@@ -67,7 +72,7 @@ const ChatPanel: React.FC = () => {
   const [attachment, setAttachment] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  
+
   // Fetch messages when selectedUser or selectedWorkspace changes
   useEffect(() => {
     if (selectedUser) fetchMessages(selectedUser._id);
@@ -82,7 +87,10 @@ const ChatPanel: React.FC = () => {
       await sendMessage({
         text: newMessage || undefined,
         image: attachment?.type.startsWith("image/") ? attachment : undefined,
-        file: attachment && !attachment.type.startsWith("image/") ? attachment : undefined,
+        file:
+          attachment && !attachment.type.startsWith("image/")
+            ? attachment
+            : undefined,
       });
 
       setNewMessage("");
@@ -94,12 +102,21 @@ const ChatPanel: React.FC = () => {
     }
   };
 
-
   if (!selectedUser && !selectedWorkspace) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-50">
-        <svg className="w-20 h-20 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        <svg
+          className="w-20 h-20 mb-4 text-gray-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          />
         </svg>
         <p className="text-lg font-medium">No conversation selected</p>
         <p className="text-sm">Select a user or workspace to start chatting</p>
@@ -130,10 +147,22 @@ const ChatPanel: React.FC = () => {
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-center">
             <div>
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg
+                className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
-              <p className="text-gray-500 text-lg font-medium">No messages yet</p>
+              <p className="text-gray-500 text-lg font-medium">
+                No messages yet
+              </p>
               <p className="text-gray-400 text-sm">Start the conversation!</p>
             </div>
           </div>
@@ -141,20 +170,30 @@ const ChatPanel: React.FC = () => {
           messages.map((msg) => {
             const senderObj =
               typeof msg.senderId === "string"
-                ? { _id: msg.senderId, name: "Unknown", avatar: "/images/avatar.jpg" }
+                ? {
+                    _id: msg.senderId,
+                    name: "Unknown",
+                    avatar: "/images/avatar.jpg",
+                  }
                 : msg.senderId;
 
             const isMine = senderObj._id === user.id;
 
             const senderName = isMine ? "You" : senderObj.name || "Unknown";
-            const senderAvatar = isMine ? undefined : senderObj.avatar || "/images/avatar.jpg";
+            const senderAvatar = isMine
+              ? undefined
+              : senderObj.avatar || "/images/avatar.jpg";
 
             return (
               <div
                 key={msg._id}
                 className={`flex ${isMine ? "justify-end" : "justify-start"}`}
               >
-                <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-xs sm:max-w-md`}>
+                <div
+                  className={`flex flex-col ${
+                    isMine ? "items-end" : "items-start"
+                  } max-w-xs sm:max-w-md`}
+                >
                   {/* Sender name - only show for others' messages */}
                   {!isMine && (
                     <div className="flex items-center gap-2 mb-1 px-2">
@@ -168,7 +207,7 @@ const ChatPanel: React.FC = () => {
                       </span>
                     </div>
                   )}
-                  
+
                   {/* Message bubble */}
                   <div
                     className={`px-4 py-2 rounded-2xl wrap-break-word ${
@@ -177,13 +216,16 @@ const ChatPanel: React.FC = () => {
                         : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
                     }`}
                   >
-                    {msg.text && <p className="text-sm leading-relaxed">{msg.text}</p>}
+                    {msg.text && (
+                      <p className="text-sm leading-relaxed">{msg.text}</p>
+                    )}
 
                     {msg.image && (
                       <img
                         src={msg.image}
                         alt="image"
                         className="mt-2 max-w-xs rounded-md"
+                        onClick={() => setModalImage(msg.image || "")}
                       />
                     )}
 
@@ -205,7 +247,7 @@ const ChatPanel: React.FC = () => {
                       </audio>
                     )}
                   </div>
-                  
+
                   {/* Timestamp - you can add this if you have timestamp data */}
                   <span className="text-xs text-gray-500 mt-1 px-2">
                     {new Date(msg.createdAt).toLocaleDateString()}
@@ -284,8 +326,18 @@ const ChatPanel: React.FC = () => {
                 }
               }}
             />
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+              />
             </svg>
           </label>
 
@@ -302,7 +354,7 @@ const ChatPanel: React.FC = () => {
                 d="M14.828 14.828a4 4 0 01-5.656 0M9 9h.01M15 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-          </button> 
+          </button>
 
           {/* The Emoji Picker */}
           {showEmojiPicker && (
@@ -312,7 +364,6 @@ const ChatPanel: React.FC = () => {
                   setNewMessage((prev) => prev + emoji.emoji);
                   setShowEmojiPicker(false);
                 }}
-                
               />
             </div>
           )}
@@ -330,12 +381,55 @@ const ChatPanel: React.FC = () => {
             className="p-3 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!newMessage.trim() && !attachment}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              />
             </svg>
           </button>
         </div>
       </div>
+
+      {modalImage && (
+        <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl transform transition-all max-h-[85vh] max-w-md flex flex-col relative">
+            {/* Close button */}
+            <button
+              onClick={() => setModalImage(null)}
+              className="absolute -top-4 -right-4 w-10 h-10 bg-gray-800 text-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-900 transition-all duration-200 z-10"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Image */}
+            <img
+              src={modalImage}
+              alt="Preview"
+              className="max-h-[85vh] max-w-full object-contain rounded-2xl m-4"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -357,7 +451,9 @@ export const Chat: React.FC<ChatProps> = ({ initialWorkspaceId }) => {
 };
 
 // Separate component to access chat context AFTER provider
-const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
+const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({
+  initialWorkspaceId,
+}) => {
   const { setSelectedWorkspace, workspaces } = useChat();
 
   // Set the workspace automatically on mount
@@ -366,9 +462,13 @@ const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspace
       // Check if workspace is already loaded in context
       const ws = workspaces.find((w) => w._id === initialWorkspaceId);
       if (ws) setSelectedWorkspace(ws);
+      // If not loaded yet, create a temporary placeholder
       else
-        // If not loaded yet, create a temporary placeholder
-        setSelectedWorkspace({ _id: initialWorkspaceId, name: "Loading...", members: [] });
+        setSelectedWorkspace({
+          _id: initialWorkspaceId,
+          name: "Loading...",
+          members: [],
+        });
     }
   }, [initialWorkspaceId, setSelectedWorkspace, workspaces]);
 
@@ -379,211 +479,3 @@ const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspace
     </div>
   );
 };
-
-
-
-// import React, { useState, useEffect } from "react";
-// import { ChatProvider, useChat } from "../context/messageContext";
-// // import { connectSocket } from "../lib/messagesocket";
-// import { useAuth } from "../context/authContext";
-// import toast from "react-hot-toast";
-
-// interface ChatProps {}
-
-// const ChatSidebar: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
-//   const {
-//     // users,
-//     workspaces,
-//     // selectedUser,
-//     selectedWorkspace,
-//     setSelectedUser,
-//     setSelectedWorkspace,
-//     // isUsersLoading,
-//   } = useChat();
-
-//   // Filter workspaces to only show the selected one (if initialWorkspaceId is set)
-//   const displayedWorkspaces = initialWorkspaceId
-//     ? workspaces.filter((ws) => ws._id === initialWorkspaceId)
-//     : workspaces;
-
-//   return (
-//     <div className="hidden w-64 border-r border-gray-200 bg-white shrink-0">
-//       <ul>
-//         {displayedWorkspaces.length === 0 ? (
-//           <p className="px-4 text-gray-500">No workspaces found</p>
-//         ) : (
-//           displayedWorkspaces.map((ws) => (
-//             <li
-//               key={ws._id}
-//               onClick={() => {
-//                 setSelectedWorkspace(ws);
-//                 setSelectedUser(null);
-//               }}
-//               className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 ${
-//                 selectedWorkspace?._id === ws._id ? "bg-indigo-100 font-semibold" : ""
-//               }`}
-//             >
-//               {ws.name}
-//             </li>
-//           ))
-//         )}
-//       </ul>
-//     </div>
-//   );
-// };
-
-
-// const ChatPanel: React.FC = () => {
-//   const { user, loading } = useAuth();
-//   const {
-//     messages,
-//     selectedUser,
-//     selectedWorkspace,
-//     fetchMessages,
-//     sendMessage,
-//     isMessagesLoading,
-//     fetchGroupMessages,
-//   } = useChat();
-
-//   const [newMessage, setNewMessage] = useState("");
-
-//   // Fetch messages when selectedUser or selectedWorkspace changes
-//   useEffect(() => {
-//     if (selectedUser) fetchMessages(selectedUser._id);
-//     else if (selectedWorkspace) fetchGroupMessages(selectedWorkspace._id);
-//   }, [selectedUser, selectedWorkspace]);
-
-//   const handleSend = async () => {
-//     if (!newMessage.trim() || (!selectedUser && !selectedWorkspace)) return;
-
-//     try {
-//       await sendMessage({ text: newMessage });
-//       setNewMessage("");
-//     } catch (err) {
-//       console.error("Error sending message:", err);
-//       toast.error("Failed to send message");
-//     }
-//   };
-
-//   if (loading || !user) {
-//     return (
-//       <div className="flex-1 flex items-center justify-center text-gray-500">
-//         Loading...
-//       </div>
-//     );
-//   }
-
-//   if (!selectedUser && !selectedWorkspace) {
-//     return (
-//       <div className="flex-1 flex items-center justify-center text-gray-500">
-//         Select a user or workspace to start chatting
-//       </div>
-//     );
-//   }
-
-//   const chatName = selectedUser?.name || selectedWorkspace?.name;
-
-//   return (
-//     <div className="flex-1 flex flex-col h-150 bg-white">
-//       <div className="p-4 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 flex items-center justify-center shadow-xl border-b border-slate-600">
-//         <h2 className="text-3xl font-bold text-center text-white tracking-tight">
-//           {chatName} Chat
-//         </h2>
-//       </div>
-//       <div className="flex-1 p-4 overflow-y-auto space-y-2">
-//         {isMessagesLoading ? (
-//           <p className="text-gray-500">Loading messages...</p>
-//         ) : (
-//           messages.map((msg) => {
-//             const senderId =
-//               typeof msg.senderId === "string" ? msg.senderId : msg.senderId?._id;
-//             const isMine = senderId === user.id;
-//             const senderName = isMine ? "You" : msg.senderId?.name || "Unknown";
-//             const senderAvatar = msg.senderId?.avatar || "/images/avatar.jpg";
-
-//             return (
-//               <div
-//                 key={msg._id}
-//                 className={`flex items-start gap-2 ${isMine ? "justify-end" : "justify-start"}`}
-//               >
-//                 {!isMine && (
-//                   <img
-//                     src={senderAvatar}
-//                     alt={msg.senderId?.name}
-//                     className="w-6 h-6 rounded-full"
-//                   />
-//                 )}
-//                 <div
-//                   className={`p-2 rounded-lg max-w-xs wrap-break-word ${
-//                     isMine ? "bg-gray-600 text-white" : "bg-indigo-100"
-//                   }`}
-//                 >
-//                   <span className="font-semibold">{senderName}: </span>
-//                   {msg.text || "Attachment"}
-//                 </div>
-//               </div>
-//             );
-//           })
-//         )}
-//       </div>
-//       <div className="p-4 border-t border-gray-200 flex items-center gap-2">
-//         <input
-//           type="text"
-//           value={newMessage}
-//           onChange={(e) => setNewMessage(e.target.value)}
-//           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-//           placeholder="Type a message..."
-//           className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-//         />
-//         <button
-//           onClick={handleSend}
-//           className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-//         >
-//           Send
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// interface ChatProps {
-//   initialWorkspaceId?: string; // optional prop to pre-select a workspace
-// }
-
-// export const Chat: React.FC<ChatProps> = ({ initialWorkspaceId }) => {
-//   const { user } = useAuth();
-
-//   if (!user) return null;
-
-//   return (
-//     <ChatProvider currentUser={user}>
-//       <InnerChat initialWorkspaceId={initialWorkspaceId} />
-//     </ChatProvider>
-//   );
-// };
-
-// // Separate component to access chat context AFTER provider
-// const InnerChat: React.FC<{ initialWorkspaceId?: string }> = ({ initialWorkspaceId }) => {
-//   const { setSelectedWorkspace, workspaces } = useChat();
-
-//   // Set the workspace automatically on mount
-//   useEffect(() => {
-//     if (initialWorkspaceId) {
-//       // Check if workspace is already loaded in context
-//       const ws = workspaces.find((w) => w._id === initialWorkspaceId);
-//       if (ws) setSelectedWorkspace(ws);
-//       else
-//         // If not loaded yet, create a temporary placeholder
-//         setSelectedWorkspace({ _id: initialWorkspaceId, name: "Loading...", members: [] });
-//     }
-//   }, [initialWorkspaceId, setSelectedWorkspace, workspaces]);
-
-//   return (
-//     <div className="flex h-full min-h-[500px] bg-gray-50">
-//       <ChatSidebar initialWorkspaceId={initialWorkspaceId} />
-//       <ChatPanel />
-//     </div>
-//   );
-// };
-
-
