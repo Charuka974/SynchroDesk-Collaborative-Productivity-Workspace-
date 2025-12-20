@@ -28,7 +28,7 @@ export default function Header() {
 
   return (
     <header className="bg-white border-b-2 border-gray-400 z-50 shadow-sm"> {/* sticky top-0 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center gap-8">

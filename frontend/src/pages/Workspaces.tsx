@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { useWorkspace, type Workspace } from "../context/workspaceContext";
 import { useAuth } from "../context/authContext";
+import { getAllUsersAPI } from "../services/profile";
+import type { IUser } from "../context/profileContext";
 
 export default function WorkspacesPage() {
   const navigate = useNavigate();
@@ -22,7 +24,9 @@ export default function WorkspacesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
+    null
+  );
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
@@ -42,13 +46,51 @@ export default function WorkspacesPage() {
     timerProgressBar: true,
   });
 
+  const [allUsers, setAllUsers] = useState<IUser[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
+
+  useEffect(() => {
+    if (!selectedWorkspace) return;
+
+    const loadUsers = async () => {
+      try {
+        const users = await getAllUsersAPI();
+
+        // Get emails of current workspace members
+        const memberEmails = (selectedWorkspace.members || []).map(
+          (m) => m.email || ""
+        );
+
+        // Filter out users who are already members
+        const nonMembers = users.filter(
+          (user: { email: string }) =>
+            user.email && !memberEmails.includes(user.email)
+        );
+
+        setAllUsers(nonMembers);
+        setFilteredUsers(nonMembers);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    loadUsers();
+  }, [selectedWorkspace]);
+
   // ---------- Handlers ----------
 
   const handleCreateWorkspace = async () => {
     if (!newWorkspaceName.trim()) {
-      return Toast.fire({ icon: "warning", title: "Please enter a workspace name" });
+      return Toast.fire({
+        icon: "warning",
+        title: "Please enter a workspace name",
+      });
     }
-    const newWS = await createWorkspace(newWorkspaceName, newWorkspaceDescription);
+    const newWS = await createWorkspace(
+      newWorkspaceName,
+      newWorkspaceDescription
+    );
     if (newWS) {
       setShowCreateModal(false);
       setNewWorkspaceName("");
@@ -62,7 +104,11 @@ export default function WorkspacesPage() {
 
   const handleUpdateWorkspace = async () => {
     if (!selectedWorkspace) return;
-    if (!editName.trim()) return Toast.fire({ icon: "warning", title: "Please enter a workspace name" });
+    if (!editName.trim())
+      return Toast.fire({
+        icon: "warning",
+        title: "Please enter a workspace name",
+      });
     const updated = await updateWorkspace(selectedWorkspace.id, {
       name: editName,
       description: editDescription,
@@ -108,7 +154,6 @@ export default function WorkspacesPage() {
     }
   };
 
-
   const handleLeaveWorkspace = async () => {
     if (!selectedWorkspace) return;
     const result = await Swal.fire({
@@ -132,12 +177,19 @@ export default function WorkspacesPage() {
     if (!selectedWorkspace || !inviteEmail.trim()) {
       return Toast.fire({ icon: "warning", title: "Please enter an email" });
     }
-    const updated = await inviteMember(selectedWorkspace.id, inviteEmail, inviteRole);
+    const updated = await inviteMember(
+      selectedWorkspace.id,
+      inviteEmail,
+      inviteRole
+    );
     if (updated) {
       setInviteEmail("");
       setInviteRole("MEMBER");
       setShowInviteModal(false);
-      Toast.fire({ icon: "success", title: `Invitation sent to ${inviteEmail}` });
+      Toast.fire({
+        icon: "success",
+        title: `Invitation sent to ${inviteEmail}`,
+      });
       refreshWorkspaces();
     } else {
       Toast.fire({ icon: "error", title: "Error inviting member" });
@@ -163,7 +215,6 @@ export default function WorkspacesPage() {
     }
   };
 
-
   const handleChangeRole = async (memberId: string, newRole: string) => {
     if (!selectedWorkspace) return;
     const updated = await changeRole(selectedWorkspace.id, memberId, newRole);
@@ -187,6 +238,19 @@ export default function WorkspacesPage() {
   const openInvite = (workspace: Workspace) => {
     setSelectedWorkspace(workspace);
     setShowInviteModal(true);
+    setSearchTerm(""); // reset search
+  };
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+
+    const filtered = allUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(term.toLowerCase()) ||
+        user.email.toLowerCase().includes(term.toLowerCase())
+    );
+
+    setFilteredUsers(filtered);
   };
 
   // UI logic for color and viewMode remains unchanged
@@ -206,14 +270,15 @@ export default function WorkspacesPage() {
     await fetchWorkspaces(); // re-fetches from backend and updates state
   };
 
-
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-gray-50 to-gray-100">
       <div className="bg-white border-b border-gray-200 px-8 py-6">
-        <div className="max-w-7xl mx-auto">
+        <div className=" mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-extrabold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">Workspaces</h1>
+              <h1 className="text-3xl font-extrabold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+                Workspaces
+              </h1>
               <p className="text-gray-600 mt-1">
                 Manage and collaborate across multiple workspaces
               </p>
@@ -293,7 +358,7 @@ export default function WorkspacesPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto px-8 py-8 max-w-7xl mx-auto">
+      <div className="flex-1 overflow-auto px-8 py-8 mx-auto">
         {workspaces.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -380,11 +445,14 @@ export default function WorkspacesPage() {
                   <p className="text-gray-600 font-semibold text-xs mb-4 line-clamp-2">
                     Created At:{" "}
                     {workspace.createdAt
-                      ? new Date(workspace.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
+                      ? new Date(workspace.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )
                       : "N/A"}
                   </p>
 
@@ -403,13 +471,31 @@ export default function WorkspacesPage() {
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         />
                       </svg>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M4 7h16M4 7a2 2 0 012-2h12a2 2 0 012 2M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M9 11h6" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 7h16M4 7a2 2 0 012-2h12a2 2 0 012 2M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M9 11h6"
+                        />
                       </svg>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M3 17l6-6 4 4 8-8M3 21h18" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 17l6-6 4 4 8-8M3 21h18"
+                        />
                       </svg>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 font-semibold">
@@ -449,11 +535,11 @@ export default function WorkspacesPage() {
                     </div>
                     {workspace.role === "ADMIN" ||
                       (workspace.role === "OWNER" && (
-                        <button 
-                          onClick={() => openInvite(workspace)} 
-                          className="ml-3 px-4 py-2 text-sm font-bold text-white bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 rounded-md hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out hover:animate-none" 
-                        > 
-                          + Invite 
+                        <button
+                          onClick={() => openInvite(workspace)}
+                          className="ml-3 px-4 py-2 text-sm font-bold text-white bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 rounded-md hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out hover:animate-none"
+                        >
+                          + Invite
                         </button>
                       ))}
                   </div>
@@ -465,7 +551,7 @@ export default function WorkspacesPage() {
                         workspace.role === "OWNER" ||
                         workspace.role === "MEMBER"
                       ) {
-                        navigate(`/selected-workspace?id=${workspace.id}`)
+                        navigate(`/selected-workspace?id=${workspace.id}`);
                         Toast.fire({
                           icon: "info",
                           title: `Open workspace: ${workspace.name}`,
@@ -475,17 +561,17 @@ export default function WorkspacesPage() {
                     className="w-full px-6 py-3 font-bold text-white bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 rounded-lg shadow-lg hover:shadow-2xl hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 active:scale-98 transform transition-all duration-300 ease-out hover:scale-[1.02] border border-slate-600/50 hover:border-slate-500 relative overflow-hidden group"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      <svg 
-                        className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" 
-                        fill="none" 
-                        stroke="currentColor" 
+                      <svg
+                        className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
                         />
                       </svg>
                       Open {workspace.name}
@@ -651,7 +737,9 @@ export default function WorkspacesPage() {
                         {(member.name?.charAt(0) ?? "?").toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{member.name}</p>
+                        <p className="font-medium text-gray-900">
+                          {member.name}
+                        </p>
                         <p className="text-sm text-gray-600">{member.email}</p>
                       </div>
                     </div>
@@ -704,7 +792,6 @@ export default function WorkspacesPage() {
                   </div>
                 ))}
               </div>
-
             </div>
 
             <div className="border-t border-red-200 pt-6 mt-6">
@@ -751,16 +838,44 @@ export default function WorkspacesPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                  Search Users
                 </label>
                 <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="colleague@example.com"
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Search by name or email"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
               </div>
+
+              <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                {filteredUsers.map((user) => (
+                  <div
+                    key={user._id}
+                    className={`flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-100 ${
+                      inviteEmail === user.email ? "bg-gray-200" : ""
+                    }`}
+                    onClick={() => setInviteEmail(user.email)} // select user
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {user.roles.join(", ")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Role
@@ -772,11 +887,12 @@ export default function WorkspacesPage() {
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
-                  <option value="member">Member</option>
+                  <option value="MEMBER">Member</option>
                   <option value="ADMIN">Admin</option>
                 </select>
               </div>
             </div>
+
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowInviteModal(false)}
