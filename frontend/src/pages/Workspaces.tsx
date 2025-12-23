@@ -285,7 +285,7 @@ export default function WorkspacesPage() {
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 text-white rounded-lg hover:bg-gray-700 transition font-medium shadow-sm"
+              className="flex items-center gap-2 px-3 py-3 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 text-white rounded-lg hover:bg-gray-700 transition font-medium shadow-sm"
             >
               <svg
                 className="w-5 h-5"

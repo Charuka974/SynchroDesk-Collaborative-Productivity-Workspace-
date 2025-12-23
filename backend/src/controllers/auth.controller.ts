@@ -5,6 +5,10 @@ import { signAccessToken, signRefreshToken } from "../utils/tokens"
 import { AUthRequest } from "../middleware/auth"
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
+import { sendEmail } from "../utils/emails"
+import { forgotPasswordTemplate } from "../types/email/forgot-password-email"
+import { v4 as uuidv4 } from "uuid";
+
 dotenv.config()
 
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string
@@ -185,23 +189,74 @@ export const refreshToken = async (req: Request, res: Response) => {
 // Forgot password
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body
+    const { email } = req.body;
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email });
     if (!user) {
-      res.status(403).json({
-        message: "Email not Found "
-      })
-      return
+      return res.status(403).json({
+        message: "Email not found",
+      });
     }
 
-    
+    // Generate secure token
+    const token = uuidv4();
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+
+    const resetUrl = `http://localhost:5173/reset-password/${token}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your Synchro Desk password",
+      html: forgotPasswordTemplate({
+        name: user.name,
+        resetUrl,
+      }),
+    });
 
     res.status(200).json({
-      message: "Email sent to " + email,
-    })
+      message: "Password reset email sent",
+    });
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: "Internal server error" })
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: "Token and new password required" });
+    }
+
+    // Find user with matching token and unexpired
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }, // token not expired
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    // Clear reset token
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password has been reset successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

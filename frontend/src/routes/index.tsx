@@ -16,6 +16,7 @@ const Tasks = lazy(() => import("../pages/Tasks"))
 const Landing = lazy(() => import("../pages/Landing"))
 const ChatMessages = lazy(() => import("../pages/Chat"))
 const ManageProfile = lazy(() => import("../pages/ManageProfile"))
+const ResetPassword = lazy(() => import("../pages/ResetPassword"))
 
 
 
@@ -64,6 +65,8 @@ export default function Router() {
           {/* <Route path="/" element={<Index />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          
           <Route
             element={
               <RequireAuth>

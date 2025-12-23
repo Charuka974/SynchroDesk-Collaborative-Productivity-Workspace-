@@ -5,7 +5,8 @@ import {
   refreshToken,
   registerAdmin,
   registerUser,
-  forgotPassword
+  forgotPassword,
+  resetPassword
 } from "../controllers/auth.controller"
 import { authenticate } from "../middleware/auth"
 import { requireRole } from "../middleware/role"
@@ -23,6 +24,9 @@ router.post("/refresh", refreshToken)
 
 // forgot password
 router.post("/forgot-password", forgotPassword)
+
+// reset password
+router.post("/reset-password", resetPassword) 
 
 // register (ADMIN) - Admin only
 router.post(
