@@ -186,11 +186,11 @@ export default function ProfileManagement() {
   if (!profile) return null;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-4 sm:p-6">
+      <div className="mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent pb-3">Profile Settings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent pb-3">Profile Settings</h1>
           <p className="font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">Manage your account settings and preferences</p>
         </div>
 
@@ -211,7 +211,7 @@ export default function ProfileManagement() {
 
         {/* Tabs */}
         <div className="bg-white border-b border-gray-200 rounded-t-xl">
-          <div className="flex gap-1 px-6">
+          <div className="flex flex-wrap gap-1 px-3 sm:px-6">
             {[
               { id: "personal", label: "Personal Info", icon: User },
               { id: "security", label: "Security", icon: Lock },
@@ -244,7 +244,7 @@ export default function ProfileManagement() {
           {activeTab === "personal" && (
             <div className="space-y-6">
               {/* Avatar Section */}
-              <div className="flex items-center gap-6 pb-6 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6 pb-6 border-b border-gray-200">
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full bg-linear-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-3xl font-semibold overflow-hidden">
                     {avatarPreview ? (
@@ -258,7 +258,7 @@ export default function ProfileManagement() {
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                   </label>
                 </div>
-                <div>
+                <div className="text-center sm:text-left">
                   <h3 className="text-lg font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">{profile.name}</h3>
                   <p className="text-sm text-gray-600">{profile.email}</p>
                   <div className="flex items-center gap-3 mt-2">
@@ -276,7 +276,7 @@ export default function ProfileManagement() {
 
               {/* Form Fields */}
               <div className="space-y-4">
-                <div>
+                <div className="text-center sm:text-left">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                   <input
                     type="text"
@@ -296,7 +296,7 @@ export default function ProfileManagement() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
                     <div className="flex flex-wrap gap-2">
@@ -319,11 +319,11 @@ export default function ProfileManagement() {
               </div>
 
               {/* Save Button */}
-              <div className="flex justify-end pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:justify-end pt-4 border-t border-gray-200">
                 <button
                   onClick={handleSavePersonal}
                   disabled={isSaving}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 shadow-xl border-b border-slate-600 font-bold text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   <Save size={18} />
                   {isSaving ? "Saving..." : "Save Changes"}
@@ -423,7 +423,7 @@ export default function ProfileManagement() {
                             animate={{ opacity: 1, y: 0 }}
                             className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
                         >
-                            <div className="flex items-start justify-between">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                 <div className="w-12 h-12 bg-linear-to-br from-gray-400 to-gray-600 rounded-lg flex items-center justify-center text-white font-semibold">
@@ -438,7 +438,7 @@ export default function ProfileManagement() {
                                 </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 text-sm text-gray-600 ml-15">
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 ml-0 sm:ml-15">
                                 {/* ROLE */}
                                 <span className="inline-flex items-center gap-1">
                                     {getRoleIcon(myRole)}
@@ -488,7 +488,7 @@ export default function ProfileManagement() {
                     <Building2 size={48} className="mx-auto text-gray-300 mb-3" />
                     <p className="text-gray-600">You're not part of any workspaces yet</p>
                     <button 
-                    className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    className="mt-4 w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                     onClick={() => handleUserIdNavigation(user?._id?.toString() || "", "/workspaces")}
                     >
                       Create Workspace
