@@ -73,7 +73,7 @@ export default function SynchroDeskDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-3">
 
           {/* Left Column */}
-          <div className="space-y-6 h-[1200px] overflow-y-auto p-1">
+          <div className="space-y-6 max-h-[1200px] overflow-y-auto p-1">
             {/* Tasks Panel */}
             {/* <TaskPanel
               tasks={tasks}
@@ -85,7 +85,7 @@ export default function SynchroDeskDashboard() {
               refreshTasks={refreshTasks}
             /> */}
 
-            <div className="h-150 overflow-y-auto space-y-6 border shadow-xl border-gray-200 rounded-xl">
+            <div className="max-h-150 overflow-y-auto space-y-6 border shadow-xl border-gray-200 rounded-xl pb-5">
               <TaskProvider>
                 <DashboardTasks />
               </TaskProvider>
