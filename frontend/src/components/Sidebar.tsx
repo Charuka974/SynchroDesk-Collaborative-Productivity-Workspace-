@@ -166,7 +166,10 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
             <div className="bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 font-bold rounded-lg p-2 text-white shadow-lg">
               <h3 className="font-semibold mb-1">Upgrade to Pro</h3>
               <p className="text-xs text-gray-100 mb-3">Unlock unlimited tasks and more features</p>
-              <button className="w-full bg-white text-gray-900 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+              <button 
+                onClick={() => handleNavigation("/subscriptions")}
+                className="w-full bg-white text-gray-900 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
+              >
                 Upgrade Now
               </button>
             </div>
@@ -177,6 +180,7 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
         {isCollapsed && (
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
             <button 
+              onClick={() => handleNavigation("/subscriptions")}
               className="w-10 h-10 bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 border-b border-slate-600 font-bold text-white rounded-lg flex items-center justify-center hover:from-gray-900 hover:to-gray-700 transition shadow-lg"
               title="Upgrade to Pro"
             >
@@ -302,7 +306,10 @@ export default function Sidebar({ isCollapsed, onCollapseToggle }: SidebarProps)
           <div className="bg-linear-to-r from-gray-500 to-gray-600 rounded-lg p-2 text-white shadow-lg">
             <h3 className="font-semibold mb-1">Upgrade to Pro</h3>
             <p className="text-xs text-gray-100 mb-3">Unlock unlimited tasks and more features</p>
-            <button className="w-full bg-white text-gray-900 py-1 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+            <button 
+              onClick={() => handleNavigation("/subscriptions")}
+              className="w-full bg-white text-gray-900 py-1 rounded-lg text-sm font-semibold hover:bg-gray-100 transition"
+            >
               Upgrade Now
             </button>
           </div>

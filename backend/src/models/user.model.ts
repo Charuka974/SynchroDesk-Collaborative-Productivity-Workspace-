@@ -13,6 +13,13 @@ export enum Status {
   REJECTED = "REJECTED"
 }
 
+export enum UserSubscriptionPlan {
+  FREE = "FREE",
+  PREMIUM = "PREMIUM",
+  ENTERPRISE = "ENTERPRISE",
+}
+
+
 export interface IUSER extends Document {
   _id: mongoose.Types.ObjectId;        // Mongoose auto-generates this
   name: string;                   // required
@@ -25,7 +32,7 @@ export interface IUSER extends Document {
   lastLogin?: Date;                      // last login timestamp
   resetPasswordToken?: string;           // for password reset
   resetPasswordExpires?: Date;           // password reset token expiration
-  subscriptionPlan?: "FREE" | "PREMIUM"; // for Stripe / paid features
+  subscriptionPlan: UserSubscriptionPlan; // for Stripe / paid features
   createdAt?: Date;                      // auto-added by timestamps
   updatedAt?: Date;                      // auto-added by timestamps
 }
@@ -42,7 +49,11 @@ const userSchema = new Schema<IUSER>(
     lastLogin: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
-    subscriptionPlan: { type: String, enum: ['FREE', 'PREMIUM'], default: 'FREE' }
+    subscriptionPlan: {
+      type: String,
+      enum: Object.values(UserSubscriptionPlan),
+      default: UserSubscriptionPlan.FREE,
+    },
   },
   { timestamps: true }
 );

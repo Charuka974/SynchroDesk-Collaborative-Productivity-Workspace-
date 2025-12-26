@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export enum SubscriptionPlan {
   FREE = "FREE",
   PREMIUM = "PREMIUM",
+  ENTERPRISE = "ENTERPRISE",
 }
 
 export interface ISubscription extends Document {

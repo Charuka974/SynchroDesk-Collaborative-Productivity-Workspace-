@@ -17,6 +17,7 @@ const Landing = lazy(() => import("../pages/Landing"))
 const ChatMessages = lazy(() => import("../pages/Chat"))
 const ManageProfile = lazy(() => import("../pages/ManageProfile"))
 const ResetPassword = lazy(() => import("../pages/ResetPassword"))
+const Subscriptions = lazy(() => import("../pages/Subscriptions"))
 
 
 
@@ -117,6 +118,13 @@ export default function Router() {
                     <ManageProfile />
                   </UserProvider>
                 </WorkspaceProvider>
+              }
+            />
+
+            <Route
+              path="/subscriptions"
+              element={
+                <Subscriptions />
               }
             />
 

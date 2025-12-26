@@ -86,8 +86,7 @@ It combines task management, chat, notes, calendars, AI-powered features, and su
 - Chat summaries  
 - Note version history  
 - Multiple workspaces  
-- Gantt chart timeline  
-- Analytics & priority notifications  
+- Priority notifications  
 
 ---
 
@@ -192,8 +191,8 @@ synchro-desk-cpw/
 
 | Component | Platform |
 |-----------|---------|
-| Frontend  | Vercel / Netlify |
-| Backend   | Render / Railway |
+| Frontend  | Vercel |
+| Backend   | Render |
 | Database  | MongoDB Atlas |
 | Files     | Cloudinary |
 

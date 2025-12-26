@@ -21,6 +21,10 @@ export default function ProfileManagement() {
   const { user, refreshUser } = useUser();
   const navigate = useNavigate();
 
+  const handleNavigation = (navipath: string) => {
+    navigate(navipath);
+  };
+
   const handleUserIdNavigation = (userId: string, link: string) => {
     navigate(link, { state: { userId } });
   };
@@ -253,22 +257,48 @@ export default function ProfileManagement() {
                       profile.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <label className="absolute bottom-0 right-0 w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700 transition-colors shadow-lg">
+                  <label className="relative bottom-7 left-15 w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700 transition-colors shadow-lg">
                     <Camera size={16} className="text-white" />
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                   </label>
                 </div>
                 <div className="text-center sm:text-left">
-                  <h3 className="text-lg font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">{profile.name}</h3>
+                  <h3 className="text-lg font-semibold bg-linear-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+                    {profile.name}
+                  </h3>
                   <p className="text-sm text-gray-600">{profile.email}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    {/* {getStatusBadge(profile.approved)} */}
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      profile.subscriptionPlan === "PREMIUM" 
-                        ? "bg-linear-to-r from-yellow-400 to-orange-500 text-white" 
-                        : "bg-gray-100 text-gray-700"
-                    }`}>
-                      {profile.subscriptionPlan}
+                    <span
+                      onClick={() => handleNavigation("/subscriptions")}
+                      className={`group relative px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                        profile.subscriptionPlan === "FREE"
+                          ? "bg-linear-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300"
+                          : profile.subscriptionPlan === "PREMIUM"
+                          ? "bg-linear-to-r from-yellow-400 via-orange-400 to-orange-500 text-white hover:from-yellow-500 hover:via-orange-500 hover:to-orange-600 shadow-md shadow-orange-200"
+                          : profile.subscriptionPlan === "ENTERPRISE"
+                          ? "bg-linear-to-r from-blue-600 via-blue-700 to-blue-800 text-white hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 shadow-md shadow-blue-200"
+                          : "bg-linear-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300"
+                      }`}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        {profile.subscriptionPlan === "PREMIUM" && (
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        )}
+                        {profile.subscriptionPlan === "ENTERPRISE" && (
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        {profile.subscriptionPlan}
+                      </span>
+                      
+                      {/* Hover tooltip */}
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                        Click to manage plan
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></span>
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -276,7 +306,7 @@ export default function ProfileManagement() {
 
               {/* Form Fields */}
               <div className="space-y-4">
-                <div className="text-center sm:text-left">
+                <div className="sm:text-left">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                   <input
                     type="text"

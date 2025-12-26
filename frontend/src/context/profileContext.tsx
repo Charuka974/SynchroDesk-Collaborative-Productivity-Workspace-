@@ -18,7 +18,7 @@ export interface IUser {
   approved: Status;
   workspaceIds?: string[];
   lastLogin?: string;
-  subscriptionPlan?: "FREE" | "PREMIUM";
+  subscriptionPlan?: "FREE" | "PREMIUM" | "ENTERPRISE";
   createdAt?: string;
   updatedAt?: string;
 }

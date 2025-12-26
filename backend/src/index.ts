@@ -14,6 +14,7 @@ import userRouter from "./routes/users"
 import noteRouter from "./routes/notes"
 import eventRouter from "./routes/event"
 import notificationRouter from "./routes/notification"
+import subscriptionRoutes from "./routes/payment";
 
 import { authenticate } from "./middleware/auth"
 import { requireRole } from "./middleware/role"
@@ -47,6 +48,8 @@ app.use("/api/v1/users", authenticate, userRouter)
 app.use("/api/v1/notes", authenticate, noteRouter)
 app.use("/api/v1/events", authenticate, eventRouter)
 app.use("/api/v1/notifications", authenticate, notificationRouter)
+app.use("/api/v1/subscriptions", authenticate, subscriptionRoutes);
+
 
  
 
