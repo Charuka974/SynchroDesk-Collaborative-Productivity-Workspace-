@@ -28,6 +28,37 @@ It combines task management, chat, notes, calendars, AI-powered features, and su
 
 ---
 
+## 📸 Screenshots
+
+### Landing Page
+![Landing](./prt-sc-images/landing.png)
+
+### Login
+![Login](./prt-sc-images/login.png)
+
+### Register
+![Register](./prt-sc-images/register.png)
+
+### Dashboard
+![Dashboard](./prt-sc-images/dashboard.png)
+
+### Task Manager
+![Tasks](./prt-sc-images/tasks.png)
+
+### Chat
+![Chat](./prt-sc-images/chat.png)
+
+### Workspaces
+![Calendar](./prt-sc-images/workspaces.png)
+
+### Workspace
+![Notifications](./prt-sc-images/workspace.png)
+
+### AI Assistant
+![AI](./prt-sc-images/aiassistant.png)
+
+---
+
 ## 🎯 Project Objectives
 
 - Improve team collaboration and communication  
