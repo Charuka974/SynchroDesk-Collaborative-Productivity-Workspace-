@@ -1,17 +1,17 @@
-# 🌐 SynchroDesk – Collaborative Productivity Workspace (CPW)
+<h1 align="center">🌐 SynchroDesk – Collaborative Productivity Workspace (CPW)</h1>
 
-A MERN-based SaaS platform for personal productivity, team collaboration, and AI-powered workflows.
-
+<p align="center">
+  A MERN-based SaaS platform for personal productivity, team collaboration, and AI-powered workflows.
+</p>
 ---
 
 ## Badges
-![Platform](https://img.shields.io/badge/Platform-MERN-blue)
-![Status](https://img.shields.io/badge/Status-In%20Development-green)
-<!-- ![Payment](https://img.shields.io/badge/Payment-Stripe-626CD9) -->
-![AI](https://img.shields.io/badge/AI-OpenAI%20%7C%20Gemini-orange)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-
-
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-MERN-blue" />
+  <img src="https://img.shields.io/badge/Status-In%20Development-green" />
+  <img src="https://img.shields.io/badge/AI-OpenAI%20%7C%20Gemini-orange" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+</p>
 ---
 
 ## 📘 Project Summary
@@ -82,69 +82,142 @@ Access the deployed application using the links below:
 
 ## 🧱 Core Features (MVP)
 
-### Personal Dashboard
-- Today’s tasks, calendar, quick notes, team activity feed, prioritized tasks  
+### 🧭 Personal Dashboard
+- Overview of today’s tasks and priorities  
+- Integrated calendar and quick notes  
+- Team activity feed for real-time updates  
 
-### Advanced Task Manager
-- CRUD tasks, priority levels, tags/labels, due dates & reminders, comments  
-- Subtasks *(premium)*, Kanban drag-and-drop, file attachments *(premium)*  
+### 📝 Advanced Task Manager
+- Full CRUD operations for tasks  
+- Priority levels, tags/labels, due dates, and reminders  
+- Task comments for collaboration  
+- Kanban-style drag-and-drop boards  
+- Subtasks and file attachments *(Premium)*  
 
-### Team Communication Hub
-- Real-time chat using Socket.io, group channels, direct messages  
-- Typing indicator, online status, file sharing, AI chat summaries *(premium)*  
+### 💬 Team Communication Hub
+- Real-time messaging powered by Socket.io  
+- Group channels and direct messaging  
+- Typing indicators and online presence  
+- File sharing within chats  
+- AI-generated chat summaries *(Premium)*  
 
-### Notes & Knowledge Base
-- Rich-text editor (TipTap/Quill), Markdown support  
-- Folder organization, shareable notes, version history *(premium)*  
+### 📚 Notes & Knowledge Base
+- Rich-text editor using TipTap / Quill  
+- Markdown support for structured content  
+- Folder-based organization  
+- Shareable notes across teams  
+- Version history *(Premium)*  
 
-### Team Workspaces
-- Create multiple teams, invite members, workspace-specific tasks  
-- Role-based access (Owner/Admin/Member)  
+### 👥 Team Workspaces
+- Create and manage multiple workspaces  
+- Invite and manage team members  
+- Workspace-specific tasks and discussions  
+- Role-based access control (Owner / Admin / Member)  
 
-### Calendar & Scheduling
-- Monthly/weekly views, event creation, task deadlines, meeting scheduling, reminders  
+### 📆 Calendar & Scheduling
+- Monthly and weekly calendar views  
+- Event creation and task deadlines  
+- Meeting scheduling with reminders  
 
-### Notifications
-- Real-time alerts for tasks, messages, calendar events  
-- Push notifications *(optional PWA)*  
+### 🔔 Notifications
+- Real-time notifications for tasks, messages, and events  
+- Push notifications *(optional PWA support)*  
 
-### AI Assistant *(Premium)*
-- Summarize notes & chats, prioritize tasks, suggest subtasks  
-- Generate meeting minutes, smart search, auto-drafted announcements  
+### 🤖 AI Assistant *(Premium)*
+- Summarize notes and conversations  
+- Automatically prioritize tasks  
+- Suggest subtasks and workflows  
+- Generate meeting minutes and announcements  
+- Smart search across workspace content  
 
-### Subscription System (Stripe)
-- Free vs Premium plans  
-- Monthly/yearly billing, payment history, billing portal, auto-renewal  
+### 💳 Subscription System (Stripe)
+- Free and Premium subscription plans  
+- Monthly and yearly billing options  
+- Secure payment processing  
+- Billing history and customer portal  
+- Automatic subscription renewal  
 
 ---
 
 ## 🔥 Premium Features
 
-- AI assistant  
-- Subtasks & file attachments  
-- Chat summaries  
+- AI-powered productivity assistant  
+- Subtasks and file attachments  
+- AI-generated chat summaries  
 - Note version history  
-- Multiple workspaces  
-- Priority notifications  
+- Multiple team workspaces  
+- Priority notifications and alerts  
+
 
 ---
 
 ## 🧰 Tech Stack
 
-### Frontend
-- React.js, React Router, Redux Toolkit / Zustand  
-- TailwindCSS / Material UI, Axios, Socket.io Client  
-- FullCalendar, Stripe.js  
+### 💻 Frontend
 
-### Backend
-- Node.js, Express.js, MongoDB + Mongoose, Socket.io  
-- Stripe SDK, JWT, Multer, bcrypt  
+| Technology | Badge |
+|-----------|-------|
+| React.js | ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white) |
+| React Router | ![React Router](https://img.shields.io/badge/React_Router-CA4245?logo=react-router&logoColor=white) |
+| Redux Toolkit | ![Redux](https://img.shields.io/badge/Redux_Toolkit-764ABC?logo=redux&logoColor=white) |
+| Zustand | ![Zustand](https://img.shields.io/badge/Zustand-000000) |
+| TypeScript | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) |
+| Tailwind CSS | ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss&logoColor=white) |
+| Material UI | ![MUI](https://img.shields.io/badge/MUI-007FFF?logo=mui&logoColor=white) |
+| Axios | ![Axios](https://img.shields.io/badge/Axios-5A29E4) |
+| Socket.io Client | ![Socket.io](https://img.shields.io/badge/Socket.io-010101?logo=socket.io&logoColor=white) |
+| FullCalendar | ![FullCalendar](https://img.shields.io/badge/FullCalendar-3788D8) |
+| Stripe.js | ![Stripe](https://img.shields.io/badge/Stripe.js-626CD9?logo=stripe&logoColor=white) |
 
-### Database
-**MongoDB Atlas** with collections: users, tasks, notes, messages, workspaces, notifications, events, subscriptions  
+---
 
-### AI Integration
-- OpenAI API or Gemini API  
+### 🔧 Backend
+
+| Technology | Badge |
+|-----------|-------|
+| Node.js | ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white) |
+| Express.js | ![Express](https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=white) |
+| TypeScript | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) |
+| MongoDB | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white) |
+| Mongoose | ![Mongoose](https://img.shields.io/badge/Mongoose-880000) |
+| Socket.io | ![Socket.io](https://img.shields.io/badge/Socket.io-010101?logo=socket.io&logoColor=white) |
+| Stripe SDK | ![Stripe](https://img.shields.io/badge/Stripe_SDK-626CD9?logo=stripe&logoColor=white) |
+| JWT | ![JWT](https://img.shields.io/badge/JWT-000000?logo=jsonwebtokens&logoColor=white) |
+| Multer | ![Multer](https://img.shields.io/badge/Multer-FF6F00) |
+| bcrypt | ![bcrypt](https://img.shields.io/badge/bcrypt-4A4A4A) |
+
+---
+
+### 🗄️ Database
+
+| Technology | Badge |
+|-----------|-------|
+| MongoDB Atlas | ![MongoDB Atlas](https://img.shields.io/badge/MongoDB_Atlas-47A248?logo=mongodb&logoColor=white) |
+
+**Collections:**  
+`users`, `tasks`, `notes`, `messages`, `workspaces`, `notifications`, `events`, `subscriptions`
+
+---
+
+### 🤖 AI Integration
+
+| Service | Badge |
+|-------|-------|
+| OpenAI API | ![OpenAI](https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white) |
+| Gemini API | ![Gemini](https://img.shields.io/badge/Gemini-4285F4?logo=google&logoColor=white) |
+
+---
+
+### 🛠️ Tools & Platforms
+
+| Tool | Badge |
+|-----|-------|
+| Git | ![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white) |
+| Postman | ![Postman](https://img.shields.io/badge/Postman-FF6C37?logo=postman&logoColor=white) |
+| Vite | ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white) |
+| Vercel | ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white) |
+| Render | ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=white) |
+
 
 ---
 
