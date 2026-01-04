@@ -256,8 +256,12 @@ cd client
 npm install
 npm run dev
 
-⚙️ Environment Variables
+---
+
+### ⚙️ Environment Variables
+
 Backend (server/.env)
+
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
@@ -267,9 +271,12 @@ CLOUDINARY_API_SECRET=your_api_secret
 STRIPE_SECRET_KEY=your_stripe_secret
 
 Frontend (client/.env)
+
 VITE_API_BASE_URL=https://synchrodesk-cpw-backend.onrender.com
 
-💼 Final Deliverables
+---
+
+## 💼 Final Deliverables
 
 Full MERN SaaS application
 
@@ -285,17 +292,23 @@ GitHub repository with documentation
 
 Screenshots and demo-ready UI
 
-🌟 Author
+---
+
+## 🌟 Author
 
 Charuka Dev
 Full-stack Developer
 Focused on SaaS, AI, and cloud-based solutions
 
-👥 Contributors
+---
+
+## 👥 Contributors
 
 U. G. Charuka Hansaja – Full-stack Developer
 
-📄 License
+---
+
+## 📄 License
 
 This project is licensed under the MIT License.
 You are free to use, modify, and distribute this software with attribution.
