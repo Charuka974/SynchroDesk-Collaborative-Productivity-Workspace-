@@ -3,16 +3,14 @@
 <p align="center">
   A MERN-based SaaS platform for personal productivity, team collaboration, and AI-powered workflows.
 </p>
----
 
-## Badges
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-MERN-blue" />
   <img src="https://img.shields.io/badge/Status-In%20Development-green" />
   <img src="https://img.shields.io/badge/AI-OpenAI%20%7C%20Gemini-orange" />
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
 </p>
----
+
 
 ## 📘 Project Summary
 
