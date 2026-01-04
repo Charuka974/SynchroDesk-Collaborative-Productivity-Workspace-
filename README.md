@@ -9,6 +9,8 @@ A MERN-based SaaS platform for personal productivity, team collaboration, and AI
 ![Status](https://img.shields.io/badge/Status-In%20Development-green)
 <!-- ![Payment](https://img.shields.io/badge/Payment-Stripe-626CD9) -->
 ![AI](https://img.shields.io/badge/AI-OpenAI%20%7C%20Gemini-orange)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 
 ---
 
@@ -26,6 +28,11 @@ It combines task management, chat, notes, calendars, AI-powered features, and su
 🔗 [Click here to try it out](https://synchro-desk-cpw-frontend.vercel.app/login)
 
 
+## Frontend
+🔗 https://synchro-desk-cpw-frontend.vercel.app/
+---
+## Backend
+🔗 https://synchrodesk-cpw-backend.onrender.com/test-public
 ---
 
 ## 📸 Screenshots
@@ -158,37 +165,32 @@ Ah! I see what happened — the folder tree lost its formatting because Markdown
 ```markdown
 ## 🗂️ Folder Structure
 
-```
-
 synchro-desk-cpw/
 ├── client/
-│   ├── public/
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── redux/
-│       ├── hooks/
-│       ├── utils/
-│       └── styles/
+│ ├── public/
+│ └── src/
+│ ├── components/
+│ ├── pages/
+│ ├── redux/
+│ ├── hooks/
+│ ├── utils/
+│ └── styles/
 ├── server/
-│   └── src/
-│       ├── controllers/
-│       ├── models/
-│       ├── routes/
-│       ├── middleware/
-│       ├── utils/
-│       ├── config/
-│       └── sockets/
-├── node_modules/
+│ └── src/
+│ ├── controllers/
+│ ├── models/
+│ ├── routes/
+│ ├── middleware/
+│ ├── utils/
+│ ├── config/
+│ └── sockets/
 ├── .env
 ├── package.json
 └── README.md
 
-```
-```
 
 
----
+```
 
 ## 📅 Development Timeline
 
@@ -248,13 +250,24 @@ synchro-desk-cpw/
 cd server
 npm install
 npm run dev
+
 Frontend
-bash
-Copy code
 cd client
 npm install
 npm run dev
 
+---
+
+### 🔧 D. Add **Frontend Environment Variables (if any)**
+
+If your frontend uses env vars (e.g. API URL), add:
+
+```md
+Create a `.env` file in `client/`:
+
+VITE_API_BASE_URL=https://synchrodesk-cpw-backend.onrender.com
+
+---
 
 ⚙️ Environment Variables
 Create a .env file in server/ with the following:
@@ -272,3 +285,17 @@ STRIPE_SECRET_KEY=your_stripe_secret
 
 Charuka Dev – Full-stack Developer
 Focused on SaaS, AI, and cloud-based solutions.
+
+---
+
+👥 Contributors
+U.G.Charuka Hansaja - Full-stack Developer
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.  
+You are free to use, modify, and distribute this software with attribution.
+
+See the [LICENSE](./LICENSE) file for details.
