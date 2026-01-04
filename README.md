@@ -195,7 +195,7 @@ synchro-desk-cpw/
 
 ## 📅 Development Timeline
 
-**Week 1 – Core MVP**
+**Core MVP**
 1. Auth + DB setup  
 2. Dashboard + UI skeleton  
 3. Task manager + Kanban  
@@ -204,7 +204,7 @@ synchro-desk-cpw/
 6. Calendar + events  
 7. Notifications  
 
-**Week 2 – Premium & Production**
+**Premium & Production**
 - AI Assistant, file uploads, workspaces  
 - Stripe payments  
 - UI refinement  
