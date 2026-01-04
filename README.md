@@ -247,12 +247,11 @@ synchro-desk-cpw/
 ## 🧑‍💻 How to Run
 
 ### Backend
-```bash
 cd server
 npm install
 npm run dev
 
-Frontend
+### Frontend
 cd client
 npm install
 npm run dev
