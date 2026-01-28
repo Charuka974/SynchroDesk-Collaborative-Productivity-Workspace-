@@ -230,10 +230,6 @@ MongoDB Database
 
 Additional: Socket.io (real-time), Stripe (payments), Cloudinary (files), JWT (authentication)
 
----
-
-Ah! I see what happened — the folder tree lost its formatting because Markdown requires **triple backticks and proper indentation** for code blocks. Here's a clean, readable version for your README:
-
 ```markdown
 ## 🗂️ Folder Structure
 
